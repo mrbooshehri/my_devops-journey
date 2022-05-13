@@ -1,4 +1,5 @@
 # Session 1
+
 ## Installation
 
 ### Network time protocol and timezone
@@ -128,8 +129,6 @@ systemctl enable zabbix-sever zabbix-agent httpd rh-php72-php-fm
 firewall-cmd --add-port={10050/tcp,10051/tcp} --permanent
 firewall-cmd --reload
 ```
-
-
 ## Tips
 * ```epel-release```
 * ```centos-release-scl```
@@ -140,6 +139,7 @@ firewall-cmd --reload
 	rm -f /etc/httpd/conf.d/welcome.conf
 	```
 * Add ```KeepAlive on``` at the end of httpd.conf 
+
 # Session 2
 
 ## SELinux configuration
@@ -153,11 +153,11 @@ yum install policycoreutils-python
 grep zabbix_t /var/log/audit/audit.log | grep audit2allow -M zabbix_server_custom
 semodule -i zabbix_server_custom.pp
 systemctl restart httpd
-
 grep denied /var/log/audit/audit.log | grep audit2allow -M zabbix_server_custom
-
 ```
 
+**Note:** It's better to use zabbix proxy to reduce connections to
+zabbix server.
 
 ## Tips
 
@@ -167,6 +167,7 @@ want to login
 ```bash
 ssh-copy-id HOST@xxx.xxx.xxx.xxx
 ```
+
 # Session 3
 
 ### Check server and agent connection
@@ -175,20 +176,33 @@ ssh-copy-id HOST@xxx.xxx.xxx.xxx
 	 ICMP protocol is disable
 1. Telnet to check the port (10050, 10051)
 
-
 ### Add host to Zabbix
+
+Host is the device that you want to monitor it.
 
 1. Go to ```configuration ```section
 1. Click on ```crete host```
-1. Enter suitable host name - Host name must be uniqe, and it's a good
-	 practice to name your host hyphenized or in camel standard
-1. Enter suitable visible name if you need to
+1. Enter suitable host name
+	1. Host name must be uniqe, and it's a good
+	 practice to name your host hyphenized or in camel standard. 
+	 1. Hostname should be the same with the name you set in ```zabbix_agent.conf```
+1. Enter suitable visible name if you need to. It makes the host more
+	 understandable
 1. Chose/create sutiable host group
-1. Chose the protocol you want to connect to Zabbix agent
+	1. It's helpful in managing hosts 
+	1. In zabbix you cannot give direct host permission to a user but
+	 with the help of host group you can do this. 
+	 1. You can add multiple host group to a host
+	 1. Never add ```Templates/...``` in host group
+1. Chose the protocol you want to connect to Zabbix agent -
+	 IP/SNMP/JMX/IPMI
 1. Enter agent IP
 1. Click on add
 
 ### Add item to host
+
+Item is the thing that we want to monitor. The number of items that we
+want to monitor is important in allocating hardware resources.
 
 **Note:** Unless you don't add item for your host zabbix is not going to
 collect any data
@@ -199,14 +213,47 @@ collect any data
 1. Choose a suitable name
 1. Choose proper type
 1. Choose a proper key - key should be uniqe in this host only. 
+	1. Some keys have thier own stracture, for example ```icmppinglost```
+		 item under ```simple check``` type gives several input arguments
+1. Choose suitable ```type of information```
+	1. Numeric(unsigned) - Positive integer numbers
+	1. Float - Negative or floating point numbers
+	1. Character
+	1. Log
+	1. Text
+1. Enter proper unit in ```Units``` section
+	It just used for clarification purpose when you look at reports
+1. Select interval
+	1. ```Update interval```: It gets report every [1m, 1d, 1w, ...]
+	1. 
+1. 
 
 ### Setting trigger
 
 You can create custom trigger to notify certain situation.
 
+1. Under ```configuration``` selecet ```Hosts```, in front of your
+	 desire host, click on ```triggers```
+1. Click on ```create trigger```
+1. For name section it's a good practice to write a meaningful sentence
+	 for more clarification
+1. Choose proper severity
+1. Select ```add``` button under ```Expression``` section and choose
+	 proper expression
+	 1. If you don't enter a value for ```Last of (T)``` for ```Last()```
+			function, it would get the last single data by default. and also
+			you can set time limit, ```T```, to check the last value of
+			```T``` times ago
+1. Click on ```Expression constructor```
+1. Click on ```Add``` button
+
 **Note:** It's a better practice to set the trigger after you analyze
 the data you get from item and then write the best trigger for your case
 
+### Tips
+1. set/query hostname with ```hostnamectl```
+	1. to set ```hostnamectl set-hostname HOSTNAME```
+1. 
 
 # Session 4
 
