@@ -98,7 +98,7 @@ ServerTokens Prod
 KeepAlive On
 ```
 
-### Starting Apache wev service
+### Starting Apache web service
 
 ```bash
 systemctl start httpd
