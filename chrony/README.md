@@ -83,7 +83,7 @@ directive to the ```/etc/chrony.conf``` file in order to open the NTP port and a
 tcpdump -i INTERFACE_NAME port 123
 ```
 
-```Note```: After configuring both client and server, restart ```chronyd``` 
+**Note:** After configuring both client and server, restart ```chronyd``` 
 in them
 ```bash
 systemctl restart chronyd
