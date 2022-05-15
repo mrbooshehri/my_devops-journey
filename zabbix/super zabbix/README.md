@@ -225,8 +225,6 @@ collect any data
 	It just used for clarification purpose when you look at reports
 1. Select interval
 	1. ```Update interval```: It gets report every [1m, 1d, 1w, ...]
-	1. 
-1. 
 
 ### Setting trigger
 
@@ -248,31 +246,113 @@ You can create custom trigger to notify certain situation.
 1. Click on ```Add``` button
 
 **Note:** It's a better practice to set the trigger after you analyze
-the data you get from item and then write the best trigger for your case
+the data you get from item and then write the best trigger for your case. So before you 
+create a trigger you need to observe the return values form your desire item.
+
+### ```Last data``` section
+In this section you can get information about the latest data about each
+host. You can set various filters and selecet single or muliple host to
+its/thier graph
+
+### ```ACK``` section
+In this section you can leave message about the specific problem, change
+sensitivity, or even close the problem.
+
+### ```Overview``` section
+you can monitor all triggers and thier status for each agent in a table.
+
+### ```Tags``` section
+In ```Hosts``` section on each host, there is a ```host``` section where
+you can add a tag to server. 
+
+## ```Inventory``` section
+In this section you can enter all the useful information about the
+agent's machine like OS, type, or even contact number of people who are
+involved. 
+
+**Note:** Zabbix can also get some of the information
+automatically.
 
 ### Tips
 1. set/query hostname with ```hostnamectl```
 	1. to set ```hostnamectl set-hostname HOSTNAME```
-1. 
 
 # Session 4
 
-### Create public and private key for Zabbix user
+In each item you can get just one value, but in zabbix 5 and later you
+can define a master item then feed other items.
 
-Because the Zabbix user defined as nologin user in ```/etc/password```
-you should generate keys with the help of ```sudo```
+### ```SSH check``` another agentless check
 
+#### Create public and private key for Zabbix user
+
+1. First of all stop agent and server then generate your key.
+	```bash
+	systemctl stop zabbix-server
+	systemctl stop zabbix-agent
+
+	```
+1. Change ```zabbix``` home directory to store keys.
+	```bash
+	usermod -m -d /home/zabbix
+	mkdir /home/zabbix
+	chmod 700 /home/zabbix
+	```
+1. start both agent and server again
 ```bash
-sudo -u zabbix ssh-keygen -t rsa
+	systemctl start zabbix-server
+	systemctl start zabbix-agent
 ```
+1. Generate ssh key for ```zabbix``` user
+	```bash
+	sudo -u zabbix ssh-keygen -t rsa
+	# leave the passphrase EPTY
+	```
+1. To privent entering ssh passphrase each time use the following
+	 command:
+	 ```bash
+	 sudo -u zabbix ssh-copy-id root@IP_ADDRESS
+	 ```
+1. then in ```/etc/zabbix/zabbix_server.conf``` add the path of your
+	 keys(```SSHKey=```). 
 
-then in ```/etc/zabbix/zabbix_server.conf``` add the path of your keys.
-Now in item creation you can write execute scripts and they will run in
-the host.
+1. Go to ```items``` section
+	1. Create new item
+	1. Set item ```key``` to ```ssh.run```
+	1. Write your key between ```[]```
+	1. set authentication method to ```public key```
+	1. Enter ```root``` as username
+	1. Enter public key file value ```id_rsa.pub```
+	1. Enter private key file value ```id_rsa```
+	1. write your command in ```Execution script``` box
+
+**Note:** make sure to cheack ```/var/log/audit/aduit.log``` if you are
+using ```selinux```.
+
+### ```zabbix-agent.conf```
+- ```SourceIP=```: detrmine the ip address of the network adapter that
+	you wand to send data to server with it, in case of you have multiple
+	NICs.
+- ```AllowKey``` and ```DenyKey```: they are used for limiting the keys
+	on zabbix agent, for example you can deny some of default keys such as
+	```sys.run[*]```.
+- ```StartAgent```: It defines the number of zabbix agents as separate
+	processes to increase the performance. Best value is the range of 3-5.
+- ```HostnameItem```: Get host name from system and set it as the zabbix
+	hostname.
+- ```RefreshActiveCheck```: How often list of active checks is
+	refreshed.
+- ```BufferSend```: Size of data that zabbix agent keep in case of
+	disconnect from server.
+- ```Timeout```: in case of hang in infint situation it halt the process
+
+**Note:** by enabling ```EnableRemoteCommand``` and ```action```s you
+can run commands on agent 
 
 ### Active check vs passive
 
 Passive -> Server ask about a data from the agent
+
 Active -> Agent ask server which kind of data it wants, then send the
 data to the server
 
@@ -291,13 +371,10 @@ UserParameter=mysql.status,if [[ $systemctl is-active mariadb.service == active]
 **Note:** This practice is not common, instead you can put these hooks
 under ```/etc/zabbix/zabbix_agentd.d``` as seperate files.
 
-
 ### 	zabbix_get zabbix_sender
 ```bash
 yum install zabbix-get zabbix-sender
 ```
-
-
 
 # Session 5
 
