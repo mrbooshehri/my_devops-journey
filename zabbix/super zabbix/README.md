@@ -397,14 +397,34 @@ agent```, in this case we use linux, to start monitoring.
 
 # Session 5
 
-### Inventory auto collection
-1: 25
+## Use ```UserParameter=```
+You can write your own scripts in ```zabbix_agentd.cong``` or in
+```zabbix_agentd.d``` as separated files like ```SCRIPT_NAME.conf```.
+Your file content should follow this structure:
+```bash
+UserParameter=SCRIPT_KEY, SCRIPT
+```
+**Note:** Please don't forget to restart your zabbix agent to make the
+chages effect.
+```bash
+systemctl restart zabbix-agentd
+```
 
-Use ```UserParameter=```
+## Run script using Telnet
+First set type on ```telnet``` then enter your telnet user and password.
+For script part; remember you need to enter a one liner script, sprate
+commands with ```;``` and then put ```#``` at the new line.
 
-### Value mapping
+## Inventory automatic value input
+In each agent invetory section you can select ```Automatic``` option. it
+will get some of data accorting to the template it has and put them on the list.
+for example ```hostname``` and ```operating system``` in ```Zabbix agent
+for linux OS```
 
-### Monitroing with SNMP
+
+## Value mapping
+
+## Monitroing with SNMP
 
 ```bash
 yum install net-snmp net-snmp-utils
