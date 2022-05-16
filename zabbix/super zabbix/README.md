@@ -371,10 +371,29 @@ UserParameter=mysql.status,if [[ $systemctl is-active mariadb.service == active]
 **Note:** This practice is not common, instead you can put these hooks
 under ```/etc/zabbix/zabbix_agentd.d``` as seperate files.
 
-### 	zabbix_get zabbix_sender
+###	```zabbix_get``` and ```zabbix_sender``` 
+
+Install them with the folloing command
 ```bash
 yum install zabbix-get zabbix-sender
 ```
+you can get value from other agents over terminal like
+```bash
+zabbix_get -s HOSTNAME_OR_IP -k ITEM_KEY
+```
+There are some predefined keys like ```agent.ping``` which you can use
+in previous command
+
+**Note:** Please consider that you need to open ```10050/tcp``` port on
+the machine you want to get data from
+
+```bash
+firewall-cmd --add-port=10050/tcp --permanent
+firewall-cmd --reload
+```
+### Zabbix agetn template
+In the host configuration you need to add ```Template OS Linux by zabbix
+agent```, in this case we use linux, to start monitoring.
 
 # Session 5
 
