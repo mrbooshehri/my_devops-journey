@@ -513,8 +513,8 @@ want to monitor via SNMP, head over to the official documentation of
 that device. Also you can list all the SNMP Values without resolving
 theier name by the following command:
 ```bash
-snmpwalk -v 2c -c YOUR_CUMMUNITY_PASSWORD -O n SERVER_IP ```
-
+snmpwalk -v 2c -c YOUR_CUMMUNITY_PASSWORD -O n SERVER_IP 
+```
 **Note:** You can download any MIB file that is not exist on your server
 and put the file on server and also on your agent.
 
