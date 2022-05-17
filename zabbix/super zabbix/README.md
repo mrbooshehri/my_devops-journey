@@ -415,23 +415,118 @@ First set type on ```telnet``` then enter your telnet user and password.
 For script part; remember you need to enter a one liner script, sprate
 commands with ```;``` and then put ```#``` at the new line.
 
-## Inventory automatic value input
+## Inventory auto collection
 In each agent invetory section you can select ```Automatic``` option. it
 will get some of data accorting to the template it has and put them on the list.
 for example ```hostname``` and ```operating system``` in ```Zabbix agent
 for linux OS```
 
+You can set your custom items return value as inventory automatice
+input feild. You just need to specify the ```Populate host inventory
+filed``` when you're adding an item, in ```create item``` page.
+
+## Time Intervals
+In ```Create item``` page you can set an interval to get data from
+zabbix agent on regular sequence. In this method you cannot set the
+start time. If you want to get information in specific times, for
+example 20:00, 20:30, and etc. , you should use ```Custom
+Intervals```.
+```Update Interval``` is a mandatory option in itrem creation time, if
+you want to use ```Custom Intervals``` instead, you need to set the
+```Update Interval``` to ```0``` to prevent any interval collision.
+
+### Custom interval
+* Flexible:
+	* Interval: It's exactly as the same as ```Update Interval```
+	* Period: It defines the time period which ```Interval``` iterates in
+		it. It's like ```1-7,8:00-23:59``` which means from Monday to
+		Saturday, from 8:00 AM to 23:59 PM
+	* You can set multiple itervals. If some interval overlap, the
+		Smallest one will iterate.
+
+* Scheduling: It's something close to cron jobs. It works based on
+	filters which should write in specific order ```mdwdhms```. filters list:
+	* ```md```: Month day - valid values 1-31
+	* wd: Week day - valid values 1-7
+	* h: hours
+	* m: minuts
+	* s: seconds
+
+**Note:** You can define time steps in your time scheduling, for example
+```md1-31/1``` works on from 1 to 31 of a month every other day. It
+works for other filters as well.
+**Note:** If you don't choose Specific time it works on ```00:00:00```.
+**Note:** ```wd6``` means iterate only on Saturdays.
+
+## Storage period
+* History storage period: It's the exact data.
+* Trend storage period: It's stores a compact version of data. It
+	collects data overy hour and stores min, max, and average values.
 
 ## Value mapping
+With this option you can make alias for item value. For example if the
+item returns 0 or 1, you can specify miningful alias. You can define
+your value maps in ```value mapping``` under
+```Administration/General``` section.
 
-## Monitroing with SNMP
+## Application Name
+You can specify your item as an application by name it in ```New
+application``` or choose it form ```Applications``` list.
+
+## Monitroing via SNMP agent
+
+SNMP has different versions, V1 is not perfered because it doesn't have
+any security mechanism, V2 use communitiy key as the security suloution,
+default community key is ```public```. V3 has propare security solution,
+uses ssl encryption.
+
+SNMP almost used in type of devices which they don't support zabbix
+agent or don't have OS like, switches, routers, servers, rack door's
+sensor, and etc.
+
+install snmp requirements on zabbix agent and server
 
 ```bash
-yum install net-snmp net-snmp-utils
+yum install net-snmp net-snmp-utils 
 ```
-config file
+
+you need to make some changes in config file under ``` vim
+/etc/snmp/snmpd.conf```.
+
 ```bash
-vim /etc/snmp/snmpd.conf
+com2sec	notConfigUser	default	YOUR_CUMMUNITY_PASSWORD
+# line 56
+	name	inc/exc	subtree
+view	systemview	included	.1
 ```
+then you need to enable and start SNMP service
+```bash
+systemctl enable snmpd
+systemctl start snmpd
+```
+to list all avialable SNMP values you can use this command
+```bash
+snmpwalk -v 2c -c YOUR_CUMMUNITY_PASSWORD SERVER_IP
+```
+to get more information about ```MIB.OID.UID```  of the device that you
+want to monitor via SNMP, head over to the official documentation of
+that device. Also you can list all the SNMP Values without resolving
+theier name by the following command:
+```bash
+snmpwalk -v 2c -c YOUR_CUMMUNITY_PASSWORD -O n SERVER_IP ```
 
+**Note:** You can download any MIB file that is not exist on your server
+and put the file on server and also on your agent.
 
+**Note:** Don't forget to open ```SNMP``` port in firewall.
+```bash
+firewall-cmd --add-port=161/udp --permanent
+firewall-cmd --reload
+```
+### Setup SNMP on zabbix UI
+In host configuration section add new interface and set it on ```SNMP```
+and choose version 2, then add ```SNMPv2``` in templates
+
+## Macros **(Read more on zabbix official website)**
+Macros are kind of variable which helps to map values securely to name.
+Macro format is like ```{$MACRO_NAME}```
