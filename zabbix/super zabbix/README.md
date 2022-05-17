@@ -494,10 +494,12 @@ you need to make some changes in config file under ``` vim
 /etc/snmp/snmpd.conf```.
 
 ```bash
+...
 com2sec	notConfigUser	default	YOUR_CUMMUNITY_PASSWORD
-# line 56
-	name	inc/exc	subtree
+...
+			name				inc/exc		subtree
 view	systemview	included	.1
+...
 ```
 then you need to enable and start SNMP service
 ```bash
@@ -530,3 +532,5 @@ and choose version 2, then add ```SNMPv2``` in templates
 ## Macros **(Read more on zabbix official website)**
 Macros are kind of variable which helps to map values securely to name.
 Macro format is like ```{$MACRO_NAME}```
+
+# Session 6
