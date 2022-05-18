@@ -567,3 +567,25 @@ graphs to it to display.
 Under ```screen``` section you can click on ```screen``` hyperlink in
 top right of the page then select slideshow and make one there.
 
+## Maps
+It helps in several manner take for example, making a diagram from our
+network.
+
+### Creating new map
+
+In ```Map``` section click on ```create map``` button then enter the
+required information.
+
+## Trigers
+
+### Expression functions
+
+1. ```last()```
+1. ```Abschange()```
+1. ```avg(a,b)```  - ```a``` can be time or count, ```b``` is timeshift,
+	 it mean ```b``` times earlier
+1. ```change()```
+1. ```count()``` - ```T``` is past time, ```V```is given value and ```O``` is operator. Valid operators, ```O```s are {eq, ne, gt, ge, lt, le, like, band, iregexp, regexp}
+1. 
+
+# Session 8
