@@ -581,11 +581,25 @@ required information.
 ### Expression functions
 
 1. ```last()```
-1. ```Abschange()```
+1. ```abschange()```
 1. ```avg(a,b)```  - ```a``` can be time or count, ```b``` is timeshift,
-	 it mean ```b``` times earlier
+	 it means ```b``` times earlier
 1. ```change()```
-1. ```count()``` - ```T``` is past time, ```V```is given value and ```O``` is operator. Valid operators, ```O```s are {eq, ne, gt, ge, lt, le, like, band, iregexp, regexp}
-1. 
+1. ```count()``` - ```T``` is past time, ```V```is given value and
+	 ```O``` is operator. Valid operators, ```O```s are
+	  {eq, ne, gt, ge, lt, le, like, band, iregexp, regexp}
+1. ```date()``` - if useful in combinational expressions. Valid date
+	 format ```YYYYMMDD```
+1. ```dayofmounth()```
+1. ```diff()``` 
+1. ```fuzzytime()```
+1. ```max()```
+1. ```nodata()```
+1. ```now()```
+1. ```sum()```
+1. ```time()``` - Valid time format ```HHMMSS```
+
+**Note:** Be aware of **False-Posetive** and **False-Negative**
+expression errors.
 
 # Session 8
