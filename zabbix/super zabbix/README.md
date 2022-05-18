@@ -484,7 +484,8 @@ SNMP almost used in type of devices which they don't support zabbix
 agent or don't have OS like, switches, routers, servers, rack door's
 sensor, and etc.
 
-install snmp requirements on zabbix agent and server
+install SNMP client on zabbix server. the following package is used for
+SNMP server and client.
 
 ```bash
 yum install net-snmp net-snmp-utils 
@@ -534,3 +535,35 @@ Macros are kind of variable which helps to map values securely to name.
 Macro format is like ```{$MACRO_NAME}```
 
 # Session 6
+
+## Adding ```SNMP``` item
+
+In item creation set the agent type on ```SNMP Agent```, then you need
+to choose a propare key, for example
+```snmp.system.mac.address.enp0s3```. Then enter your desired SNMP OID.
+The rest of the configuration is the same as previous
+
+# Session 7
+
+In ```Latest data``` section you can select multiple items and display
+them as a grph form the bottom of the list.
+
+## Custom Graph
+Each hosts can has its own custom grapgh. Under ```Configuration >
+Hosts```, in fron of each host there is a ```graph``` section which you
+can define your custom graphs there.
+
+## Screens
+In zabbix you can display multiple graphs as a slidshow. It cloud be
+find under ```Monitoring``` section.
+
+In ```create screen``` section you can define size of the screen (number
+of row and columns), also you can set access permissions to the screen.
+After you defined your screen you need to construct it and add some
+graphs to it to display.
+
+### Sliedshows
+
+Under ```screen``` section you can click on ```screen``` hyperlink in
+top right of the page then select slideshow and make one there.
+
