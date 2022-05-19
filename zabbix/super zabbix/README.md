@@ -598,8 +598,127 @@ required information.
 1. ```now()```
 1. ```sum()```
 1. ```time()``` - Valid time format ```HHMMSS```
+1. ```band()``` - Find out if a received value is even or odd is an
+	 example this function.
+1. ```percentile``` - It gets Persentage of values ot ```T``` times ago
+	 and check thme with the condition. For example it 75% of the data of
+	 30 minutes ago are less than 10 fires a trigger
 
 **Note:** Be aware of **False-Posetive** and **False-Negative**
 expression errors.
 
 # Session 8
+
+## Triggers
+
+In expression section you can compare two variable with eachoter instead
+of comparing them with just a number. 
+```bash
+host1.tcp.listen[80].last()=host1.tcp.listen[80].avg(5,10)
+
+## Prediction and Forecasting
+
+There is an official article on Zabbix website about this section but
+here we just want to check perdefined functions. [here](https://www.zabbix.com/documentation/5.0/assets/en/manual/config/triggers/prediction_docs.pdf)
+
+Zabbix has two main functions for forecasting:
+* ```timeleft()```
+	* ```Last of T```: Means, last ```T``` times ago. For example
+		```30m``` means 30 minutes ago.
+	* ```Time Shift```: It's a step for previous value for example if you
+		consider ```1d``` for time shift, zabbix will get the data of last
+		30 minutes in, according to current time, for a day ago
+	* ```Threshold```: The value that we are sensitive to it
+	* ```fit```: It's the mathematical model - linear, ploynomialN,
+		exponensial, logaritmic, power - which you chose to predice
+		your dataset. You can left this field empty.
+
+**Example:**
+
+The following expression will fire a trigger when there is only one day
+left to host fs size reach to 10GB. The expression forcast the data of
+last 30 minutes of today with the exact time for a day ago considering
+10GB as its threshold.
+```bash
+{host:vfs.fs.size[/,used].timeleft(30m,1d,1000000000)}<1d
+```
+* ```forecast()```
+	* ```Last of T```: Means, last ```T``` times ago. For example
+		```30m``` means 30 minutes ago.
+	* ```Time Shift```: It's a step for previous value for example if you
+		consider ```1d``` for time shift, zabbix will get the data of last
+		30 minutes in, according to current time, for a day ago
+	* ```Time```: The next t times
+
+**Example:**
+
+The following expression will fire a trigger if the disk space of one
+hour later be more than 10GB according to the disk space values of 30
+minutes ago.
+
+```bash
+{host:vfs.fs.size[/,used].forecast(30m,1h,polynomial)}>1000000000
+```
+### Ok Event Generation
+
+There are three types os Expression in this section:
+1. Expression
+1. Recovery Expression
+1. None
+
+#### Recovery Expression
+As well as we can set triggers for problem and disaster situations, we
+can also defined recovery expression, which means if the condition, the
+one we define in recovery expression, is true the situation is ok and
+the disaster trigger will remove automatically.
+
+Attention to the following example:
+
+we want to fire a trigger if disk space is more than 10GB and remove
+this trigger automatically if the disk space is less than 8GB.
+
+**Disaster expression**
+
+```bash
+{host:vfs.fs.size[/,used].forecast(30m,1h,polynomial)}>1000000000
+```
+
+**Recovery expression**
+
+```bash
+{host:vfs.fs.size[/,used].forecast(30m,1h,polynomial)}<800000000
+```
+
+## Tags
+It helps in event correlation, do action on hosted which has the same
+tag or better to say there is correlation between them.
+
+## Dependences
+In this section we cam make dependencies between triggers. For example
+there are two triggers, ```A```  and ```B``` and the trigger ```B```
+depends on ```A```. If we define this dependency chain in the trigger
+section, it will helps us to have a cleaner overview tab. Because zabbix
+does not fire trigger for the triggers that are lower in the hierarchy.
+
+**Real-life Example:**
+
+We are monitoring a router and a server at the same time and defined a
+dependecy chain between them. So each time the router goes down zabbix
+just fire a trigger for router not for both of them.
+
+## Event correlation
+It's under ```configuration``` section. It's simillar to dependecy with
+a big diffrence, dependecy will not show the dependet triggers but
+correlation will close the triggers.
+
+For making correlation you need to defind a relationship between your
+tags, for example ```old event tag name``` AndOr ```new event tag
+name```, thne set the operation in ```operations``` tab.
+
+
+## Templates
+Templates help us to define items, application name, trigger, screen,
+graph, and etc. once and then use them in our hosts. There are a lot of
+predefined templates in zabbix and much more on ```share``` section. To
+add your downloaded template to zabbix just go to ```Templates```
+section then import the downloaded file.
