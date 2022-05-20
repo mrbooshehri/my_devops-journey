@@ -615,7 +615,7 @@ In expression section you can compare two variable with eachoter instead
 of comparing them with just a number. 
 ```bash
 host1.tcp.listen[80].last()=host1.tcp.listen[80].avg(5,10)
-
+```
 ## Prediction and Forecasting
 
 There is an official article on Zabbix website about this section but
@@ -722,3 +722,50 @@ graph, and etc. once and then use them in our hosts. There are a lot of
 predefined templates in zabbix and much more on ```share``` section. To
 add your downloaded template to zabbix just go to ```Templates```
 section then import the downloaded file.
+
+### Nested Templates
+Sometimes we can add other templates in our template. Our template could
+contain only ```linked templates```, like zabbix ```Template OS Linux
+serve by Zabbix agent``` official template.
+
+## Macro
+Macros are equivalent to variablesin Zabbix. Macros define in
+```Hosts``` or ```Templates``` There are two types of Macros.
+
+1. System Macro: The Macros that defined by Zabbix
+1. User Macro: The Macros that define by user
+
+Valid macro format is like ```{$VARIABLE_NAME}```. It's better practice
+to name your macros in capital letters.
+
+* You can store Macro's value as a plane text or secret text
+* You cam use macros almost anywhere you want, Name field, Expression,
+	and etc.
+
+## ```http agent```
+It's a useful agent that helps you post, get, and etc. to a dynamic URL
+you can also have request body, headers, response code, and etc.
+
+## Tips
+### Get Aapache status
+Just add the following lines in your Aapache config then reload it's
+daemon. Apache confing file location ```/etc/httpd/conf/httpd.conf```
+```bash
+<Location "/server-status">
+	SetHandler server-status
+	Deny from All
+	Allow from IP_ADRESS_YOU_WANT_TO_ACCESS
+<Location>
+```
+### User Hostname in item title
+With the help of macros you can wtire a general item for all hosts in
+the name field like, ```Agent in not available on {$HOST.NAME}```. This
+helps us to have an understanable title, sending error via messege or
+Telegram.
+
+### Operational data
+If you want to opertational data in dashboard terminal, you should
+define it in item configuration in ```operational data``` field.
+```{#ITEM.VALUE}``` could be candidate for this field.
+
+# Session 9
