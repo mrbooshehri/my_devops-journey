@@ -447,10 +447,10 @@ you want to use ```Custom Intervals``` instead, you need to set the
 * Scheduling: It's something close to cron jobs. It works based on
 	filters which should write in specific order ```mdwdhms```. filters list:
 	* ```md```: Month day - valid values 1-31
-	* wd: Week day - valid values 1-7
-	* h: hours
-	* m: minuts
-	* s: seconds
+	* ```wd```: Week day - valid values 1-7
+	* ```h```: hours
+	* ```m```: minuts
+	* ```s```: seconds
 
 **Note:** You can define time steps in your time scheduling, for example
 ```md1-31/1``` works on from 1 to 31 of a month every other day. It
