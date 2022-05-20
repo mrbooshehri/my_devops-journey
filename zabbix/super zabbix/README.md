@@ -769,3 +769,106 @@ define it in item configuration in ```operational data``` field.
 ```{#ITEM.VALUE}``` could be candidate for this field.
 
 # Session 9
+
+## Web monitoring
+You can monitor a website with this feature with the help of scenarios
+and steps.
+
+### Web Scenario:
+In this section you need to enter the basic information such as name,
+application, intervals, variables, and headers.
+
+### Wep steps
+Here you should break down your web browsing scenario into steps.
+Consider a situation you need to login to a website. The folloing steps
+should be defined to login to the website:
+1. Load the website
+1. Find login button/link and click on it
+1. Check we are in the right page
+1. Enter username and password in the propare place
+1. press login button
+1. check we are in the right page
+
+**Note:** In add step modal for ```Post field``` values, you need to
+inspect elemet of the login page and check the source code of the page
+and find the relevant field and take its name.
+
+## Scripts
+Scripts are another agentless monitoring method. There are two methods
+to monitor with scripts:
+
+### External check
+These type of scripts are defined on a path on server/proxy. In the
+```zabbix_server.conf``` the defualt value is
+```ExternalScripts=/usr/lib/zabbix/externalscripts```, you can put your
+scripts there and make it executable, also make the ownership of it to
+```zabbix```. To use your scrip, in add item page select item type on
+```External chck``` and for key value just enter the script name. If
+your script has input argument you have to pass them between ```[]```
+like ```MY_SCRIPTS[P1,P2,...]```. For making this flow more dynamic you
+can define script based items in templates and pass macros as thier
+input parameter like, in item template ```MY_SCRIPT[{$SERVICE_NAME},
+{$PORT}]```, then in each host under macro section define sutable macro.
+**(Super zabbix session 9 2:50)**
+
+**Note:** If you want to use input arguments in zabbix agent in ```UserParameter``` you
+should add a ```*``` between brackets like:
+```bash
+UserParameter=KEY[*], COMMAND $1 | COMMAND $2 ,...
+```
+
+### Zabbix trapper
+In this type you can witre your script in any languages and palce it
+where ever you want. Implanting this type has two sides:
+1. Creating an item on zabbix server with type ```zabbix trapper``` and
+	 a unique key
+1. Write your script on the zabbxi agnet side and make it executable.
+	 and send the scritp result to the server with the following command:
+	 ```bash
+	 zabbix_sender -z ZABBIX_SERVER/PROXY_IP -p 10051 -s
+	 HOSTNAME_ON_ZABBIX_SERVER -k KEY -o VALUE
+	 ```
+	 **Note:** ```KEY``` is the one you set in zabbix item, ```VALUE``` is the one
+	 you want to send to zabbix
+
+It's a good practice to put the ```zabbix_sender``` command into your
+script like:
+
+```bash
+#!/bin/bash
+status_code=$(systemctl is-active mariadb | grep -c ^active)
+zabbix_sender -z 192.168.100.2 -p 10050 -s mariadb.host -k
+mysql.status.check -o "$status_code"
+```
+
+**Note:** To prevent run dangerous commands like ```rm```, it's a good
+practice to add a user without root privilege and with ```nologin```
+shell, like:
+```bash
+useradd scriptrunner
+usermode -s /sbin/nologin scriptrunner
+```
+
+To run the script periodically, put it in cron tab, like:
+```bash
+sudo -u scriptrunner cronta	-e
+```
+in crontab add the folloing line to run the script every 5 minuts:
+```bash
+*/5 * * * *	SCRIPT_PATH
+```
+
+You can use [this](cronmaker.com) website to calculate cron rule easily.
+
+**Note:** To prevent getting garbage value on you ```zabbix traper```,
+you can strict the item, in item configuration/creation, by ```Allowed
+hosts```, by this rule zabbix server only get values from specific
+hosts(by ip).
+
+## Tips 
+1. Install ```fail2man``` to prevent DOS and DDOS attacks
+1. Once you produced ```FILE_NAME.pp``` with ```allo2audit```, for your
+	 specific demand, you can store it somewhere and use it as
+	 ```semodule``` input parameter input parameter 
+
+# Session 10
