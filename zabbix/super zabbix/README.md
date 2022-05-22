@@ -877,3 +877,67 @@ hosts(by ip).
 
 ## ODBC
 
+ODBC is a third-party package which it allows the OS to connect directly
+to the database and search queries on database. To monitor data on
+zabbix we need to install ODBC package on zabbix server.
+
+### Intsall ODBC on zabbix server
+```bash
+yum -y install unixODBC unixODBC-devel
+```
+
+ODBC package will make two files for us that we need to config them
+before ues the package, but first we need to make sure the MYSQL
+connector packe for ODBC, ```mysql-connector-odbc``` is installed. You
+can search for other databases with the following command:
+```bash
+yum search odbc | grep DB_NAME
+```
+
+Che the folloing file and make sure related libraries for your case is
+available on your system.
+```bash
+vim /etc/odbsinst.ini
+```
+Create/Edit ```odbc.ini``` file under ```/etc``` and enter the
+information of the database you want to connect.
+
+```bash
+[Target_server]
+Description = MySQL database 1
+Driver = MySQL
+Port = 3306
+Server = 192.168.100.43
+User = zabbix
+Password = zabbix
+Database = application
+```
+
+**Note:** ```Driver``` value should be the same as defined in
+```/etc/odbcinst.ini```
+
+**Note:** Please consider the ```User```, ```Password```, and
+```Database``` you have input in ```/etc/odbc.ini```, **are NOT related
+to zabbix database**. They're just credential information for the
+database you want to monitor
+
+On the database server open the related port on the firewall:
+```bash
+firewall-cmd --add-port=3306/tcp --permanent
+firewall-cmd --reload
+```
+
+Now we can check ODBC with the folloing command:
+```bash
+isql Target_server
+```
+
+**Note:** ```mariadb``` my not work with older version of odbs
+connectors in case of error, try to install it from source 
+if it is not available on the official repository. If you install it
+from source make a soft link to related library if it's not exits:
+```bash
+ln -s /usr/lib64/libmyodbc5w.so /uer/lib64/libmyodbc5.so
+```
+
+
