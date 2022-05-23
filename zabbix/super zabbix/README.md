@@ -940,4 +940,72 @@ from source make a soft link to related library if it's not exits:
 ln -s /usr/lib64/libmyodbc5w.so /uer/lib64/libmyodbc5.so
 ```
 
+### Configture ODBC item
 
+### Configture ODBC item
+
+1. Choose ```Database monitor``` as its type
+1. Select the propar key
+	1. ```db.odbc.select``` - it can return a single item of a row in
+		 the database table
+	1. ```db.odbc.get``` - it can get all the data, including rows, and
+		 trun it to json. You can use it as master item and feed dependent
+		 items with it. This function is useful for those type of databases
+		 that has limit on the number of sessions you can establish with the
+		 database.
+	1. for both type of keys:
+		* enter a uniqe description - it's mandatory
+		* for ```dsn```, enter ther database name you had enter in
+			```odbc.ini```
+		* You can skip the last argument, ```conncetion string```, and
+			remove it
+1. If you have username and password in your ```odbc.ini```, you don't
+	 need to write them in the ```username``` and ```password``` field
+	 respectively. If You want to stoer usename and password in the item
+	 you can use the macros to store the password as a
+	 secret text value for more security.
+
+**Note:** Each database connection happens three times for a single
+request:
+	1. For login and authentication
+	1. For executing your query
+	1. For logout, disconnecting form the database
+
+**Note:** You can add ```simple change``` type in preproccessing in each
+item to check the number of values which came to server in last 5
+minutes. **CHEACK IT ONLINE**
+
+## ```Calculated``` item type
+You can monitor events by calculating specific value in specific host
+in any host itm.
+1. Select ```calculated``` as item type
+1. Enter a key
+1. Write the following formula format
+	```bash
+	func(<key|hostname:key,parameter1,parameter12,,,,)
+	```
+	* func - all types of function we had in triggers like, last, min,
+		max, avg, count, and etc.
+	* The above formula is meaningless, becase there is no arithmatic
+		operation performed on it.
+
+## Prediction graphs
+
+1. Create an item an choose ```calculeted``` as its type
+1. Assgin a proper key to it
+1. Write a formula like this:
+	```bash
+	forecast(sec|count, <time_shift>, time, <fit>, <model>)
+
+**Note:** If you want to compare perdicted value with the current real
+value, you need to create another calculated item and use the  previous predicet
+calculated item in the new one as ```last()``` function paramter, then
+with the help of time step of ```last()``` function overlap the
+prediceted value and real value.
+
+**Note:** Please consider you can use all predict models in as different
+items and check which one is close to reality, but it's a very better
+practice to get some knowledge about each one and their usecases.
+	```
+## Descovery
+3:32:29
