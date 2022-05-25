@@ -1061,3 +1061,4 @@ discovery all we create everything dynamically
 
 ## Network discovery
 
+# Session 11
