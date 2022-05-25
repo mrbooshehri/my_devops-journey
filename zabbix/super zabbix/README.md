@@ -417,7 +417,7 @@ commands with ```;``` and then put ```#``` at the new line.
 
 ## Inventory auto collection
 In each agent invetory section you can select ```Automatic``` option. it
-will get some of data accorting to the template it has and put them on the list.
+will get some of data according to the template it has and put them on the list.
 for example ```hostname``` and ```operating system``` in ```Zabbix agent
 for linux OS```
 
@@ -1007,5 +1007,57 @@ prediceted value and real value.
 items and check which one is close to reality, but it's a very better
 practice to get some knowledge about each one and their usecases.
 	```
+
 ## Descovery
-3:32:29
+With this feature you can define dynamic items according to the
+application you are communicate with, take odbc as an example. In this
+example you need to create items, graphs, predictions, and etc. one bye
+one for each set of records you want to monitor. Discovey feature will
+add item automatically acording to the situation.
+
+### Low Level discovery (LLD)
+It will create item by the rule we defiend for it.
+
+there are several ways to implement LLD like, ```ODBC```, ```SNMP```,
+```JMX```, or even custom script.  
+
+### Createing discovery rule
+Under ```Hosts``` in ```Configuration``` tab in front of your desier
+hsot you can find a discovery section. The discovery types are the same as
+item types. Keys are also similar to items with small difference, here
+there is ```discovery``` term in the key name. The only new thing here
+is ```keep lost resources period```, which is responsible to remove all
+the ```items```, ```triggers```, and every thing related to removed data
+that we uesed to monitor.
+
+Consider the following example:
+
+```sql
+SELECT * FORM DATABASE WHERE 'status' = 'falied'
+```
+
+As far as the query we made returns different values ,according to the 
+situation, some items, triggers and etc. should remove, LLD do this job
+for us.
+
+discovery retun values follow special format. It's a JSON which has
+```$KEY``` as its key to use them as macro in zabbix. If you want to
+write your own custom script you should make the return value like this.
+
+in ```portotype``` section for each field in discovery section you can
+define dynamic items or other things with the help of return macros.
+
+**Note:** It's a better practice to optimize your query with propar
+condition instead of preporccess data in zabbix, becaues it can reduce
+the proccess pressure on the database.
+
+## Tmplate vs Discovey
+In temple we create static items then link them to our hosts, but in
+discovery all we create everything dynamically
+
+**Note:** In template you can also define discovery rules to create dynamic items too.
+
+## Auto registration
+
+## Network discovery
+
