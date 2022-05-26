@@ -114,3 +114,19 @@ firewall-cmd --reload
 16. Default login credential 
 	* Username: minioadmin
 	* Password: minioadmin
+
+## Example scenarios
+
+### Single server with 1 disk
+
+The default configuration will start a single server with a single disk. 
+
+### Single server with 4 disks
+Edit the configuration file like
+```bash
+MINIO_VOLUMES="/PATH/TO/minio/data{0...3}"
+```
+or
+```bash
+MNIO_VOLUMES="/PATH/TO/minio/foobar /PATH/TO/minio/barfoo /PATH/TO/minio/faabor /PATH/TO/minio/borfaa"
+```
