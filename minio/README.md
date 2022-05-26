@@ -10,31 +10,31 @@ MinIO is a High Performance Object Storage released under GNU Affero General Pub
 ```bash
 wget https://dl.minio.io/server/minio/release/linux-amd64/minio
 ```
-1. Set the permission
+2. Set the permission
 ```bash
 chmod u+x minio
 ```
-1. Set the ownership
+3. Set the ownership
 ```bash
 chown root:root minio
 ```
-1. Move it to the following directory
+4. Move it to the following directory
 ```bash
 mv minio /usr/local/bin
 ```
-1. Create a user for minio
+5. Create a user for minio
 ```bash
 useradd minio-user
 ```
-1. Create a directory
+6. Create a directory
 ```bash
 mkdir /tmp/minio
 ```
-1. Set the ownership for the minio directory
+7. Set the ownership for the minio directory
 ```bash
 chown -R minio-user:minio-user /tmp/minio
 ```
-1. Configure the minio
+8. Configure the minio
 ```bash
 cat > /etc/default/minio << EOF
 MINIO_VOLUMES="/tmp/minio/"
@@ -49,7 +49,7 @@ ip -br a | grep enp | awk '{print $3}' | cut -d/ -f1
 **Note:** Minio use random port number for console, you can bind a fix
 port number as we did above.
 
-1. Configure the minio service enter into following directory
+9. Configure the minio service enter into following directory
 ```bash
 cat > /etc/systemd/system/minio.service << EOF
 [Unit]
@@ -92,25 +92,25 @@ SuccessExitStatus=0
 WantedBy=multi-user.target
 EOF
 ```
-1. Reload systemd
+11. Reload systemd
 ```bash
 systemctl daemon-reload
 ```
-1. Start and enable the minio service
+12. Start and enable the minio service
 ```bash
 systemctl enable minio.service
 systemctl start minio.service
 ```
-1. Check the status 
+13. Check the status 
 ```bash
 systemctl status minio.service
 ```
-1. Add minio port to the Firewall
+14. Add minio port to the Firewall
 ```bash
 firewall-cmd --zone=public --add-port={9000/tcp,9001/tcp} --permanent
 firewall-cmd --reload
 ```
-1. Open it in any browser
-1. Default login credential 
+15. Open it in any browser
+16. Default login credential 
 	* Username: minioadmin
 	* Password: minioadmin
