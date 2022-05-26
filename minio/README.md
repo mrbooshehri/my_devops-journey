@@ -1,7 +1,8 @@
-# Install MinIO
+# MinIO
 
 ## What is MinIO
 
+MinIO is a High Performance Object Storage released under GNU Affero General Public License v3.0. It is API compatible with Amazon S3 cloud storage service. Use MinIO to build high performance infrastructure for machine learning, analytics and application data workloads.
 
 ## How to install MinIO
 
@@ -37,13 +38,17 @@ chown -R minio-user:minio-user /tmp/minio
 ```bash
 cat > /etc/default/minio << EOF
 MINIO_VOLUMES="/tmp/minio/"
-MINIO_OPTS="--address 192.168.1.102:9000"
+MINIO_OPTS="--address 192.168.1.102:9000 --console-address :9001"
 EOF
 ```
-**Note:** Check your IP address. You can use the following line too:
+**Note:** Check your IP address. You can use the following line, for
+cable connections, too:
 ```bash
 ip -br a | grep enp | awk '{print $3}' | cut -d/ -f1
 ```
+**Note:** Minio use random port number for console, you can bind a fix
+port number as we did above.
+
 1. Configure the minio service enter into following directory
 ```bash
 cat > /etc/systemd/system/minio.service << EOF
@@ -100,8 +105,12 @@ systemctl start minio.service
 ```bash
 systemctl status minio.service
 ```
-1. Open it in any browser
-1. To get credential information see the file below
+1. Add minio port to the Firewall
 ```bash
-cat /tmp/minio/.minio.sys/config/config.json
+firewall-cmd --zone=public --add-port={9000/tcp,9001/tcp} --permanent
+firewall-cmd --reload
 ```
+1. Open it in any browser
+1. Default login credential 
+	* Username: minioadmin
+	* Password: minioadmin
