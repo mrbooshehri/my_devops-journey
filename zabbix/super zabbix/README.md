@@ -1057,8 +1057,58 @@ discovery all we create everything dynamically
 
 **Note:** In template you can also define discovery rules to create dynamic items too.
 
-## Auto registration
-
 ## Network discovery
+Under ```Configuration```, there is ```Descovery```  section where you
+can define the range of your hsots to add to zabbix server
+automatically. Its like:
+```bash
+192.168.1.2-50,192.168.100.4-90
+```
+There are some other configurations to find your desiered host more
+accurately that they are mentioned bellow:
+* ```Update interval```
+* ```Checks``` - Here you can check if a specific port/service on the host is in
+	open added it to server.
+
+You need to define an ```action``` for found hosts inorder to use/show
+them in ```Configuration/hosts```. 
+
+## Actions
+Action do something when they get specific data from host, discovery, 
+items, and etc.
+
+**Note:** On the top left hand of ```Action``` page you can select which
+types of action do you want to use.
+
+Types of action:
+
+1. Trigger action
+1. Discovey action 
+1. Autogeneration action
+1. Internal action
+
+### Action fields
+
+1. ```Name```
+1. ```Condition``` - Type of event that action performs based on that
+	 like, for ```Trigger actions``` there are, item, trigger, trigger
+	 sensitivty, and etc.  ther are different conditions according to the
+	 type of Action you pick.
+1. operation - it has serveral options
+	1. Send message
+	1. Remote command
+	1. Add/Remove host
+	1. Add/Remove hostgroup
+	1. Link/Unlink to template
+	1. Enable/disable host
+	1. set host inventory mode
+
+## Auto registration
+In used in active monitoring. Each agent introduce itself to zabbix
+server and it will be add automatially to the zabbix server.
 
 # Session 11
+
+## Maintenance
+
+1:07:14
