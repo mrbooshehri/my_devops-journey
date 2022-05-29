@@ -1109,6 +1109,39 @@ server and it will be add automatially to the zabbix server.
 
 # Session 11
 
+## Services
+
+We can monitor availability of a service in zabbix based on items we are
+monitoring. Under ```configuration``` there is ```Services``` section
+that you can calculate ```SLA``` there for your serivce.
+
+1. Assign a proper name
+1. Select caculatoin algorthim according to your contract
+1. Select ```SLA``` availability.
+1. Select Triggers which you want to calculate availability of your
+	 service based on that.
+
+You can also add dependecy to other services and bind the proper time
+that the service should be run over that period, you can add the valid
+downtime there too. 
+
+**Note:** If you set tigger on service(parent) you cannot add trigger to
+its childs at the same time. So we set the triggers on final childs, the
+leat of the tree but we can set ```SLA``` on paretns
+
+**Note:** Only triggers higher then ```warning``` sensitivty will be considered in ```SLA```
+calculation, the ```information``` jsut display in services and ```Not
+classified``` will be ignored 
+
+Need to know terms:
+* KPI
+* SLA
+* Downtime
+	* Contorlled: downtime that happens in deploying service or situations
+		like that, thats totally expectable and it doesn't count in outage.
+
+## Log file monitoring
+2:5:47
+
 ## Maintenance
 
-1:07:14
