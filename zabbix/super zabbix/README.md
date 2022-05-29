@@ -1200,3 +1200,12 @@ This is a ([0-9][a-z]+) and ([A-Z]{3})
 if we use ```\1``` in ```output```, zabbix consider the first group,
 ```([0-9][a-z]+)``` matched value as output. It will be helpful in
 drawing graphs.
+
+**Note:** If you want to count the number of occurrence of a string in a
+log file you should use ```log.count``` or ```logrt.count``` as key in
+item creation.
+
+**Note:** You can write your desired log time format, match with the one
+exists in log file, in item creation for log monitoring items.
+
+2:00:00
