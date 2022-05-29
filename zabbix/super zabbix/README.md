@@ -1141,7 +1141,38 @@ Need to know terms:
 		like that, thats totally expectable and it doesn't count in outage.
 
 ## Log file monitoring
-2:5:47
+It's a kind of agentless monitoring method. Zabbix is not a log
+analyzing tool but we can monitor logs with it, in fact we tell the
+zabbix to pick a specific factor from a log file and monitor that,
+nothing else more. There are two types of log monitoring:
 
-## Maintenance
+### Monitoring a singe file
+In some cases some services/applications store thier data in a single
+file 
+
+To monitor logs we need to create an item with ```Zabbix
+agent(active)``` and ```log``` key, then pick ```log``` for type of
+information. Update interval will check for new log in the given time
+period. 
+
+log key instruction
+```bash
+log[PATH,"PATTERN",,,skip/all]
+```
+
+**Note:** You need to reload config cache on server:
+```bash
+zabbix_server -R config_cache_reload
+```
+
+#### Useful trigger functions for log monitoring
+1. ```logeventid```
+1. ```logsimularity```
+1. ```logsource```
+1. ```str```
+1. ```strlength```
+1. ```regex```
+1. ```iregex```
+
+# Session 12
 
