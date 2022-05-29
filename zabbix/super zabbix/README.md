@@ -715,6 +715,8 @@ For making correlation you need to defind a relationship between your
 tags, for example ```old event tag name``` AndOr ```new event tag
 name```, thne set the operation in ```operations``` tab.
 
+**Note:** It's a good approach to consider hyrarcical structures of
+bottlenecks as dependency, and related events as correlation.
 
 ## Templates
 Templates help us to define items, application name, trigger, screen,
@@ -1176,3 +1178,25 @@ zabbix_server -R config_cache_reload
 
 # Session 12
 
+**Note:** If you want to use ```docker``` command in ```crontab``` **you
+should not use** ```-it```.
+
+## Define Regex
+Under ```Administration/General``` section, n the left had side drop
+down menu under ```Regular expressions```, you can define your custom
+regexs. You can use your custom regexs as pattern in log items.
+
+## Monitor log files with time stamp
+In some cases there is a log file per day or any other time stamps for a
+server/application, take logrotate version mode as an example, in these
+cases we should use ```logrt``` as key in item creation. You need to
+pass file name regex as the fires argument.
+
+**Note:** In log key creation there is a ```output``` section that you
+can use it te extract special group from regex, for example:
+```bash
+This is a ([0-9][a-z]+) and ([A-Z]{3})
+```
+if we use ```\1``` in ```output```, zabbix consider the first group,
+```([0-9][a-z]+)``` matched value as output. It will be helpful in
+drawing graphs.
