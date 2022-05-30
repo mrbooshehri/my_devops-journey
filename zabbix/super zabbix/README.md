@@ -1208,4 +1208,87 @@ item creation.
 **Note:** You can write your desired log time format, match with the one
 exists in log file, in item creation for log monitoring items.
 
-2:00:00
+## Grafana and Zabbix
+
+You need to have grafana installed on your zabbix server, then install
+grafana plugin on your server.
+
+
+### Install Grafana
+
+Add Grafana repo to the system
+```bash
+wget https://dl.grafana.com/enterprise/release/grafana-enterprise-8.5.3-1.x86_64.rpm
+sudo yum install grafana-enterprise-8.5.3-1.x86_64.rpm
+```
+Reload systemd
+```bash
+systemctl daemon-reload
+```
+Enable and start Grafana service
+```bash
+systemctl enable grafana-server
+systemctl start grafana-server
+```
+Check the status
+```bash
+systemctl status grafana-server
+```
+Open port on firewall
+```bash
+firewall-cmd --add-port=3000/tcp --permanent
+firewall-cmd --reload
+```
+Login to the web interface by ```admin:admin``` username:password.
+
+### Install Zabbix plugin on Grafana
+
+From the left hand side menu in the web interface select the gear
+icon(configuration), then plugins. By defualt Zabbix plugin is not
+pre-installed in Grafana, so click on ```Find more plugins on
+Grafana.com``` and search for Zabbix plugin.
+
+**Note:** Use [shecan](https://shecan.ir) to proceed the installation
+process.
+
+```bash
+grafana-cli plugins install alexanderzobnin-zabbix-app
+systemctl restart grafana-server
+```
+Go to Grafana web user interface and enable Zabbix plugin from the
+plugins section.
+
+### Connect Zabbix to Grafana
+From configuration section select ```Data Sources```, click on ```Add
+data source```, then select zabbix. Config fields:
+1. Name
+1. URL - Zabbix ```api``` URL. Follow the filed hint, just replce the
+	 sever address with yours.
+1. Access - The way you want to connect to zabbix
+1. Auth - The security configuration
+1. Custom HTTP Headers - Web server configuration
+1. Zabbix API details - You need to create a username in zabbix for
+	 graphana
+	 1. In ```Administration/User Group``` in zabbix, create new group
+	 1. Pick a good name like ```API Visualization```
+	 1. From the ```Permission``` tab set permission on ```read```
+	 1. Click on ```select``` and check all the options
+	 1. Check ```Include all subgroups```, then click on ```add```
+			hyperlink
+	 1. Click on ```Add``` button
+	 1. Disable ```Frontend access```
+	 1. Under ```Administration/Users```, click on ```create user```
+	 1. Selecet Group on ```API Visualization```
+	 1. Pick a password
+	 1. Click on ```Add``` button
+1. Direct DB Connection - You need to add the proper plugin according to
+	 your database and add it as a new data source then configure it. With
+	 this option Grafana just get the query command from zabbix then get
+	 the data from database directly. It's a good prctice for a larg
+	 amount of data.
+1. Alerting
+1. Click on ```Save & Test```, it should pop a green toast
+1. From ```Dashboard``` section, select your desier dashboard to view	
+
+### Creating custom dashboard 
+2:46:01
