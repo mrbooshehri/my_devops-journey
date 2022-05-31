@@ -1291,4 +1291,78 @@ data source```, then select zabbix. Config fields:
 1. From ```Dashboard``` section, select your desier dashboard to view	
 
 ### Creating custom dashboard 
-2:46:01
+
+From the left side pannel click on ```+``` icon, then select ```create
+dashboard```. Create your desired pannel and add it, then pick a data
+source and choose your monitoring factors.
+
+**Note:** You can find the ```item id``` by going to the graph of each
+item, in latest data section, and from the URL. The numbers at the end of the URL is the item
+id.
+
+**Note:** You can find the ID of any thing by gonig to the configuration
+section of it, from the URL.
+
+
+### Alerting
+You can set alert rules and notification channel. With this feature you
+can send rend informations like renderd picture of the graph to
+configured channel like Email, Telegram, Slack, and etc.
+
+# Session 13
+
+## Zabbix proxy
+
+We use Zabbix proxy in two types of scenarios:
+* There are some nodes in internet in on a same network
+	* Pros:
+		* We don't need to stablish separate connection for each host to
+			connect to the server(port forwarding, opening port)
+		* The gathered data from host will cache for a while in zabbix proxy
+			so if we have connection problem there will be no data lost
+		* Increase network security and performance
+* There are a large number of hosts in the our zabbix server zone
+	* Pros:
+		* Zabbix server don't waste its proccess power on gathering data and
+			handeling them, it jsut proccess the data
+
+**Note:** We use Zabbix server in our data center and zabbix proxy
+any elsewhere that we need to monitor.
+
+## Install Zabbix Proxy
+
+First of all you need to add ```epel-release``` and zabbix
+repositories on your system.
+
+You can install zabbix proxy with a variety of database options, here we
+chose sqlite
+
+```bash
+yum install zabbix-proxy-sqlite3
+```
+It's a good practice to choose a good hsotname like
+```bash
+hostnamectl set-hostname zabbix-proxy
+```
+Initiate sqlite database:
+```bash
+zcat /usr/share/doc/zabbix-proxy-sqlite3*/create.sql.gz | sqlite3
+/opt/zabbix.db
+
+Now configure ```zabbix_proxy.conf``` under ```/etc/zabbix/```:
+1. Set Server IP
+1. Set Hostname
+1. Set DBNaem - DBNaem=/opt/zabbix.db
+
+Start and enable zabbix proxy
+```
+bash
+systemctl start zabbix-proxy
+```
+
+### Active vs Passive zabbix proxy
+The difence is in configuration data. In active mode zabbix proxy get
+config data, like hosts config, from the server and load them, But in
+passive zabbix server will send the config data to the proxy
+
+1:36:40
