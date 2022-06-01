@@ -1355,8 +1355,7 @@ Now configure ```zabbix_proxy.conf``` under ```/etc/zabbix/```:
 1. Set DBNaem - DBNaem=/opt/zabbix.db
 
 Start and enable zabbix proxy
-```
-bash
+``` bash
 systemctl start zabbix-proxy
 ```
 
