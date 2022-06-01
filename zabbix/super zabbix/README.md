@@ -1348,6 +1348,7 @@ Initiate sqlite database:
 ```bash
 zcat /usr/share/doc/zabbix-proxy-sqlite3*/create.sql.gz | sqlite3
 /opt/zabbix.db
+```
 
 Now configure ```zabbix_proxy.conf``` under ```/etc/zabbix/```:
 1. Set Server IP
