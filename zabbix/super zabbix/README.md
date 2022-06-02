@@ -1340,14 +1340,24 @@ chose sqlite
 ```bash
 yum install zabbix-proxy-sqlite3
 ```
+
+Open zabbix port on firewall
+
+```bash
+firewall-cmd --add-port={10050/tcp,10051/tcp} --permanent
+firewall-cmd --reload
+```
+
 It's a good practice to choose a good hsotname like
 ```bash
 hostnamectl set-hostname zabbix-proxy
 ```
 Initiate sqlite database:
 ```bash
+mkdir /opt/zabbix
 zcat /usr/share/doc/zabbix-proxy-sqlite3*/create.sql.gz | sqlite3
-/opt/zabbix.db
+/opt/zabbix/zabbix.db
+chown -R zabbix:zabbix /opt/zabbix
 ```
 
 Now configure ```zabbix_proxy.conf``` under ```/etc/zabbix/```:
@@ -1359,10 +1369,167 @@ Start and enable zabbix proxy
 ``` bash
 systemctl start zabbix-proxy
 ```
-
 ### Active vs Passive zabbix proxy
 The difence is in configuration data. In active mode zabbix proxy get
 config data, like hosts config, from the server and load them, But in
 passive zabbix server will send the config data to the proxy
 
-1:36:40
+### Add zabbix proxy in zabbix server
+Under ```Administration/proxies```, click on ```create proxy```. The
+proxy name should be the exact name which you puth in your
+```zabbix_proxy.conf``` as its hostname. In active mode ony hostname is
+mandatory but it's a better practice to write the IP address(for
+security considerations). In passive mode you need to get all the
+necessary informations. To monitor a host by proxy you need to select
+proper proxy for that host in its configuration page. 
+
+There are two stratagies in usings zabbix proxy
+1. The hosts we want to monitor are only reachable through the
+	 proxy, zabbix proxy is at the edge and all nodes are in the zone.
+1. Choose the closest zabbix proxy, the one has the minimun cost and
+	 maximun performance.
+
+**Note: ** You need to put **Zabbix proxy IP adrress** as the server ip
+in all zabbix agents.
+
+**Note: ** If you used ```zabbix_sender``` in your agent you need to
+change the IP of reciver to zabbix proxy.
+
+**Note: ** If you made changes while the zabbix proxy is running you can
+reload its cache configuration by the following command.
+```bash
+zabbix_proxy -R config_cache_reload
+```
+
+**Note: ** To store data locally in zabiix proxy you need to chage this
+option.
+```bash
+ProxyLocalBuffer=HOURE
+```
+
+## Queue
+It's the list of item that zabbix server expect to get from its items. 
+The more ```0```s you see in the queue the better performance you have.	
+
+## Docker and zabbix
+Prerequisites:
+```bash
+yum install -y epel-release yum-urils ntpd 
+```
+
+Enabling ntpd
+
+```bash
+systemctl start ntpd
+systemctl enable ntpd
+```
+
+Adding docker repository
+```bash
+yum-config-manager --add-repo
+https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+Insatlling docker
+```bash
+yum install docker-ce docker-ce-cli containerd.io -y
+```
+
+Enabling docker
+```bash
+systemctl start docker
+systemctl enable docker
+```
+Pull related packages
+
+```bash
+docker pull mariadb/server
+docker pull zabbix/zabbix-agent
+docker pull zabbix/zabbix-server-mysql
+docker pull zabbix/zabbix-web-nginx-mysql
+```
+Create external storage for containers
+```bash
+mkdir -p /docker/mysql-data
+mkdir -p /docker/mysql-grafana 
+mkdir -p /usr/lib/zabbix/externalscripts
+```
+**Tip:** Read about Network Defined Network (SDN) in docker
+
+Create a sparate network for our containers
+```bash
+docker network create --subnet 172.20.0.0/16 --ip-rage 172.20.240.0/20
+zabbix-net
+```
+run a mariadb container
+```bash
+docker run --name mariadb-server -t -e MYSQL_DATABASE="zabbix" -e \
+MYSQL_USER="zabbix" -e MYSQL_PASSWORD="zabbixpass" -e \
+MYSQL_ROOT_PASSWORD="rootpass" -e TZ="Asia/Tehran" -v \
+/docker/mysql-data:/var/lib/mysql --network=zabbix-net -d mariadb-server \
+--character-set-server=utf8 --collation-server=utf8_bin \
+--default-authentication-plugin=mysql_native_password
+```
+run zabbix mysql server 
+```bash
+docker run --name zabbix-server-mysql -t -e \
+DB_SERVER_HOST="mariadb-server" -e MYSQL_DATABASE="zabbix" -e \
+MYSQL_USER="zabbix" -e MYSQL_PASSWORD="zabbixpass" -e \
+MYSQL_ROOT_PASSWORD="rootpass" -e TZ="Asia/Tehran" -v \
+/usr/lib/zabbix/externalscripts:/usr/lib/zabbix/externalscripts:rw \
+-p 10051:10051 --restart unless-stop --network=zabbix-net -d \
+zabbix/zabbix-server-mysql
+```
+run zabbix web server
+```bash
+docker run --name zabbix-web-nginx-mysql -t -e \
+DB_SERVER_HOST="mariadb-server" -e MYSQL_DATABASE="zabbix" -e \
+MYSQL_USER="zabbix" -e MYSQL_PASSWORD="zabbixpass" -e \
+MYSQL_ROOT_PASSWORD="rootpass" -e TZ="Asia/Tehran" -e \
+PHP_TZ="Asia/Tehran" -e ZBX_SERVER_HOST="zabbox-server-mysql" -p 80:8080 --restart unless-stop --network=zabbix-net -d \
+zabbix/zabbix-web-nginx-mysql
+```
+
+run zabbix agent
+```bash
+docker run --name zabbix-agent --network=zabbix-net -e \
+ZBX_SERVER_HOST="zabbix-server-mysql" -e ZBX_HOSTNAME="zabbix server - \
+with docker" -e TZ="Asia/Tehran" -d zabbix/zabbix-agent
+```
+
+get zabbix agent ip and replace int with ```172.0.0.1```
+```bash
+docker ps -a
+docker inspect ID_OF_DOCKER_IMAGE | grep \"IPAddress
+```
+
+run grafana
+
+```bash
+docker run -d -p 3000:3000 --name=grafana --network=zabbix-net -v \
+/docker/grafana:/var/lib/grafana:rw -e \
+"GF_INSTALL_PLUGINS=alexanderzobnin-zabbix-app" grafana/grafana
+```
+**Note:** If you faced with any erros in ```docker ps```, read log of
+the container that cuases problem
+```bash
+docker logs CONTAINER_ID
+```
+To add zabbix as data source in grafana you need to get
+```zabbix-web-nginx-mysql```, ```zabbix-net``` ip and put in graphana
+config.
+```bash
+docker inspect CONTAINER_ID | grep \"IPAddress
+```
+
+**Note:** You can resolve any host in a same docker network by name, ex:
+```bash
+ping zabbix-web-nginx-mysql
+```
+
+**Note: Please consider you have to use **container port**, which is
+8080 here, in grafana config not the exposed one, 80
+
+**Tips:** You can find useful docker files [here](https://github.com/zabbix/zabbix-docker)
+
+# Session 14
