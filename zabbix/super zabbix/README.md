@@ -1574,3 +1574,29 @@ should in all zabbix servers, except the main one, in
 you need to select ```App Remote zabbix server``` as template for the
 zabbix server you want to moitor in the main one.
 
+### Prtitioning database
+To imporve zabbix performance we can partition data on database, based
+on day, which means database does not need to make query on all data, it
+just apply the query on the partition we give. To achive this goal we
+need to define some procedures in the database.
+
+1. Connect to ```zabbix``` database with ```MySql workbench```, if you are
+	 using different database, follow the related instruction.
+	 * Connect over ```ssh``` if you disabled root remoate connection for
+		 your databse
+1. Select ```zabbix``` schema
+1. Run the following query
+```mysql
+
+```
+#### Important tables in zabbix database
+
+* ```history``` - It stores float data
+* ```history_log``` - It stores log data
+* ```history_str``` - It stores web scenario errors or outpots
+* ```history_text``` - It stores text data
+* ```history_uint``` - It stores unsigned intigers
+* ```trends``` - It stores float trends
+* ```trends_uint``` - It stores unsigned intiger trends
+
+2:16:6
