@@ -1,3 +1,14 @@
+Table of Contents
+=================
+
+* [MinIO](#minio)
+   * [What is MinIO](#what-is-minio)
+   * [How to install MinIO](#how-to-install-minio)
+   * [Example scenarios](#example-scenarios)
+      * [Single server with 1 disk](#single-server-with-1-disk)
+      * [Single server with 4 disks](#single-server-with-4-disks)
+
+
 # MinIO
 
 ## What is MinIO
@@ -80,6 +91,7 @@ LimitNOFILE=65536
 
 #Disable timeout logic and wait until process is stopped
 TimeoutStopSec=0
+
 
 #SIGTERM signal is used to stop Minio
 KillSignal=SIGTERM
