@@ -1533,3 +1533,44 @@ ping zabbix-web-nginx-mysql
 **Tips:** You can find useful docker files [here](https://github.com/zabbix/zabbix-docker)
 
 # Session 14
+
+## Tuining
+
+From all zabbix server monitored data, ```Utilizations``` are more
+important and give us an overview about zabbix performance. It's a good
+solution to use Grafana to monitor zabbix server data and make
+decissions for optimizing your server. 
+
+### Understand ```zabbix_server.conf``` deeper
+
+At least you should read whole the configuration file once to grasp an
+overview about how things work in zabbix. Here there are some
+considerable options:
+
+* Listen port for trapper - default port is 10051
+* Source IP - determine which NIC to use in case of having multiple NICs
+* DBSocket - use linux socket instead of put DB username and password in
+	config file for more security
+* HistoryStorageURL, HistoryStorageDateIndex, HistoryStorageType - used
+	to store history in ```elasticsearch```, it doesn't store any trends
+* ExportDir, ExportFileSize - You can export 	events, history and trends
+	in JSON format
+* StartPollers - the number of pre-forked instances of pollers. You
+	should increse that number if you have a lot of items or triggers, of
+	cource the correct practice is monitoring the ```Utilization of poller
+	data collectore proccesses``` parameter and according to your hardware
+	resourcees.
+* JavaGateway - Zabbix has an external component called ```Zabbix java
+	gateway``` which allows you to monitor java applications with
+	```JMX``` port
+* VMwareCollectors - It's used for monitoring ```ESXi```
+* VMwareCacheSize - 
+* HousekeepingFrequency - How often zabbix remove outdated data from
+	database
+
+**Note:** If you want to monitor other zabbix servers form main one you
+should in all zabbix servers, except the main one, in
+```StatsAllowedIP=``` put the main zabbix server's ip address, and also
+you need to select ```App Remote zabbix server``` as template for the
+zabbix server you want to moitor in the main one.
+
