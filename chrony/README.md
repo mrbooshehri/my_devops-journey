@@ -1,3 +1,19 @@
+
+Table of Contents
+=================
+
+* [Chrony](#chrony)
+   * [Install chrony](#install-chrony)
+   * [Configuration](#configuration)
+      * [Configuration structure](#configuration-structure)
+   * [Configuration](#configuration-1)
+      * [Configuration Sections](#configuration-sections)
+   * [Minimal Clinet Configuration](#minimal-clinet-configuration)
+   * [Useful chronyc](#useful-chronyc)
+   * [Configure chrony as NTP Server](#configure-chrony-as-ntp-server)
+   * [Check the workflow](#check-the-workflow)
+   * [Chrony force sync with NTP Server](#chrony-force-sync-with-ntp-server)
+
 # Chrony
 
 ## Install chrony
