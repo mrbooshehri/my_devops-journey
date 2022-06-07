@@ -58,11 +58,6 @@ mysql_secure_installation
 # or mariadb_secure_installation
 ```
 
-```bash
-yum install httpd
-yum install mysql mysql-server
-yum install php php-mysql php-xml php-cli php-soap php-ldap php-gd php-zip php-json php-mbstring graphviz
-```
 ## Install PHP 8
 ### Add repository
 ```bash
@@ -84,7 +79,7 @@ iTop needs write access to the temp dir (this path is retrieved using
 the PHP function ```sys_get_temp_dir()```). Check rights and also the
 ```openbase_dir``` PHP parameter !
 
-## PHP
+## PHP configuration
 Recommanded valuse for ```php.ini```
 ```php
 memory_limit = 256M ; could be increased if needed
@@ -101,7 +96,47 @@ max_input_vars = 5000
 ```
 **Note:** If you're using CLI tools like cron.php, check also the PHP instance used for CLI !
 
+### Attachments upload
 
+|file_uploads|	Set to 1 to allow file upload, to zero to prevent all file uploads.|
+|:-----|:----|
+|upload_tmp_dir|	The temporary location (on the server) were the uploaded files will be stored. Make sure that this parameter points to a location that is accessible (and writable) by the process running the web server (or by the end users in case of IIS with the Windows built-in authentication) and that there is enough space left.|
+|upload_max_filesize|	The maximum size allowed for an uploaded file. The value is expressed in bytes. You can use units like K for kilobytes (=1024 bytes), M for megabytes and G for gigabytes. Example: 4M stands
+for 4 megabytes.|
+|max_file_uploads|	The maximum number of files that can be uploaded simultaneously in a single web page. iTop should normally upload only one file at a time. You can safely use the default value, which is 20.|
+|post_max_size|	The maximum amount of data that can be sent to the server via a POST request. This value MUST BE bigger than upload_max_filesize, since the same request will contain some more information (the title of the document, an operation code…). So it’s better to put a bigger value here. For example, if upload_max_filesize is 4M, then put 5M for post_max_size.|
+|memory_limit|	After being uploaded on the server, the file will be read in memory before being stored in the database. Therefore make sure that memory_limit (if enabled) is at least 5 times bigger than
+upload_max_filesize.|
+|max_input_time|	This value defines the maximum time allowed for the server to read its input. This includes the time spent uploading the files. The default of 60 seconds may be exceeded for uploading big files over slow connections.|
 
+It is good practice to have the following relation between the various settings:
+
+|upload_max_filesize|	<|	post_max_size|	<|	max_allowed_packet|	<| memory_limit|
+|:------|:------|:------|:------|:------|:------|:------|
+|php.ini||		php.ini||		my.cnf||		php.ini|
+
+## MariaDB configuration 
+
+Create user for ```iTop```
+```bash
+GRANT ALL PRIVILEGES ON *.* TO 'iTop'@'%' IDENTIFIED BY 'some_password';
+FLUSH PRIVILEGES;
+```
+
+add the following line to ```/etc/my.cnf```
+
+```bash
+innodb_buffer_pool_size = 512M
+query_cache_size = 32M
+query_cache_limit = 1M
+ 
+innodb_default_row_format = DYNAMIC
+innodb_large_prefix = true
+ 
+; max_allowed_packet : should be set to a value bigger than upload_max_filesize in php.ini 
+```
+
+# Getting iTop
+You can get the latest version of iTop from [here](https://sourceforge.net/projects/itop/files/latest/download)
 # Tuning iTop performance
 Head over [here](https://www.itophub.io/wiki/page?id=3_0_0%3Aadmin%3Aperformance)
