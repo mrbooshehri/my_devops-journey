@@ -31,5 +31,29 @@ Benefits of CI
 * Team communication
 * Risk mitigation
 
+CI pipeline
+* Build
+* Unit tests
+* Integration tests
+
 ### Continues Delivery(CD)
--14:22
+* Continues Delivery is about putting the release schedule in the hands
+of the business, not in the hands of IT.
+* Making sure you software is always production ready throughout its
+	entire lifecycle that any build could potentially be released to
+	users.
+
+Benefits of CD
+* It helps in time reduction
+
+CD pipeline
+* Review
+* Staging
+* Production
+
+### Continues Deployment
+All the process form	code to production handel by automation
+mechanisms, if you do anything manually from staging to production it's
+not continues deployment anymore, it's continues delivery.
+
+# Session 2
