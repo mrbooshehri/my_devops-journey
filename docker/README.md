@@ -207,3 +207,5 @@ docker run IMAGE_NAME
 ```docker ps``` by default lists the runing containers and get
 information about them but, ```-a``` option will show all the
 containers.
+
+# Session 3
