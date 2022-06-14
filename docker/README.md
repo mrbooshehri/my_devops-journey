@@ -143,4 +143,67 @@ image).
 
 **Note:** Container is a process on your host machine.
 
--1:17:16
+## Installing Docker
+```bash
+yum install -y yum-utils
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum-config-manager --disable docker-ce-edge
+yum makecache fast
+yum install docker-ce
+systemctl enable --now docker
+```
+
+## Get information about docker installed version
+
+The following command will only display the version of docker
+```bash
+docker --version
+```
+
+For more information about your docker you should use this command
+instead
+```bash
+docker version
+```
+According to the previous command you can see docker has a client and a
+server part.
+
+In case of you need full information about docker you can use the
+following command
+```bash
+docker info
+```
+
+## Get an image from docker registry
+The default docker registry is ```docker hub```. To get image use the
+following command
+```bash
+docker pull IMAGE_NAME
+```
+**Note:** It's a good pracitce not to use the ```latest``` version(tag)
+of images in production phase. 
+
+To see the downloaded images
+```bash
+docker image ls
+# or
+docker images
+```
+with ```-a``` option you can see all the images and ```-q``` will just
+list image IDs.
+
+## Image naming structure
+Each image formed from to part, repository and tag which follow this
+stype ```IMAGE_REPO_NAME:IMAGE_TAG```. Each image has a uniqe ID.
+
+## Runing an instace from an image
+Until here we just pulled an image from docker official registry, to
+creating an instace:
+```bash
+docker run IMAGE_NAME
+```
+## Get information about containers
+
+```docker ps``` by default lists the runing containers and get
+information about them but, ```-a``` option will show all the
+containers.
