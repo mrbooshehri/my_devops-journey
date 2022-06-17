@@ -137,8 +137,8 @@ third-party as a publicly or privately registry like:
 1. Google container registry
 1. AWS container registry
 
-Image registries contain multiple image repository. In turn, image
-registries can contain multiple images(also different versions of an
+Image registries can contain multiple image repositories. In turn, image
+repositories can contain multiple images(also different versions of an
 image).
 
 **Note:** Container is a process on your host machine.
@@ -209,3 +209,66 @@ information about them but, ```-a``` option will show all the
 containers.
 
 # Session 3
+## Manage docker as a non-root user
+The docker daemon binds to a unix socket instead of a TCP port. By
+default a unix socket owned by root user and other users can only access
+it using sudo. The docker daemon always runs as the root user. To solve
+this problem you should add your user to the ```docker``` gourp.
+
+```bash
+usermod -aG docker $USER
+```
+**Note:** Only root user can use unix sockets.
+
+## Virtual machine vs Docker
+
+### Differences
+
+| VM | Docker |
+| :--: | :--:|
+| Each VM runts its OS | All containers share the same kernel of the host |
+| Boot up time is in minutes | Containers instantiate in seconds |
+| VMs snapshots are sparingly | Images are build incrementally on top of another like layers |
+| Not effective diffs, no version control | Image can be diffed and can be version controlled |
+| Cannot run more than couple of VMs on an average laptop | Can run many docker containers on a laptop|
+| Only one VM can be started from set of VMX and VMDK files | Multiple docker containers can be started from an docker image|
+
+### Similarities
+
+| VM | Docker |
+| :--: | :--:|
+| Process in one VM cannot see processes in other VMs | Process in one container cannot see processes in other containers |
+| Each VM has its own root file system | Each container has its own root file system (not kernel) |
+| Each VM gets its own virtual network adapter | Docker can get virtual network adapter | 
+| VM is a running instance of physical files(VMX and VMDK) | Containers are running instances of docker image |
+| Host OS can be different from guest OS | Host OS can be different from container OS|
+
+## Where should you run docker containers?
+
+### Why run docker on bare-metal
+1. Access through bare-metal hardware in apps without relying on
+	 pass-through techniques.
+1. Have optimal use of system resources. A host can, distirbute use of
+	 shared system resources
+1. Get bare-metal performance to apps, because there is no hardware
+	 emulation layer saparating them from a host server.
+1. deply apps inside portable environments that can move easily between
+	 host and server
+1. Get app isolation
+
+### Why don't run docker on bare-metal
+1. Physical server upgrades are difficult
+1. Most clouds require VMs
+1. Container platforms don't support all hardware and software
+	 configurations
+1. Containers are OS-dependet
+1. Bare-metal servers don't offer rollback features
+
+### Advntages of docker on bare-metal vs VM
+1. Fewer layers to manage and simpler trubleshooting
+1. High efficiency
+1. More containers per server
+1. Better, more predictable performance 
+1. Lower total costs
+
+-1:48:08
