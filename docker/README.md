@@ -271,4 +271,53 @@ usermod -aG docker $USER
 1. Better, more predictable performance 
 1. Lower total costs
 
--1:48:08
+## Benefits Docker containers
+1. Modularity
+1. Free up a huge amount of system resources
+1. Speed
+1. Portability
+1. Reduce potential licencing cost, patching and maintenance of OS
+1. Layers and image version control
+1. Rollback
+1. Rapid deployment
+1. Run you application in an isolation and independent environment
+
+## What problems docker solve?
+1. Dependencies - dependency hell
+1. Improving portability - your desktop your develop environment,
+	 company's server, and your company's all can run the same programs.
+1. Protecting your computer
+
+## Traditional Linux container (LXC) vs Docker
+LXC can run multiple aplications in each container while it 
+is recomanded to run only single applications in a docker container.
+
+## Docker Engine
+The docker engine the core software that run and manage containers which
+follows client-server architecture.
+
+### Docker engine components
+* Server: The docker daemon (dockerd)
+* Rest API: To instruct docker container what to do
+* Command line interface (CLI)
+
+## Older version of dockr
+* Docker had two major components:
+	* The docker daemon
+	* LXC
+* The docker daemon was a monolithic binary
+* LXC provided the daemon with access to the fundemental
+	building-blocks of containers existed in the linux kernel.
+
+## What is cgroups
+Cgroups are a kernel mechanism for limiting and measuring the total
+resorces usedd by a group of process runing on a system. For example,
+you can apply CPU, momory, network, or IO quotas
+
+## What is Namespace
+Namespaces are a kernel measuring for limiting the visibility that a
+group	of processes have of the rest of the system. For example you can
+limit visibility to certain process trees, network interfaces, user IDs
+or filesystem mounts.
+
+-56:19
