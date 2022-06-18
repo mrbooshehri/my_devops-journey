@@ -320,4 +320,37 @@ group	of processes have of the rest of the system. For example you can
 limit visibility to certain process trees, network interfaces, user IDs
 or filesystem mounts.
 
--56:19
+## Docker engine architecture
+![docker engine architecture](./assets/docker-engine-architecture.png)
+
+* ```runc``` has a single purpose in life -> **Create containers**
+* The ```contierd``` purpose in life was to **manage container
+	life-cycle** operations -> container life-cycle operations -> start |
+	stop | pause | rm ..
+* ```shim```: once a container's parent ```runc``` exits, the associated
+	containerd, ```shim``` process becomes the **container's parent**.
+	some of the responsibilites:
+	* Keeping any STDIN and STDOUT stream open
+	* Reports the container's exit status back to the daemon.
+
+## Let's run a container
+docker run <option> <image>:<tag> <app>
+```docker run -it centos:latest /bin/bash```
+
+* ```docker run``` tells the docker daemon to start a new container.
+* The ```-it``` flags tell docker to make the container interactive
+	and attach our current shell to the container's terminal.
+* ```/bin/bash``` is the app we want to run inside the container
+
+**Note:** It's not a good practice not to use ```latest``` tag for the
+production.
+
+**Note:** The ```PID 1``` in coniter belongs to the app we pass to the
+container
+
+**Note:** You can use container in detach mode by ```-d``` option.
+
+**Note:** You can exit the container witout stop the container with
+```ctrl+PQ```
+
+# Session 4
