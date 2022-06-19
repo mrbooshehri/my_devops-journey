@@ -354,3 +354,41 @@ container
 ```ctrl+PQ```
 
 # Session 4
+
+## Daemonless containers
+* By removing the code of containers management from the daemon, the
+	entire container runtime is decoupled from the Docker daemon.
+* It makes it possible to perform maintenance and upgrades on the docker
+	daemon without impacting runing containers
+
+### Enable live restore
+* By default, when the docker daemon terminates, it shuts down running
+	containers
+* Live restore: containers remain running if the docker becomes
+	unavailable
+* Live restore is not supported on windows containers, but it does work
+	for linux containers running on docker desktop for windows.
+
+### How to enable live restore
+Create/open the following file
+```bash
+vim /etc/docker/daemon.json
+```
+add this line
+```bash
+{
+	"live-restore":true
+}
+```
+reload docker daemon
+```bsah
+systemctl reload docker
+```
+
+### Docker components on Linux system
+* dockerd - the docker daemon
+* docker-containerd - containerd
+* docker-containerd-shim - shim
+* docker-runc - runc
+
+-1:45:30
