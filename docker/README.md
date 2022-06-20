@@ -206,7 +206,9 @@ docker run IMAGE_NAME
 
 ```docker ps``` by default lists the runing containers and get
 information about them but, ```-a``` option will show all the
-containers.
+containers. ```-f status=exited``` lists containers with a specific
+status,```-f``` stands for filter and ```-q``` list only the container
+IDs. Also ```-n=N``` list the ```N``` last containers.
 
 # Session 3
 ## Manage docker as a non-root user
@@ -391,4 +393,73 @@ systemctl reload docker
 * docker-containerd-shim - shim
 * docker-runc - runc
 
--1:45:30
+### Docker daemon responsibilities
+* Image management
+* Image builds
+* REST API
+* Authentication
+* Security
+* Core Networking
+* Orchestration
+
+## Storage drivers
+Every docker container gets its own area of local storage where all
+containers read/write operations occur. This local storage area has been
+managed by the storage driver or graphdriver. Some of the storage driver
+abvailable for docker on Linux include:
+* aufs - the original and the oldest
+* overlay2 - probably the best choice for the future
+* devicemapper
+* btrfs
+* zfs
+
+On linux you set the storage driver in ```/etc/docker/daemon.json``` and
+the you need to restart the docker service for any changes to take
+effect.
+```json
+{
+	"storage-driver":"overlay"
+}
+```
+To change your driver storage 	while you need your images and
+containers to be available after change
+* Save them with docker save
+* Pusht the saved images to a repository
+* Chage the storage driver
+* Restart docker
+* Pull the images locally
+* Restart your containers
+
+**Note:** It's a good practice to choose your storage driver 
+in design phaze(installation) and before you do anyting with docker.
+
+### Chose which storage diver to ues
+| OS | Storage dirver|
+| :--- | :-----|
+| RHEL with a 4.x kernel or higher + dokcer 17.06 and higher | overlay2|
+| RHEL with an older kernel and older docker 	| devicemapper |
+| Ubuntu with a 4.x kernel or higher | overlay2 |
+| Ubuntu with an earlier kernel | aufs |
+| SUSE Linux enterprise server | btrfs |
+|
+
+## Docker socket
+When you install docker, you get two major components:
+* the docker client
+* teh docker daemon
+On Linux the client talks to the daemon via a local IPC/Unix socket at
+/var/run/docker.sock
+
+## ```docker ps``` options
+* ```-a``` - list all containers
+* ```-q``` - only lists the container IDs
+* ```-n=N``` - list the last ```N``` containers
+* ```-f``` - fileter the output like ```-f status=exited```
+* ```-l``` - the latest container
+* ```-s``` - show the size of containers, the value inside the ```()```
+	is the image size and the one before it is the container size minuse
+	the image size
+
+## Container resource management
+-1:10:00
+
