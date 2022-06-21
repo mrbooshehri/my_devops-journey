@@ -11,6 +11,12 @@ enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc
 EOF
 ```
+**Note:** Please consider mongodb version 5 and higher relies on
+```avx``` cpu feature so make sure your cpc has that feature before
+installing version 5 or higher, to check:
+```bash
+grep avx /proc/cpuinfo
+```
 
 ## Add repo for version 4.4
 ```bash
