@@ -461,5 +461,73 @@ On Linux the client talks to the daemon via a local IPC/Unix socket at
 	the image size
 
 ## Container resource management
--1:10:00
+By default there is no limitation to resource allocation to the
+containers but we can apply limitation on them.
 
+### Memory and Swap
+```bash
+docker-it -m 400M --memory-swap -1 <image> <app>
+```
+The container will use 400 Mb of ram and use swap memory as much as it
+needs(no limitation)
+
+**Note:** ```--memory-swap``` is the memory and swap altogether, so if
+we had 400 Mb of memory and the ```--memory-swap 1G```, the swap memory
+will be 600 Mb.
+
+### CPU
+```bash
+docker ru -it --cpuset-cpus="1,3" <image> <app>
+```
+The container will use core #1 and #3 of the cpu. You can give range of
+cpus too, like ```--cpuset-cpus=1-3```
+
+### Storage
+```bash
+docker run -it --sotrage-opt size=100G <image> <app>
+```
+**Note:** You can use this option only on ```overlay2``` sotrage driver
+with ```xfs``` back filesystem, other back filesystem, like ext4, are not
+supported.
+
+**Note:** You should enable quota on your ```overlay2``` drive with
+```xfs``` back filesystem in order to use this featuer
+
+#### Enabling quota
+First check if the quota is enabled or not
+```bash
+mount | grep xfs
+```
+if it's not open the ```/etc/default/grub``` file, add the following
+strind at end of ```GRUB_CMDLINE_LINUX```
+```bash
+rootflags=uquota,pquota
+```
+then reconfigure grub
+```bash
+grub2-mkconfig -o /boot/grub2/grub.cfg
+```
+then reboot the system.
+
+**Note:** You can monitor resource that containers are using with
+```docker stats```
+
+**Note:** ```yes > /dev/null &``` will consume all the cpu, so don't use
+it, just in case you want to test your cpu
+
+## Tagging
+You can make tags for your desierd image with ```docker tag``` command
+```bash
+docker tag <source_image[:tag]> <target_image[:tag]> 
+```
+
+## Dangling images
+Dangling images is an image that is no longer tagged, and appears in
+listings as 	<none>:<none>. A common way they occure is when building a
+new image and tagging it with an existing tag.
+
+To delete all dangling images
+```bash
+docker image prune
+```
+-21:30
