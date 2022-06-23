@@ -530,4 +530,13 @@ To delete all dangling images
 ```bash
 docker image prune
 ```
--21:30
+> sometimes in developer builds a docker image and add and ```v2``` tag
+on it, then (s)he want to add a feature to the image with the same tag.
+in this case the prious version gets a <none> tag and become dangle
+
+## Seraching docker hub from the cli
+```bash
+docker search <image_name>
+```
+# Session 5
+
