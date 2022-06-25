@@ -118,6 +118,26 @@ due to IP address changes.
 
 ## Configuration
 
+Create the directory where MongoDB stores data files before deploying MongoDB.
+Specify the mongod configuration in a configuration file stored in
+```
+/etc/mongod.conf
+```
+ or a related location.
+
+## Procedure
+The following procedure outlines the steps to deploy a replica set when access control is disabled.
+1. Start each member of the replica set with the appropriate options.
+
+For each member, start a mongod instance with the following settings:
+
+    * Set replication.replSetName option to the replica set name. If
+			your application connects to more than one replica set, each set
+			must have a distinct name.
+    * Set net.bindIp option to the hostname/IP or a comma-delimited list
+			of hostnames/IPs.
+    * Set any other settings as appropriate for your deployment.
+
 
 Related:
 ```
