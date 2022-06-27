@@ -540,3 +540,74 @@ docker search <image_name>
 ```
 # Session 5
 
+## Show details of an image or container
+
+```bash
+docker inspect <image_name/image_id>
+docker inspect <docker_name/docker_id>
+```
+
+### Image inspect info
+* Id
+* Repo tags
+* Repo digests - it make our image uniqe all over the repository
+* Parent info
+* Comment
+* Container config
+* Graph driver
+
+## Remove image with ```rmi```
+
+Remove a tag (untag) - it doesn't remove any data
+```bash
+docker rmi <image_name>:<image_tag>
+```
+**Note:** if you apply the previous command on an image that has only
+one tag, the image becam dangle.
+**Note:** While an image is using by a container you can't remove it
+from disk, even if you stop the container and remove the image by
+```-f``` switch and you can't see the image in ```docker images```, the
+stoped container will start again.(you can turn the removed image back
+to image list by pull the image from the repository again)
+
+## Remove container with ```rm```
+```bash
+docker rm <container_name>
+```
+**Note:** If the container that you want to remove is still running, you
+can't remove it. You should first stop the container then remove it or
+use ```-f``` switch.
+
+**Note:** You can remove all the containers at once with 
+```bash
+docker rm -f $(docker ps -qa)
+```
+
+## Docker attach
+Attach local standard input, output, and error stream to a running
+container.
+
+```bash
+docker attach [option] container
+```
+
+**Note:** If a container runs ```bash``` by default, you can execute
+command in that container, because it gives you a prumpt, but in general
+```attach``` command connect you to the container's iostream.
+
+**Note:** You can only attach to a running container.
+
+## Docker exec
+Run a command in a running container
+```bash
+docker exec [option] container command [ARG]
+```
+Run command in a working directory in a running container
+```bash
+docker exec -it -w /home <container_name> ls
+```
+set an environment variable in the current container bash session
+```bash
+docker exec -it -e myvar=value <container_name> bash
+```
+-1:25:09
