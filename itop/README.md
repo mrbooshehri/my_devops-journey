@@ -186,4 +186,58 @@ To complete the functionality there some more steps
 1. User preferences
 
 ## Configuration
+1. Create an organization
+1. Create a delivery model
+1. Create contacs - Admin, agent, and customer should add to the
+	 same organization
+1. Create teams and add memeber to them
+1. Create contract
+1. Create service Family
+1. Create service and service subcategory
+1. Create users and add profile to them
 
+### Mail notification
+
+1. You need a valid mail adress with username and password
+1. Under configuration section ```General configuration```
+1. Comment ```'email_transport' => 'PHPMail'```
+1. Add the following lines instead
+```php
+'email_transport' => 'SMTP',
+'email_transport_smtp.host' => 'mail@mailserver.com',
+'email_transport_smtp.password' => 'PASSWORD',
+'email_transport_smtp.port' => '25',
+'email_transport_smtp.username' => 'ticket@mailserver.com',
+```
+1. then press the ```apply``` button
+
+Typically you need generate for four events:
+1. Ticket creation
+1. Assign to some agent
+1. Resolve the issue
+1. Close the ticket
+
+### Creating triger
+1. Unsr configuration section select ```notification```
+1. Add new trigger
+	1. For new request select ```Trigger (on object creation)```
+		1. For target class select ```User Request```
+	1. For assign ticket to some agent select ```Trigger (on entering state)```
+		1. For target class select ```User Request```
+		1. For state select ```assigned (Assgined)```
+	1. For resolve the request add another trigger to ```Trigger (on entering state)```
+		1. For target class select ```User Request```
+		1. For state select ```resolved (Resolved)```
+	1. For close the request add another trigger to ```Trigger (on entering state)```
+		1. For target class select ```User Request```
+		1. For state select ```closed (Closed)```
+
+**Note:** You can test your email notification functionality by
+```email.test.php```
+
+then we need to create actions
+
+### Creating actions
+To create notification we need to have some object query language (oql)
+knowledge
+7:59
