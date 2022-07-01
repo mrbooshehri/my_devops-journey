@@ -140,3 +140,50 @@ innodb_large_prefix = true
 You can get the latest version of iTop from [here](https://sourceforge.net/projects/itop/files/latest/download)
 # Tuning iTop performance
 Head over [here](https://www.itophub.io/wiki/page?id=3_0_0%3Aadmin%3Aperformance)
+
+# iTop configuration
+## Overview
+### Organize the support team
+For resolve users request first we need to organize the support team.
+Take the picture below  as an example:
+
+![hierarchy](./assets/itop-1.png)
+
+Each team should have a responsible manager and some support agents
+
+There are some steps to follow in order to configure the organization in
+itop:
+
+1. Create organization 
+1. Create users
+	1. Managers - Who have top level administration of the software
+	1. Agents - Who follow up the customer problem with realted team
+	1. Normal User - Who have only portal privilege ,just can login and make a ticket
+1. Create teams and add member to them
+1. Create service contract - It's a required object and describe the
+	 type of service(s) which you provide to the customer , duration of
+	 your contract, and other information regarding to your contract with
+	 your specific custome
+1. Create service families - You can create a category for ralated
+	 services like ```IT service```
+1. Create service - You should bound a contract to the service you want
+	 to add
+1. Create service subcategory - A narrow down specification like ```IT
+	 service -> Netword support -> Network printers```. In this example
+	 ```Network printers``` is subcategory
+1. Create service delivery model - Bind support team members to a
+	 specific customer. If you don't do this step you won't be able to
+	 select any team and assign the ticket to any agent
+1. Add support member to delivery model
+1. Create iTop users for software login
+1. Add permission profile to iTop user
+
+To complete the functionality there some more steps
+1. Email notification setup
+1. Create trigger
+1. Create action
+1. Dashboard design
+1. User preferences
+
+## Configuration
+
