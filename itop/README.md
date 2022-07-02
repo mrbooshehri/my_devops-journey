@@ -238,6 +238,99 @@ Typically you need generate for four events:
 then we need to create actions
 
 ### Creating actions
-To create notification we need to have some object query language (oql)
-knowledge
-7:59
+To create notification we need to have some object query language (OQL)
+knowledge. [Reference](https://www.itophub.io/wiki/page?id=3_0_0%3Aoql%3Astart) 
+
+Under action section click on notification and create yours. hear are
+some expamles:
+
+```
+Name: Notification to the agent
+From: mail@mailserver.com
+To: SELECT Person WHERE id = :this->agent_id
+Subject: The ticket $this->ref$ has been assigned to you
+Body: The ticket $this->ref$ has been assigned to you. Title:
+$this->title$ Description: $this.description$
+$this->head_html(ticket_log)$ for more information on this tickek. click
+here: $this->hyperlink()$
+```
+
+```
+Name: Notification to the caller
+From: mail@mailserver.com
+To: SELECT Person WHERE id = :this->caller_id
+Cc:
+SELECT p2 From Person as p1
+JOIN Person as p2 ON p1.manager_id = p2.id
+WHERE p1.id = this->agent_id
+
+Subject: The ticket $this->ref$ has been Resolved..
+Body: The ticket $this->ref$ has been Resolved.. Title: $this->title$
+Description: $this->description$
+```
+
+```
+Name: Notification to the caller during create
+From: mail@mailserver.com
+To: SELECT Person WHERE id = :this->caller_id
+Subject: The ticket $this->ref$ has been created
+Body: The ticket $this->name()$ has creted.. Title: $this->title$
+Description: :$this->description$
+```
+
+```
+Name: Notification to the manager
+From: mail@mailserver.com
+To: 
+SELECT p2 From Person as p1
+JOIN Person as p2 ON p1.manager_id = p2.id
+WHERE p1.id = :this->agent_id
+
+Subject: The ticket $this->ref$ has been created
+Body: The ticket $this->name()$ has creted.. Title: $this->title$
+Description: $this->description$
+```
+
+For the last thing you should assign notifications to related triggers.
+
+For better understaing about notification see also:
+* [Notifications](https://www.itophub.io/wiki/page?id=3_0_0%3Aadmin%3Anotifications)
+* [Notifications: a step by step example](https://www.itophub.io/wiki/page?id=3_0_0%3Aadmin%3Anotifications-step-by-step)
+
+## Design dashboard
+Under ```Helpdesk``` section select ```All open requests``` the
+customize the the filters to what condition suits you. You can also
+customize the list columns. At the last select ```add to dashboard``` from drop donw
+menu.
+
+
+## Creating shortcut
+Under ```Helpdesk``` section select ```All open requests``` the
+customize the the filters to what condition suits you. You can also
+customize the list columns. At the last  select ```create a shortcut``` from drop donw
+menu.
+
+## Creating charts
+In your dashboard click on the dropdown menu on the right hand side and
+select ```Create a custom version```, then add your favorite chart. The
+following example is a requied configuration for a pie chart which shows
+open/close tickets
+```
+Title: open/close tickets
+Query: $SELECT UserRequest WHERE service_name IN ("service 1","service 2")
+Group by: status [Aggregation, function, Count]
+Style: pie chart
+Order by: status
+Direction: decending
+```
+
+And this is the configuration for a bar chart which displays thicket
+creation per month
+```
+Title: ticket creation per month
+Query: $SELECT UserRequest WHERE DATE_SUB(NOW(), INTERVAL 30 DAY) < state_date
+Group by: start date (day of month)
+Style: pie chart
+Order by: status
+Direction: accending
+```
