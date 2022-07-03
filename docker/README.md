@@ -610,4 +610,58 @@ set an environment variable in the current container bash session
 ```bash
 docker exec -it -e myvar=value <container_name> bash
 ```
--1:25:09
+## Docker cp
+Copy files/folders between a container and the local filesystem. the
+container can be **running** or **stoped**.
+```bash
+docker cp [Option] <container>:<src_path> <des_path>
+docker cp [Option] <src_path> <container>:<des_path>
+```
+**Note:** To copy a file with its all atributes use ```-a``` swith in cp
+command
+
+## Docker stop
+Stop one or more containers
+```bash
+docker stop [Option] <container> [container]
+```
+**Note:** to stop a container with a delay use ```-t``` option
+```bash
+docker stop -t 20 <container>
+```
+**Note:** With ```-t``` option the main process inside the container will recieve
+**SIGTERM**, and after a grace period, **SIGKILL*. 
+
+**Note:** If you see ```Exited (137)``` in ```docker ps``` output it
+means the container has gotten kill signal.
+
+**Note:** You can monitor a container exit code with ```docker wait
+<container>```
+
+Simply you can start any stoped container with ```docker start``` and
+restart the with ```docker restart``` command
+
+**Note:** stop/start containers **will not** remove stored data on the
+container.
+
+## Environment variables
+You can initiate environment variables with ```-e``` option, while you
+are running the container. 
+
+Docker automatically set some environement variables when creating Linux
+container.
+| variable | Value|
+| :-----   | :--- |
+| HOME | Set based on the value of USER |
+| HOSTNAME | The hostname associented with the container |
+| PATH | Includes popular directories, such as /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin |
+| TERM | xterm if the container is allocated a pesudo-TTY |
+
+**Note:** Docker does not set any environment variables when creatin
+windows container.
+
+To set custom env with ```-e```:
+```bash
+docker run -it -e myenv=123 --name cont centos:latest
+```
+# Session 6
