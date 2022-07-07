@@ -665,3 +665,192 @@ To set custom env with ```-e```:
 docker run -it -e myenv=123 --name cont centos:latest
 ```
 # Session 6
+## Docker log
+Fetch the logs of a container
+```bash
+docker logs [Option] <Container>
+```
+you can use ```-f``` to follow log output and ```-t``` to show
+timestamps.
+
+## Docker event
+Get real-time event from the server(Only the last 1000 log events are
+returned)
+```bash
+docker event [Option]
+```
+For example when you stop a container 4 events happen inorder to do so
+1. Container kill
+1. Container die
+1. Network disconnect
+1. Container stop
+
+**Note:** Docker logs and docker events are totally different. Docker
+log demonstrates logs on your container whereas docker event shows the
+events which are happening on your docker host.
+
+### Docker events examples
+
+```bash
+docker events --since '2020-11-26T3:50:20' <container>
+docker events --until '2020-11-26T3:50:20' <container>
+docker events --since '20m' <container> 
+docker events --filter 'event=stop' <container>
+docker events --filter 'container=nginx' <container>
+docker events --filter 'type=network' <container>
+docker events --filter 'type=volume' <container>
+docker events --filter 'scope=swarm' <container>
+```
+
+## Docker pause/unpause (freez/unfreez)
+Pause all processes within one or more containers
+```bash
+docker pause <container> [container]
+```
+Unpause all processes within one or more containers
+```bash
+docker unpause <container> [container]
+```
+
+**Note:** When you pause a container, the requests will be send to the
+container and the container will receive them, but it won't answer them
+- it hase no response, as soon as you unpase the container, it will
+	reponse to all requests it received. It's useful when you want to do maintenance and
+	you don't want to reponse to your clients during the proccess.
+
+## Docker rename
+Rename a container
+```bash
+docker rename <container> <new_name>
+```
+## Docker commit
+Create a new image from a container's changes
+```bash
+docker commit [option] <container> [repository[:tag]]
+```
+
+Example
+```bash
+docker commit --change='CMD ["/bin/sh"]' <container> <new_name[:tag]>
+```
+
+**Note:** It is better to use Dockerfiles to manage your images in a
+documented and maintainable way. Because you can make your changes in a
+small file and push it to a version control service and make different
+versions.
+
+**Note:** By default, the container being commited and its proccess will
+be pause while the image is commited.
+
+
+## Docker save
+Save an archive from the given image with all the nessesary layers
+as a ```.tar.gz``` file. In other words it transforms an image to an archive
+file.
+
+```bash
+docker save -o <name.tar.gz> <container[:tag]>
+```
+## Docker load
+Load ```.tar.gz``` archived image to docker
+```bash
+docker load -i <name.tar.gz>
+# or
+docker load < <name.tar.gz>
+```
+
+## Docker export
+Export a container's filesystem as a tar archive. In the other words it
+transforms a container to an archive file.
+```bash
+docker export [options] <container>
+```
+Example
+```bash
+docker export --output="<name.tar>" <container>
+# or 
+docker export <container> > <name.tar>
+```
+
+## Docker import
+Import an archived container to docker
+```bash
+docker import <name.tar>
+```
+**Note:** When you import an archived file it become dangle image,
+because the value of ```Repository``` and ```TAG``` is ```none```, so
+you need to assign a tag to it with the following commmand
+```bash
+docker tag <image_id> <image_name>:<tag>
+```
+
+**Note:** You don't need to have building images of exported archive on
+the destination host which you want to import that archive.
+
+## Docker flow
+![docker flow](./assets/docker-flow.png)
+
+## Docker logging
+Docker logging is a mechanism to get information from running container.
+Docker daemon has a default logging driver which is json-file. To find
+the current logging driver you can run docker info as follow:
+```bash
+docker info --format'{{.LoggingDriver}}'
+```
+You can chage the default logging driver in
+```/etc/docker/daemon.json```. for example to set the driver to
+```syslog```:
+
+```json
+	{
+		"log-driver":"syslog"
+	}
+```
+If the logging driver has configurable options, you can set them in the
+```daemon.json```
+```json
+	{
+		"log-driver":"syslog"
+		"log-opts":
+			{
+				"max-size":"10m",
+				"max-file":"3",
+				"labels":"production_status",
+				"env":"os,customer"
+			}
+	}
+```
+To run a container with a specific logging dirver use ```--log-driver```
+in the docker run command:
+```bash
+docker run -it --log-driver <logging_driver> alpine sh
+```
+
+to find out current logging driver for a running container:
+```bash
+docker inspect -f '{{.HostConfig.LogConfig.Type}}' <container>
+```
+
+Docker provides two modes for delivering messages from the container to
+the log dirver:
+* direct (defualt) - blocking delivery from container to driver
+* non-blocking - delivery that stores log messages in an intermediate
+	pre-container ring buffer for consumption by driver. (it's useful for
+	those type of applications which has high log generation frequnce, to
+	optimise I/O problems)
+
+**Note:** When the buffer is full and new messages is enqueued, the
+oldest messages in memory is dropped.
+
+**Note:** You can use ```gelf``` log driver to write log messages into
+```graylog``` or ```logstash```
+
+You can use tag log option to customize the log message. For more info
+see [here](https://docs.docker.com/config/containers/logging/log_tags/)
+
+**Note:** You can find the defualt log file under
+```/var/lib/docker/container/<container_id>/<container_id>-json.log```
+as docker does.
+
+## Docker vloume
+-38:32
