@@ -21,6 +21,7 @@ Table of Contents
    * [SELinux configuration](#selinux-configuration)
    * [Tips](#tips-1)
 * [Session 3](#session-3)
+
       * [Check server and agent connection](#check-server-and-agent-connection)
       * [Add host to Zabbix](#add-host-to-zabbix)
       * [Add item to host](#add-item-to-host)
@@ -32,6 +33,7 @@ Table of Contents
    * [Inventory section](#inventory-section)
       * [Tips](#tips-2)
 * [Session 4](#session-4)
+
       * [SSH check another agentless check](#ssh-check-another-agentless-check)
          * [Create public and private key for Zabbix user](#create-public-and-private-key-for-zabbix-user)
       * [zabbix-agent.conf](#zabbix-agentconf)

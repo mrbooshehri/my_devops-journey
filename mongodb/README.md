@@ -11,12 +11,10 @@ enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-5.0.asc
 EOF
 ```
-**Note:** Please consider mongodb version 5 and higher relies on
-```
-avx
-``` 
+**Note:** Please consider mongodb version 5 and higher relies on ```avx``` 
 CPU feature so make sure your CPU has that feature before
 installing version 5 or higher, to check:
+
 ```bash
 grep avx /proc/CPUinfo
 ```
@@ -36,6 +34,11 @@ EOF
 ## Install MongoDB
 ```bash
 yum install mongodb-org
+```
+
+## Remove MongoDB
+```bash
+yum erase $(rpm -qa | grep mongodb-org)
 ```
 
 ## Enable and start service
@@ -100,6 +103,7 @@ members. The use of logical DNS hostnames avoids configuration changes
 due to IP address changes.
 
 ## Network Considerations
+
 * Establish a virtual private network. Ensure that your network topology
 	routes all traffic between members within a single site over the local
 	area network.
@@ -110,19 +114,13 @@ due to IP address changes.
 	within your deployment. See the IP Binding considerations.
 * Ensure that each member of a replica set is accessible by way of
 	resolvable DNS or hostnames. You should either configure your DNS
-	names appropriately or set up your systems' 
-	```
-	/etc/hosts
-	``` 
+	names appropriately or set up your systems' ```/etc/hosts``` 
 	file to reflect this configuration.
 
 ## Configuration
 
 Create the directory where MongoDB stores data files before deploying MongoDB.
-Specify the mongod configuration in a configuration file stored in
-```
-/etc/mongod.conf
-```
+Specify the mongod configuration in a configuration file stored in ```/etc/mongod.conf```
  or a related location.
 
 ## Procedure
@@ -131,12 +129,9 @@ The following procedure outlines the steps to deploy a replica set when access c
 
 For each member, start a mongod instance with the following settings:
 
-    * Set replication.replSetName option to the replica set name. If
-			your application connects to more than one replica set, each set
-			must have a distinct name.
-    * Set net.bindIp option to the hostname/IP or a comma-delimited list
-			of hostnames/IPs.
-    * Set any other settings as appropriate for your deployment.
+* Set replication.replSetName option to the replica set name. If your application connects to more than one replica set, each set must have a distinct name.
+* Set net.bindIp option to the hostname/IP or a comma-delimited list of hostnames/IPs.
+* Set any other settings as appropriate for your deployment.
 
 
 Related:
