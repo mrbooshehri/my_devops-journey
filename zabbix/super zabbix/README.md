@@ -1,3 +1,6 @@
+Table of Contents
+=================
+
 * [Session 1](#session-1)
    * [Installation](#installation)
       * [Network time protocol and timezone](#network-time-protocol-and-timezone)
