@@ -853,4 +853,96 @@ see [here](https://docs.docker.com/config/containers/logging/log_tags/)
 as docker does.
 
 ## Docker vloume
--38:32
+There are to main catgory of data:
+* non-persistent
+* Persistent - stuff you need to keep
+
+### non-persistent storage
+It's automatically created alongside the container, and it's tied to the
+life-cycle of the container. That means deleting the container will
+delete this storage and any data on it.
+
+### Persistent storage
+The recommaneded way to persist data in containers is using volumes. You
+create a volume, then you create a container, and mount the volume into
+it. If you delete the container the volume and its data still exist and
+available.
+
+By defualt all files created inside a container are stored on a writable
+container layer which means:
+
+* The data doesn't presist when the container no longer exist, and it
+	can be difficult to get data out of the container if another
+	proccess needs it
+* The writable 	layer is tightly coupled to the host machine where the
+	container is running. You can't easily move the data somewhere else
+* Writing into a container's storage layer requier a storage driver to
+	manage the filesystem. This extra abstraction reduce the performance
+	as compared to using data volumes, which wirte directly to the host
+	filesystem
+
+Docker has two options for containers to store files in the host
+machine, so that the files are persisted even after the container stops
+
+There are there ways to mount data inside a docker container
+
+* volumes
+* bind mount
+* tmpfs (only on linux hosts)
+
+[types-of-mounts-volume](./assets/types-of-mounts-volume.png)
+
+### Volumes
+Volumes are stored in a part of the host filesystem which is managed by
+docker (/var/lib/docker/volume on linux). Non-Docker proccesses should
+not modify this part of the filesystem. Volumes are the best way to
+persist data in docker.
+![Docker-8.0](./assets/Docker-8.0.png)
+The ```/code``` directory is a docker volume. Any data written in the
+```/code``` directory inside the container will be stored on the volume
+and will be exist after the container is deleted. All other directories
+use the containers ephemeral local storage.
+
+#### Creating docker volumes
+
+```bash
+docker volumes create [options] [volume]
+```
+Examples
+```bash
+docker volumes create --name myvol --label testvol
+```
+**Note:** If a name is not specified, docker generates a random name.
+
+**Note:** Volume names must be unique among drivers.
+
+```bash
+docker run -d -v myvol:/data --name mycent centos:lates
+```
+**Note:** ```-v``` docker_path:container_path:permission(ro,rw)
+
+**Note:** If the ```container_path``` doesn't exist while container
+creation, docker will create that path automatically
+
+**Note:** You can get all information about the volume with the hlep of
+the following command
+```bas
+docker volume inspect <volume>
+```
+**Note:** You can list the existing volumes with ```docker volume ls```
+and filter the output by ```-f``` on label, driver, or name criteria
+
+**Note:** You can find all containers which are using specific volume
+with the following command
+```bash
+docker ps --filter volume=<volume_name>
+```
+
+### Bind mount
+Bint mount may be stored anywhere on the host system. Non-Docker
+processes on the docker host or a docker container can modify them at
+any time.
+
+### tmpfs
+tmpgs mounts are stored in the host system's memory only, and are never
+written to the host system's filesystem
