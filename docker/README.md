@@ -897,7 +897,9 @@ Volumes are stored in a part of the host filesystem which is managed by
 docker (/var/lib/docker/volume on linux). Non-Docker proccesses should
 not modify this part of the filesystem. Volumes are the best way to
 persist data in docker.
+
 ![Docker-8.0](./assets/Docker-8.0.png)
+
 The ```/code``` directory is a docker volume. Any data written in the
 ```/code``` directory inside the container will be stored on the volume
 and will be exist after the container is deleted. All other directories
@@ -938,6 +940,17 @@ with the following command
 docker ps --filter volume=<volume_name>
 ```
 
+#### Removing docker volume
+```bahs
+docker volume rm <volume>
+```
+
+**Note:** You can only remove unused volume, otherwise you can not
+remove it, even the container which use that volume is in stop state.
+
+**Note:** You can remove all unused volumes wiht ```docker volume prune```
+
+
 ### Bind mount
 Bint mount may be stored anywhere on the host system. Non-Docker
 processes on the docker host or a docker container can modify them at
@@ -946,3 +959,51 @@ any time.
 ### tmpfs
 tmpgs mounts are stored in the host system's memory only, and are never
 written to the host system's filesystem
+
+# Session 7
+
+## Create NFS docker volume
+```bash
+docke volume create --driver local --opt type=nfs --opt o=addr=<server nfs ip address>,rw --opt device=:<store path on nfs> <NFS_name>
+```
+
+## Using --mount flag in docker run command
+The --mount flag allows you to mount volumes and host-directories in a
+container.
+
+```bash
+docker run -itd --name mycent --read-only --mount type=volume,source=myvol,target=/data centos:latest /bin/bash
+```
+
+**Note:**
+* If the myvol volume does not exist this flag create it automatically.
+	(same as ```-v``` flag)
+* Even though there is no plan to deprecate ```--volume```, usage of
+	```--mount``` is recommended.
+* ```--read-only``` mounts the container's root filesystem 	as read only
+	prohibiting writes to locations other than the specified volumes for
+	the container
+* ```type=bind``` the host-path must refer to an existing path on the
+	host.
+
+## Sharing volumes
+
+![pic_7.jpg](./assets/pic_7.jpg)
+
+You can write in a single file from different source simultaneously, it
+will handle by os. In some case some apps lock the file and you can't do
+it.
+
+## Benefits of volumes
+Volumes are preferred way to persist data in docker containers and
+services.
+
+* Sharing data among multiple running containers
+* Volumes are only removed when you explicitly remove them
+* Decouple the configuration of the docker host from the container
+	runtime
+* Store your container's data on a remove host or a cloud provicer,
+	rather than locally
+* Back up, restore, or migrate data from one docker host to another
+
+-1:53:23
