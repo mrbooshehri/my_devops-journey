@@ -1006,4 +1006,93 @@ services.
 	rather than locally
 * Back up, restore, or migrate data from one docker host to another
 
--1:53:23
+**Note:** You can change some container's features by ```docker
+update``` commnad - you can not mount volume to a running container
+
+## Volume's advantages over bind mount
+* Volume are easier to backup and migrate than bind mounts
+* You can manage volumes using docker CLI commnads or the docker API -
+	like ```docker volume ls``` or ```docker volume inspect```, ...
+* Volumes work on both Linux and Windows containers
+* Volumes can be more safely shared amoung multiple containers - in
+	terms of security
+* Volume diver let you store volumes on remote hosts or cloud providers,
+	to encrypt the content of the volume, or to add other functionality
+* New volumes can have thier content pre-populated by a container
+* If you use ```--mount``` to bind-mount a file or directory that does
+	not exist yet on the Docker host, Docker does not automatically create
+	it for you, but generates an error
+
+## Tmpfs usage
+* When you create a container with a tmpfs mount, the container can
+	create files outside the container's writable layer
+* As opposed to volumes and bind mounts, a tmpfs mount is temporary, and
+	only persists in the host memory. When the container stops, the tmpfs
+	mount is removed, and files written there won't be persisted
+* This is useful to termporarily sotre senstive files that you don't
+	want to persist in either the hsot or the container writable layer.
+
+Limitationas:
+
+* Unlike volumes and bind mounts, you can't share tmpfs between
+	containers
+* This functionality is only available if you're running docker on Linux
+
+```bash
+docker run -id --name mycent --tmpfs /tmp centos:latest
+# or
+docker run -id --name mycent --mount type=tmpfs,destination=/tmp centos:latest
+```
+
+**Note:** ```tmpfs``` does not need source, as it use host memory as its
+source
+
+## Docker Networking
+Docker networking	comprises three major components:
+* The docker Network model (CNM) - the design specification which is an
+	open-source pluggable architecture
+* Libnetwork - Docker's real-word implementation of the CNM which is
+	writtern in Go, and it provides all of Docker'r core networking
+	functionality
+* Drivers - extend the model by implementing specific network
+	topolgies
+
+### The container network model (CNM)
+The design guide for Docker networking is the CNM. It defines three
+building blocks:
+
+* Sandboxes - An isolated network stack. It includes, Ethernet
+	interfaces, ports, routing table, and DNS config
+* Endpoints - They are virtual network interfaces. Like normal
+	network interfaces, they're responsible for making connections. In the
+	case of the CNM, it's the job of the endpoint to connect a sandbox to
+	a network
+* Network - A software implementation of an 802.1d bridge (more commonly
+	known as a switch)
+
+![cnm](./assets/cnm.png)
+
+* Container Athos communicate with contaienr Porthos via bukingham
+	netwrokd 
+* Container Aramis communicate with contaienr Porthos via rochfort
+	netwrok 
+* Porthos two endpoints cannot communicate with eachother without the
+	assistance of a layer 3 router
+* If a container needs to connecting to multiple netwroks, it needs
+	multiple endpoints.
+
+### Libnetwork
+It implements all the three components defined in the CNM. It also
+implements native service discovery, ingress-based container load
+balancing, and network control plane and management palne functionality
+
+### Driver
+Drivers implement the data plane. For example, connectivity and
+isolation is all handled by drivers. Each driver is in charge of the
+acutal creation and mangement of all resources on the networks it is
+responsible for.
+
+-37:11:00
+![docker-7.5](./assets/docker-7.5.png)
+
+
