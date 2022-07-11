@@ -4,67 +4,67 @@
 sudo yum install https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
 ```
 
-1. Install postgres
+2. Install postgres
 ```bash
 yum install postgresql11-server
 ```
-1. Initail database
+3. Initail database
 ```bash
 /usr/pgsql-11/bin/postgresql-11-setup initdb
 ```
-1. Enable and start db
+4. Enable and start db
 ```bash
 systemctl enable --now postgresql-11.service
 ```
-1. Change data directory [optional]
+5. Change data directory [optional]
 	1. Login to ```postgres``` user
 	```bash
 	su - postgres
 	whoami
 	```
-	1. Enter into postgres CLI
+	2. Enter into postgres CLI
 	```bash
 	psql
 	```
-	1. Check the data directory and quite
+	3. Check the data directory and quite
 	```postgres
 	postgres=# SHOW data_directory;
 	\q
 	```
-	1. Note ownership and permissions of data directory files
+	4. Note ownership and permissions of data directory files
 	```bash
 	ls -l /var/lib/pgsql/11/data
 	```
-	1. Stop the service
+	5. Stop the service
 	```bash
 	systemctl stop postgresql-11
 	systemctl status postgresql-11
 	```
-	1. Set ownership and permission to your target directory
+	6. Set ownership and permission to your target directory
 	```bash
 	chown postgres:postgres <directory>
 	chmod 700 <directory>
 	```
-	1. Remove old config files which you copied [in centos only]
+	7. Remove old config files which you copied [in centos only]
 	```bash
 	rm /pgdata/data/pg_hba.conf
 	rm /pgdata/data/pg_ident.conf 
 	rm /pgdata/data/postgresql.auto.conf 
 	rm /pgdata/data/postgresql.conf
 	```
-	1. Login into ```postgres``` user
+	8. Login into ```postgres``` user
 	```bash
 	su - postgres
 	```
-	1. Change ```data_directory``` in ```/var/lib/psql/11/data/postgres.conf```
+	9. Change ```data_directory``` in ```/var/lib/psql/11/data/postgres.conf```
 	```bash
 	data_directory='PATH_TO_DATA'
 	```
-	1. start service
+	10. start service
 	```bash
 	SHOW data_directory;
 	```
-	1. Login into postgres and check the ```data_directory``` as you did in previous steps
+	11. Login into postgres and check the ```data_directory``` as you did in previous steps
 	
 
 Related
