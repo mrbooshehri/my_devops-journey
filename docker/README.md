@@ -1092,7 +1092,46 @@ isolation is all handled by drivers. Each driver is in charge of the
 acutal creation and mangement of all resources on the networks it is
 responsible for.
 
--37:11:00
 ![docker-7.5](./assets/docker-7.5.png)
+
+### Single-host bridge network
+
+* **Single-host:** It only exist on a sigle docker host and can only
+connect containers that are on the same host.
+* **Bridge:** It's an implementation of an 802.1d bridge
+
+### Docker network driver types
+#### Bridge
+The default network driver. They're usually used when your application
+is run in standalone containers that needs to comunicate.
+
+#### Host
+For standalone containers, remove network isolation between container
+and the docker host, and used the host network directly.
+
+#### None
+Disable all networking. Usually used in conjunction with a custom
+networking driver. None is not available for swarm services.
+
+#### Overlay
+Overlay connects multiple docker daemons together and enable swarm
+services to communicate with each other. You can use also overlay
+netwrok to facilitate communicate between a swarm service and a
+standalone container, or between standalone containers on different
+docker daemons.
+
+#### Macvlan
+Macvlan allows you to assign a MAC address to a container, make it
+appear as a physical device on your network. The docker daemon routes to
+containers by their MAC address. Using the macvlan network sometimes is
+the best choice when dealing with legacy applications that expect to be
+directly connected to the physical network, rather than	routed through
+the docker host's netwrok stack.
+
+### Docker Network inspect
+
+![bridge1](./assets/bridge1.png)
+
+# Session 8
 
 
