@@ -27,7 +27,7 @@ provider distributed installers. It’s a preferred way for those ones
 want to deploy production-grade Kubernetes clusters on an on-premises
 environment or want to manage cluster lifecycle manually.
 
-1. kubespray - a collection of Ansible playbooks that are used to deploy
+1. [kubespray](https://kubespray.io) - a collection of Ansible playbooks that are used to deploy
 	 production-grades clusters on both bare-metal and the cloud.
 	 Alongside the installation, day two operations can be performed with
 	 kubespray.{SEARCH FOR TERM 'day two operations'}
@@ -151,7 +151,12 @@ To meet these goals, RKE2 does the following:
 The certified Kubernetes distribution built for IoT & Edge computing -
 Lightweight Kubernetes
 
-Related:
+
+# cluster lifecycle manager
+
+
+# Related
+
 ```
 * https://itnext.io/kubernetes-installation-methods-the-complete-guide-1036c860a2b3
 * https://containerjournal.com/topics/container-ecosystems/kubernetes-distribution-what-it-is-and-what-it-isnt/
@@ -160,3 +165,5 @@ Related:
 * https://docs.rke2.io/
 * https://k3s.io/
 ```
+
+
