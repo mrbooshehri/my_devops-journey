@@ -14,8 +14,8 @@
 ## Kubernetes Architecture
 ![Kubernetes-Architecture](./assets/Kubernetes-Architecture-1.png)
 ![Containerd_version](./assets/Containerd_version.png)
-![Container runtimes](./assetes/assets/container_runtime.jpeg)
-![components-of-kubernetes.png](./assetes/components-of-kubernetes.png)
+![Container runtimes](./assets/assets/container_runtime.jpeg)
+![components-of-kubernetes.png](./assets/components-of-kubernetes.png)
 
 ## Deploy k8s cluster
 * Production
