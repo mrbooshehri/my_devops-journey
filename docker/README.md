@@ -1134,4 +1134,79 @@ the docker host's netwrok stack.
 
 # Session 8
 
+## Create docke network
+```bash
+docker network create -d <deeriver_type> <network_name> 
+```
+**Note:** ```bridge``` is  the default deriver in docker creation
+
+## Join container to a specific network
+```bash
+docker run -it --name <name> --network <network_name> <image>
+```
+## Docker default bridge vs user-defined bridge
+* User-defined bridges provide automatic **DNS resolution** between
+	containers
+	* The default bridge network on Linux do not support name resolution via
+	  the docker DNS service. All other user-defined bridge network do!
+* User-defined bridges provide better **isolation**
+	* All contianers without a --network specified, are attached to
+		default bridge network. This can be a risk, as unrelated
+		stacks/services/continers are then able to communicate.
+* Contaiener can be **attached and detached from user-defined networks
+	on the fly**
+	* During a contianer lifetime, you can connect or disconnect it from
+		user-defined networks on the fly. To remove a container from default
+		bridge network, you need to stop container and recreate it with
+		different network option.
+
+## Connect or disconnect a container to/from network(s)
+```bash
+docker network connect <network_name> <contianer_name>
+docker network disconnect <network_name> <contianer_name>
+```
+
+## Port mapping/publishing
+![Docker-ports](./Docker-ports.png)
+
+* Port mapping let you map container port to a port on Docker host
+```bash
+docker run -it --name <name> -p <host_port>:<container_port> <image>
+```
+to show all used port by a container
+```bash
+docker port <container_name>
+```
+## Enabale forwarding from docker containers to outside world
+By default traffic from containers connceted to the default bridge
+network is not forwarded to the outside world. To enable forwarding:
+```bash
+sysctl net.ipv4.conf.all.forwarding=1
+sudo iptables -P FORWARD ACCEPT
+```
+## Set static IP on containers
+```bash
+# assign to a created container
+docker run -itd --name cent1 centos
+docker network create --subnet 192.168.100.0/24 mynet
+docker network conncet --ip 192.168.100.10 cent1
+# while you creating a new container 
+docker run -itd --name cent2 --network mynet --ip 192.168.100.20 centos
+```
+
+## Connecting to existing networks(MACVLAN driver)
+The ability to containerized apps **to external system and pyshical networks**
+
+Pros of using MACVLAN:
+* MACVLAN is good as it doesn't requier port mapping or additional
+	bridges - you connceted the container interface to the host interface
+	(or a sub-interface)
+Cons of using MACVLAN:
+* It requiers the host NIC to be in promiscuous mode, which isn't allowd
+	on most public cloud platforms
+* Assumes we have an existing physical netwrok with two VLANs:
+	* VLAN 100: 10.0.0.0/24
+	* VLAN 200: 192.168.3.0/24
+
+# Session 9
 
