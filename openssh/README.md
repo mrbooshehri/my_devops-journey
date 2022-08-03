@@ -13,6 +13,7 @@ wget https://ftp.openssl.org/source/openssl-1.1.1g.tar.gz
 ```
 
 3. Install telnet [Optional]
+
 In case you don't access to your machine install telnet ass backup connection method
 
 Installation
@@ -33,6 +34,7 @@ telnet 127.0.0.1
 ```
 
 4. Upgrade ```openssl```
+
 Backup
 ```bash
 mv /usr/bin/openssl /usr/bin/openssl_old
@@ -43,6 +45,7 @@ tar xzvf openssl-1.1.1g.tar.gz
 cd openssl-1.1.1g/
 ./config shared && make && make install
 ```
+
 Configure soft connection
 ```bash
 ln -s /usr/local/bin/openssl /usr/bin/openssl
@@ -50,7 +53,7 @@ ln -s /usr/local/bin/openssl /usr/bin/openssl
 If implementedopenssl versionReport the following error
 ```bash
 openssl: error while loading shared libraries: libssl.so.1.1: cannot open shared object file: No such file or directory
-5. ```
+```
 Execute the following command to solve the problem:
 ```bash
 ln -s /usr/local/lib64/libssl.so.1.1 /usr/lib64/
@@ -62,6 +65,7 @@ openssl_old version
 openssl version
 ```
 5. Upgrade openssh
+
 Install required dependencies
 ```bash
 yum install zlib-devel  openssl-devel  pam-devel -y
@@ -85,6 +89,7 @@ vim /etc/ssh/sshd_config
 #Example: configure root login according to your previous configuration
 PermitRootLogin yes
 ```
+
 Start up
 ```bash
 mv /usr/lib/systemd/system/sshd.service /etc/ssh_old/sshd.service
