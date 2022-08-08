@@ -1210,3 +1210,85 @@ Cons of using MACVLAN:
 
 # Session 9
 
+## Service discovery
+Service discovery allows all containers and swarm services to locate
+each other with name. The only requierment is that they have to be on the
+same netwrok. All docker containers have a local DNS resolver.
+
+![dns](./assets/dns.jpg)
+
+**Note:** Service discovery only works for user-defined networks, and
+not for default network.
+
+## Nerwork Trubleshooting
+If you're having netwrok issue with your application's container, you
+can launch netshoot with that container's network namesapce like:
+```bash
+docker run -it --net contianer:<container_name> nikolaka/netshoot
+```
+If you think the networking issue is on the host itselt, you can launch
+netshoot with that host network namespace:
+```bash
+docker run -it --net host nikolaka/network
+```
+### Checking containers network performance
+With ```iperf``` you can analyze container's performance
+```bash
+docker create network perf-test
+docker run -itd --name perf-test-a --network perf-test nicolaka/netshoot iperf -s -p 9999
+docker run -itd --name perf-test-b --network perf-test nicolaka/netshoot iperf -c perf-test-a -p 9999
+docker logs perf-test-a
+```
+### Check container's ports with ```netstat```
+```bash
+docker run -d --name mynginx -p 80:80 nginx
+docker run -it --network container:mynginx nicolaka/netshoot
+netstat -na
+```
+You can scan a container port with ```nmap``` too, but you need to run a
+```--privileged``` container, a continer that has root access to your
+host, as bellow
+```bash
+docker run --it --privileged nicolaka/netshoot nmap -p 1-1024 -dd <contianer_ip> | grep open
+```
+
+### Check interface traffic with ```iftop```
+```bash
+docker run -d --name mynginx -p 80:80 nginx
+docker run -it --network container:mynginx nicolaka/netshoot iftop -i eth0
+```
+
+### Check containers function with ```ctop```
+```bash
+docker run -it -v /var/run/docker.socket:/var/run/docker.socket nicolaka/netshoot ctop
+```
+
+**Note:** ```netshoot``` needs that volume to get information about
+other containers
+
+### Snif containers with ```termshark```
+```bash
+docker run --cap-add NET_ADMIN --cap-add CAP_NET_RAW -it --network container:<container_network> \
+nicolaka/netshoot termshark -i eth0 tcp
+```
+
+**Note:** ```netshoot``` needs those capablities to snif traffic with
+```termshark```. You can read more about capablities in whitelist
+capablity
+
+### Analyzing network using netcat
+Check if firewall drop a connction or not
+```bash
+docker run -d --name mynginx -p 80:80 --netwrok <network_name> nginx
+docker -itd --nmae mynetcat --netwrok <network_name> nicolaka/netshoot nc -vz mynginx 80
+docker logs mynetcat
+```
+
+## Build custom docker image
+
+* A ```Dcokerfile``` is a text document that containes all the commnads a user
+could call on the command line to assmble an image.
+* The ```docker build``` commnad builds an image from a ```Dockerfiles``` 
+
+-1:39:18
+
