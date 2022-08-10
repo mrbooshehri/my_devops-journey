@@ -28,7 +28,7 @@ chmod u+x atlasian-confluence-xxx.bin
 ```
 then run it
 ```bash
-./https://github.com/hgqapp/atlassian-agent
+./atlasian-confluence-xxx.bin
 ```
 then follow the installation felow. Remember, **NOT TO START CONFLUENCE** during installation proccess or after it.
 
