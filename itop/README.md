@@ -334,3 +334,18 @@ Style: pie chart
 Order by: status
 Direction: accending
 ```
+
+## Install custom language for itop
+
+After installing itop copy ```en-us.dict.php``` from ```/var/www/itop/env-production/dictionaries```, then translate the section you care about, for example if you want to translate ```standard portal``` run the following commands:
+
+```bash
+cp /var/www/itop/env-production/dictionaries/en-us.dict.php <des-dir>
+grep Portal en-us.dict.php  
+```
+you should change the value of the printed data from the last command with your editor of choice.
+
+After all you need to remove all caches under ```/var/www/itop/data/*```
+```bash
+rm -rf /var/www/itop/data/*
+```
