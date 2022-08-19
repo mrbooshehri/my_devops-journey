@@ -1288,7 +1288,130 @@ docker logs mynetcat
 
 * A ```Dcokerfile``` is a text document that containes all the commnads a user
 could call on the command line to assmble an image.
-* The ```docker build``` commnad builds an image from a ```Dockerfiles``` 
+* The ```docker build``` commnad builds an image from a
+	```Dockerfiles```  and a context. The build is run by the Docker
+	daemon, not by the CLI. The first thing a build process does is send
+	the entire context to the daemon.
 
--1:39:18
+**Note:** It's best practice to start with an empty directory as context
+and keep your ```Dockerfile``` in that directory. Add only the files
+needed for building the ```Dockerfile```.
 
+## Dockerfile instructions
+
+### ```From```
+A ```Dockerfile``` must begin with a ```FROM``` instruction. The
+```FROM``` instruction specifies the parent image from which you are
+building and sets the Base Image.	
+
+**Note:** Docker allows multiple ```FROM``` instructions in a single
+```Dockerfile``` in order to create multiple images.
+
+Example:
+```bash
+mkdir ~/dockerfile_example
+echo "FROM centos:latest" >> ~/dockerfile_example/Dockerfile
+cd ~/dockerfile_example
+docker build -t myimage:v1 .
+```
+**Note:** ```-t``` will tag/name your image.
+
+**Note:** The ```.``` in ```dcoker build``` command is the path of your
+dockerfile
+
+**Note:** In this example the image ID of ```cnetos``` and ```myimage```
+will be the same because we did not change the original image.
+
+**Note:** If you want to build your image from scratch you can do the
+following:
+
+```dockerfile
+FROM scratch
+ADD IMAGE_FILE.tar.xz /
+```
+
+### ```LABLE```
+Labels are some metadata for more information about our image, nothing
+more.
+```dockerfile
+FROM cnetos:laest
+LABEL maintainer="name"
+LABEL description="This is a simple image"
+LABEL version="v1.0"
+```
+
+### ```COPY```
+It's using in case of your want to copy file or directory from your
+docker host to your docker image.
+
+```dockerfile
+COPY [--chown=UID:GID] /PATH/TO/FILE/OR/DIR/ON/HOST/NEAR/DOCKERFILE /PATH/TO/FILE/OR/DIR/ON/IMAGE
+```
+
+**Note:** If you put ```/``` at the end of the path on image side,
+docker will create directory automatically, for example
+```dockerfile
+COPY test.txt /sabple_dir/
+```
+
+### ```ADD```
+This instructions copies new files, directories or remote file URLs from
+<srs> to <des> 
+```dockerfile
+ADD [--chown=UID:GID] /PATH/TO/FILE/OR/DIR/ON/HOST/NEAR/DOCKERFILE /PATH/TO/FILE/OR/DIR/ON/IMAGE
+```
+
+### ```ADD``` vs ```COPY```
+
+* ```ADD``` allows <src> to be a URL
+* If it's a local tar archive in a recognized Compression format
+	(identity, bzip2, gzip or xz) then it's unpacked as a directory.
+* Resourcese form URLs are not decompressed.
+* Using ```COPY``` is recommaneded where the magicof ```ADD``` is not
+	required.
+
+### ```RUN```
+The ```RUN``` instruction will execute any commands in a new layer on
+top of the current image and commit the result.
+
+```dockerfile
+RUN <commands> #(shell form)
+RUN ["executable","param1","param2"] #(exec form)
+```
+The default shell is ```/bin/sh -c``` on Linux. To use a different
+shell:
+
+```dockerfile
+RUN /bin/bash -c 'echo hello'
+RUN ["/bin/bash","-c","echo hello"]
+```
+
+### ```ENV```
+The ```ENV``` instruction set the environment variable <key> to the
+<value>.
+
+```dockerfile
+ENV <key>=<value>
+```
+To set a value for a single command:
+```dockerfile
+RUN <key>=<value> <command>
+```
+
+### ```USER```
+The ```USER``` instruction set the username (or UID) and optionally
+the user group (or GID) to use when running the image and for any,
+```RUN```, ```CMD``` and ```ENTRYPOINT``` instructions 
+
+```dockerfile
+USER 	<user>[:<group>]
+USER 	<UID>[:<GID>]
+```
+**Note:** Remember you should add the user before you run ```USER```
+commnad.
+```dockerfile
+RUN useradd mohammad
+USER mohammad
+```
+
+# Session 10
