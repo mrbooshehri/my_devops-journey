@@ -1413,5 +1413,151 @@ commnad.
 RUN useradd mohammad
 USER mohammad
 ```
-
 # Session 10
+
+## Continue of Dockerfile instructions
+
+### ```WORKDIR```
+It sets the working directory for any ```RUN```, ```CMD```,
+```ENTRYPOINT```, ```COPY```, and ```ADD``` instructions.
+
+**Note:** If the working directory doesn't exist, it will be created
+
+### ```VOLUME```
+It creates a mount point with the specified name and marks it as holding
+externally mounted volumes from native host or other containers.
+```dockerfile
+VOLUME ["PATH_1","PATH_1"]
+```
+
+```dockerfile
+VOLUME /myvol_1 
+VOLUME ["myvol_1","myvol_2"]
+```
+**Note:** The host directory is declared at container run-time
+```bash
+docker -it --name mycent -v /home/test1:myvol_1 -v /home/test1:myvol_2
+mycentos:v1
+```
+### ```EXPOSE```
+It inform Docker that the container listens on the specific network port
+at **run-time**.
+```docker
+EXPOSE <port> [<port>/<protocol>...]
+```
+
+**Note:** This instruction does not actually publish the port. It
+functions as a type of documentation. To actually **publish** the port
+when running the container, use ```-p``` flag on ```docker run``` to
+publish and map.
+
+### ```CMD``` (considerable)
+The main purpose of a ```CMD``` is to provide defaults for an executing
+container. These defaults can including an executable, or the can omit
+the executable, in which case you must specify an ```ENTRYPOINT``` 
+instruction as well.
+
+```dockerfile
+CMD ["executable","param_1","param_2"] (preferred form)
+CMD ["param_1","param_2"] (as defaults params to ENTRYPOINT)
+CMD command param_1 param_2 (shell form)
+```
+
+### ```ENTRYPOINT```
+It allows you to configure a container that will run as an executable.
+```dockerfile
+ENTRYPOINT ["executable","param_1","param_2"]
+ENTRYPOINT command param_1 param_2
+```
+
+**Note:** You cannot **override** an ```ENTRYPOINT``` when starting a
+container unless you add the ```--entrypoint``` flag.
+
+
+#### ```CMD``` and ```ENTRYPOINT```
+* If ```CMD``` is used to provide default arguments for the
+	```ENTRYPOINT``` instruction, both ```CMD``` and ```ENTRYPOINT```
+	instructions should be specified with the JSON format.
+* When used in the shell or exec format, the ```CMD``` instruction sets
+	the command to be executed when running the image.
+* If docker has multiple ```CMD```s, it only applies the instructions
+	from the last one.
+* If the user specifies arguments to ```docker run``` they will override
+	the default specified in ```CMD```
+
+```dockerfile
+# for bullet 1
+ENTRYPOINT ["/bin/cp"]
+CMD ["/mnt/file","/opt/file"]
+```
+
+```dockerfile
+# for bullet 2
+ENTRYPOINT ["ping"]
+CMD ["8.8.8.8"]
+
+# to override the default CMD
+docker run <image_name>:<tag> 4.2.2.4
+```
+
+#### ```CMD``` vs ```ENTRYPOINT```
+* Containers are designed for running specific task and process, not for
+	hosting and oprating system.
+* Once the process stops, the container stops as well
+* There are two types of instructions that can define the process
+	running in the container:
+	* ENTRYPOINT: command to run when container starts.
+	* CMD: command to run when container starts or arguments to ENTRYPOINT
+		if it exists.
+* Docker has a define ENTRYPOINT which is ```/bin/sh -c``` but does not
+	have the default command. 
+
+### ```SHELL```
+* It allows the default shell used for the shell form of command to be
+overriden.
+* The default shell on Linux is ```["bin/bash","-c"]```, and on windows
+	is ["cmd","/S","/C"]
+* The ```SHELL``` instruction must be written in JSON format in
+	dockerfile.
+
+```dockerfile
+SHELL ["executable","param"]
+```
+### ```HEALTHCHEACK```
+It tells docker how to test a container to ckeck that it is still
+working. This can detect cases such as a web server that is stuck an
+infinit loop and unable to handle new connections, even though the
+server process is still runnign.
+
+```dockerfile
+HEALTHCHECK [option] CMD command
+```
+
+The options that can be appear before ```CMD```:
+1. ```--interval```=DURATION (default: 30s)
+1. ```--timeout```=DURATION (default: 30s)
+1. ```--start-period```=DURATION (default: 0s)
+1. ```--retries```=N (default: 3)
+
+## Dockerfile besr practice
+
+* Incremental (build time)
+* Image size
+* Maintaiability
+* Security
+* Consistancy/Repeatability
+* Areas of improvement
+* Order from least to most frequently changing contect, in case of using
+	docker cashed stages.
+* Only copy what needed. Avoid ```copy .``` if possible.
+* prevent to using outdated package cache
+* Remove unnecessary dependencies
+* Remve package manager cache
+* Use official images when possible
+* The ```latest``` tag is a rolling tag. Be specific, to prevent
+	unxpected changes in your base image.
+* looking for minimal flavors of your image
+
+## Port expose vs port publish
+
+# Session 11
