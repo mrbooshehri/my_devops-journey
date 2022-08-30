@@ -1561,3 +1561,54 @@ The options that can be appear before ```CMD```:
 ## Port expose vs port publish
 
 # Session 11
+
+## Docker history
+
+Show the histroy of an image
+```bash
+docker histroy [option] <image_name>
+```
+
+**Note:** You can find out how the image had build in case of you don't
+have docker file, and with the help of that write your own.
+
+## Start container automatically
+
+Docker provides restart policies to control whether your containers
+starts automatically when they exit , or when docker restarts.
+
+```bash
+docker run -it --name <name> --restart [flag] <image:tag>
+```
+
+| Flag | Description |
+| ---- | ----------- |
+| no | Do not automatically restart the container. (default) |
+| on-failure | Restart the container if it exits due to an error, which manifests as non-zero exit code.|
+| always | Always restarts the container when it stops. If it manualy stoped, it is restarted only when docker daemon restarts on the container itself is manually restarted.|
+| unless-stopped | Simillart to always, except that when the container is stopped (manually or otherwise), it is not restared even after docker daemon restarts.|
+
+| Exit code | Description |
+| 0 | indicates that the specific container does not have a foreground process attached.|
+| 1 | indicates failiure due to application error |
+| 137 | indicates that container received SIGTERM |
+| 139 | indicates that the container received SIGSEGV. SIGSEGV indicates a segmentation fault. This occurs when a program attempts to access a memory location that it's not allowed to access.|
+| 143 | initiates that the container received SIGTERM |
+| 126 | indicates permission problem or command is not executable.|
+| 127 | indicates posible typo in shell script with unrecognizable character.|
+| 225 | indicates that there was an error in running the ENTRYPOINT/CMD.|
+
+## Deploy a registry server
+
+A registry is a storage and contect delivery system, holding name Docker
+images, available in different tag versions.
+
+### Run a local registry
+
+```bash
+docker run -d -p 5000:5000 --restart=always --name registry registry:2
+```
+
+The registry now is ready to use in test environment.
+
+-1:56:30
