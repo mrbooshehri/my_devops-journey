@@ -1611,4 +1611,107 @@ docker run -d -p 5000:5000 --restart=always --name registry registry:2
 
 The registry now is ready to use in test environment.
 
--1:56:30
+**Note:** When you want to push your image to registry, you should add a
+tag to it as the folloing format:
+```bash
+docker tag <image_name>:<label> <rgistry_address>[:<registry_port>]/<image_name>:<lable>
+```
+then push that to the repo.
+```bash
+docker push <rgistry_address>[:<registry_port>]/<image_name>:<lable>
+```
+### Run a web interface for local docker registry
+```bash
+docker run -d -p 8080:8080 --restart=alwys --name registry-web --link <registry_container_name> -e REGISTRY_URL=http://registry:5000/v2 -e REGISTRY_NAME=localhost:5000 hyper/docker-registry-web 
+```
+
+## Docker Compose
+
+### Installing docker compose on linux
+
+```bash
+yum install -y nss curl libcurl
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.10.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose 
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+```
+
+**Note:** In ```yaml``` file the lines which start witout any indent or
+whitespace called **top level**.
+
+### Write your first ```docker-compose```
+
+write a docker-compose file which runs a flask app with two services
+(web and redis). The app is a simple web server that count the number of
+visits and store the value in redis.
+
+**Note:** Put your ```docker-compose``` file in a meaningful named
+directory, beacuse all the containers which made from your file will get
+a prefix which is the directory name. Also the network will create by
+compose follows this rule.
+
+```yml
+version: '3'
+services:
+		web:
+				build: .
+				ports:
+						-"5000:5000"
+		redis:
+				image: "redis:alpine"
+```
+* This compose file define two services: **web** and **redis**
+* The web service use an image that's build from the Dockerfile in the
+	current directory. It then binds the container and the host machine to
+	exposed port, 5000.
+* The **redis** service use a public Redise image pulled from the Docker
+	Hub registry.
+
+**Note:** Services defined in compose can call eachother by thier name
+
+**Note:** The previous example is not complete and needs other files.
+you can find them [here](https://github.com/mrbooshehri/lab/tree/master/docker/docker_compose/ex_1)
+
+you can run the compose file with the following cammnds:
+```bsah
+cd /PATH/TO/YOUR/DOCKER-COMPOSE
+docker-compse up
+# for detached mode
+docker-compse up -d
+```
+### ```docker-compose``` options
+
+You can only use docker-compose options in the directory you have a
+compose file
+
+* ```ps```: List of all active containers in related docker-compose
+* ```images``` : List of all used images in related docker-compose
+* ```top```: It runs top in all of your containers
+* ```stop```: It will stop all the contianers
+* ```start```: It will stop all the contianers
+* ```restart```: It will restart all the contianers
+* ```down```: It stop all the contianers then remove them, also remvoe
+	the network which was created for the compose
+* ```config```: It will check the syntax of ```docker-compose```, if
+	your file doesn't have any error it will print it.
+* ```pause/unpause```: It pause/unpause all the contianers.
+* ```logs```: Print all logs in output, you can use ```-f``` for
+	following the log or ```-t``` for time stamping each line
+
+**Note:** By default ```docker-compose down``` won't remove the volumes,
+if you want to remove them use the ```-v``` switch:
+
+```bash
+docker-compose down -v
+```
+
+# Services 12
+
+## Explainging ```docker-compose.yml```
+
+* ```version```: It's mandatory and always place at the first line. This
+	defines the version of the compose file format. You should normally
+	use the latest. It doesn't represent the version of ```Dockerfile```
+	or ```Docker Engine```
+* ```services```: Where we define the different application services.
+	Compose will deploy each of services as its own contianer
