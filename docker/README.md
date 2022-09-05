@@ -1560,6 +1560,10 @@ The options that can be appear before ```CMD```:
 
 ## Port expose vs port publish
 
+When you expose a port, it will not going to discover outside your
+docker machine, but when you publish it (port mapping) it can be reached
+from outside your docker machine
+
 # Session 11
 
 ## Docker history
@@ -1809,7 +1813,8 @@ networks:
 			name: mynet
 ```
 
-**Note:** If you want the built docker file from compse gets its own
+#### Set a custom name to your build
+**Note:** If you want the built docker file from compose gets its own
 name you should specify a name on ```name``` key under ```build```
 level.
 
@@ -1821,6 +1826,7 @@ service:
 		name: myweb:v1
 ```
 
+#### Pass dockerfile from other locations
 **Note:** You can pass a docker file from other location than the
 current location like bellow:
 
@@ -1833,6 +1839,7 @@ service:
 		dockerfile: DOCKERFILE_NAME
 ```
 
+#### Override ```CMD```
 **Note:** You can override ```CMD``` of your container like bellow
 
 ```yaml
@@ -1843,5 +1850,87 @@ service:
 		command: python app.py
 		...
 ```
+#### Set custom name to your container
+**Note:** Set your own container name:
 
--1:54
+```yaml
+version: 3
+service:
+	web:
+		build .
+		container_name:my-web-container
+		...
+```
+It will be ignored when deploying a stack in swarm mode.
+
+#### Manage containers dependence chain
+
+Express dependence between services. Services dependencies cause the
+following behavirs:
+* docker-compose up **starts/stops services in dependence order**.
+```yaml
+version: 3
+service:
+	web:
+		build .
+		depends_on:
+			- db
+			- redis
+		redis:
+			image: redis
+		db:
+			image: postgres
+```
+
+#### Environment variables in compose
+```yaml
+environment:
+	MYSQL_ROOT_PASSWORD=123
+	MYSQL_PASSWORD=456
+	MYSQL_DATABASE=db
+	MYSQL_USER=user
+```
+If service specifies a build optiond, variables defined in
+```environment``` are not automatically visible during the build. Use
+the args sub-options of build to defined build-time environment
+variables.
+
+#### Helthchek
+Configure a check that's run to determine whether or not containers for
+this service are healthy:
+
+```yaml
+healthcheck:
+	test: ["CMD","curl","-f","https://localhost"]
+	interval: 1m30s
+	timeout: 10s
+	retries: 3s
+	start_period: 40s
+```
+
+#### Restart policy
+
+```yaml
+	restart: "no" # never restart the container/service
+	restart: "always" # always restart the container/service
+	restart: "on-failure" # restarts when exit code indicates an on-failure error
+	restart: "unless-stopped" # always restart container/service except manually stop
+```
+#### Mount ```tmpfs```
+Mount a temprory file system inside the container. Can be a single value
+or a list.
+
+```yaml
+	tmpfs:
+		-/run
+		-/tmp
+```
+or
+```yaml
+	type: tmpfs
+	target:/app
+	tmpfs:
+		size:100
+```
+-1:05
+
