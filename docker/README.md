@@ -1150,20 +1150,20 @@ docker run -it --name <name> --network <network_name> <image>
 	* The default bridge network on Linux do not support name resolution via
 	  the docker DNS service. All other user-defined bridge network do!
 * User-defined bridges provide better **isolation**
-	* All contianers without a --network specified, are attached to
+	* All containers without a --network specified, are attached to
 		default bridge network. This can be a risk, as unrelated
 		stacks/services/continers are then able to communicate.
 * Contaiener can be **attached and detached from user-defined networks
 	on the fly**
-	* During a contianer lifetime, you can connect or disconnect it from
+	* During a container lifetime, you can connect or disconnect it from
 		user-defined networks on the fly. To remove a container from default
 		bridge network, you need to stop container and recreate it with
 		different network option.
 
 ## Connect or disconnect a container to/from network(s)
 ```bash
-docker network connect <network_name> <contianer_name>
-docker network disconnect <network_name> <contianer_name>
+docker network connect <network_name> <container_name>
+docker network disconnect <network_name> <container_name>
 ```
 
 ## Port mapping/publishing
@@ -1224,7 +1224,7 @@ not for default network.
 If you're having netwrok issue with your application's container, you
 can launch netshoot with that container's network namesapce like:
 ```bash
-docker run -it --net contianer:<container_name> nikolaka/netshoot
+docker run -it --net container:<container_name> nikolaka/netshoot
 ```
 If you think the networking issue is on the host itselt, you can launch
 netshoot with that host network namespace:
@@ -1249,7 +1249,7 @@ You can scan a container port with ```nmap``` too, but you need to run a
 ```--privileged``` container, a continer that has root access to your
 host, as bellow
 ```bash
-docker run --it --privileged nicolaka/netshoot nmap -p 1-1024 -dd <contianer_ip> | grep open
+docker run --it --privileged nicolaka/netshoot nmap -p 1-1024 -dd <container_ip> | grep open
 ```
 
 ### Check interface traffic with ```iftop```
@@ -1560,6 +1560,10 @@ The options that can be appear before ```CMD```:
 
 ## Port expose vs port publish
 
+When you expose a port, it will not going to discover outside your
+docker machine, but when you publish it (port mapping) it can be reached
+from outside your docker machine
+
 # Session 11
 
 ## Docker history
@@ -1687,14 +1691,14 @@ compose file
 * ```ps```: List of all active containers in related docker-compose
 * ```images``` : List of all used images in related docker-compose
 * ```top```: It runs top in all of your containers
-* ```stop```: It will stop all the contianers
-* ```start```: It will stop all the contianers
-* ```restart```: It will restart all the contianers
-* ```down```: It stop all the contianers then remove them, also remvoe
+* ```stop```: It will stop all the containers
+* ```start```: It will stop all the containers
+* ```restart```: It will restart all the containers
+* ```down```: It stop all the containers then remove them, also remvoe
 	the network which was created for the compose
 * ```config```: It will check the syntax of ```docker-compose```, if
 	your file doesn't have any error it will print it.
-* ```pause/unpause```: It pause/unpause all the contianers.
+* ```pause/unpause```: It pause/unpause all the containers.
 * ```logs```: Print all logs in output, you can use ```-f``` for
 	following the log or ```-t``` for time stamping each line
 
@@ -1714,4 +1718,219 @@ docker-compose down -v
 	use the latest. It doesn't represent the version of ```Dockerfile```
 	or ```Docker Engine```
 * ```services```: Where we define the different application services.
-	Compose will deploy each of services as its own contianer
+	Compose will deploy each of services as its own container
+
+## Docker compose network
+
+* By default compse will create bridge network. Each container for a
+	service joint the default network and is both realible by other
+	containers on that network, discoverable by them at a hostname
+	identical to the container name.
+* Network service-to-service communication use the CONTAINER_PORT. whe
+	HOST_PORT is defined, the service is accessible outside of the swarm
+	as well.
+
+### links
+Links allows you to define extra aliases by which a service is reliable
+from another service. They are not required to enable services to
+communicate - by default any service can reach any other service at the
+service's name. In the following example, db is reachable from web at
+the hostnames db and database:
+
+```yaml
+version: 3
+service:
+	web:
+		build .
+		links: 
+			- "db:database"
+	db:
+		image: "postgres"
+```
+### Specify custom network
+The top level network key tells Docker to create new networks. Each
+service can specifiy a network to connect to with the service level
+network key, which is a list of names referencing entries under the top
+level networks key.
+
+```yaml
+version: 3
+service:
+	web:
+		build .
+		ports:
+			- "5000:5000"
+		networks: 
+			- counter-net
+	db:
+		image: "postgres"
+		networks: 
+			- counter-net
+networks: 
+	counter-net:
+```
+
+Create a new ```overlay``` network called over-net that allows
+standalone containers to connect to it (attachable)
+
+```yaml
+version: 3
+service:
+	web:
+		build .
+		ports:
+			- "5000:5000"
+		networks: 
+			- over-net
+	db:
+		image: "postgres"
+		networks: 
+			- over-net
+networks: 
+	over-net:
+		driver: overlay
+		attachable: true
+```
+
+**Note:** This sloution used when you want to connect containers on your
+cluster with a swarm.
+
+To join a pre-existing network, use the external option:
+
+
+```yaml
+version: 3
+service:
+	web:
+		build .
+		ports:
+			- "5000:5000"
+	db:
+		image: "postgres"
+networks: 
+	default:
+		external:
+			name: mynet
+```
+
+#### Set a custom name to your build
+**Note:** If you want the built docker file from compose gets its own
+name you should specify a name on ```name``` key under ```build```
+level.
+
+```yaml
+version: 3
+service:
+	web:
+		build .
+		name: myweb:v1
+```
+
+#### Pass dockerfile from other locations
+**Note:** You can pass a docker file from other location than the
+current location like bellow:
+
+```yaml
+version: 3
+service:
+	web:
+		build .
+		context: /PATH/TO/DOCKERFILE
+		dockerfile: DOCKERFILE_NAME
+```
+
+#### Override ```CMD```
+**Note:** You can override ```CMD``` of your container like bellow
+
+```yaml
+version: 3
+service:
+	web:
+		build .
+		command: python app.py
+		...
+```
+#### Set custom name to your container
+**Note:** Set your own container name:
+
+```yaml
+version: 3
+service:
+	web:
+		build .
+		container_name:my-web-container
+		...
+```
+It will be ignored when deploying a stack in swarm mode.
+
+#### Manage containers dependence chain
+
+Express dependence between services. Services dependencies cause the
+following behavirs:
+* docker-compose up **starts/stops services in dependence order**.
+```yaml
+version: 3
+service:
+	web:
+		build .
+		depends_on:
+			- db
+			- redis
+		redis:
+			image: redis
+		db:
+			image: postgres
+```
+
+#### Environment variables in compose
+```yaml
+environment:
+	MYSQL_ROOT_PASSWORD=123
+	MYSQL_PASSWORD=456
+	MYSQL_DATABASE=db
+	MYSQL_USER=user
+```
+If service specifies a build optiond, variables defined in
+```environment``` are not automatically visible during the build. Use
+the args sub-options of build to defined build-time environment
+variables.
+
+#### Helthchek
+Configure a check that's run to determine whether or not containers for
+this service are healthy:
+
+```yaml
+healthcheck:
+	test: ["CMD","curl","-f","https://localhost"]
+	interval: 1m30s
+	timeout: 10s
+	retries: 3s
+	start_period: 40s
+```
+
+#### Restart policy
+
+```yaml
+	restart: "no" # never restart the container/service
+	restart: "always" # always restart the container/service
+	restart: "on-failure" # restarts when exit code indicates an on-failure error
+	restart: "unless-stopped" # always restart container/service except manually stop
+```
+#### Mount ```tmpfs```
+Mount a temprory file system inside the container. Can be a single value
+or a list.
+
+```yaml
+	tmpfs:
+		-/run
+		-/tmp
+```
+or
+```yaml
+	type: tmpfs
+	target:/app
+	tmpfs:
+		size:100
+```
+-1:05
+
