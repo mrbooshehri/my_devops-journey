@@ -1932,5 +1932,23 @@ or
 	tmpfs:
 		size:100
 ```
--1:05
+## Docker Swarm
 
+A swarm consists of multiple docker host which run in swarm mode and act
+as manager and workder. A given host can be a manager, a worker, or
+perform both roles. When you create a service, you define its optimal
+state. Docker swarm works to maintain that desire state.
+
+**Note:** A comination of workers and **master(s)** form a cluster
+
+**Note:** Master gets a desired state and perform it as current/actual
+state on worker nodes, then it monitors all workers to be sure your
+desired state is working. The proccess of monitoring of workers call
+**watch loop** 
+
+**Note:** swarm doesn't have auto scaling and you should do it by other
+mechanism like run script, or an ansible palybook when a trigger fired
+in your monitoring system.
+
+
+-24:00
