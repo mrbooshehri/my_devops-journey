@@ -1950,5 +1950,119 @@ desired state is working. The proccess of monitoring of workers call
 mechanism like run script, or an ansible palybook when a trigger fired
 in your monitoring system.
 
+### Swarm components
 
--24:00
+* A secure cluster
+* An orchestration engine
+
+On the clustering front, it gourps one or more docker nodes and lets you
+manage them as an encrypted distributed cluster.
+
+On the 	the orchestration front, swarm exposes a ritch API that allows
+you to deploy and manage complicated microservices apps with ease. You
+can even perform rolling updates, rollback and scaling operations.
+
+### Conceptes relating to docker swarm services
+
+* Node: A swarm consists of one or more docker nodes. These can be
+	physical servers, VMs, Rasperry Pi's, or cloud instances. Nodes are
+	configured as **manager** or **workder**.
+	
+	* Managers look after the control plane of the cluster, meaning things
+		like the state of the cluster and dispatching tasks to the workers.
+		Manager nodes also perform orchestration and cluster functions
+		required to maintain the desired state of the swarm. Manager nodes
+		elect a single leader to conduct orchestration tasks.
+
+	* Worker node receive and execute tasks dispatched from manager nodes.
+		By default manager nodes also run services like worker nodes, but
+		you can configure them to rum manager tasks exclusively and be
+		manager-only nodes. An agent	runs on each worker node and reports
+		on the task assign to it. The work node notifies the manager node of
+		the current state of it assigned task so that the manager can
+		maitain the desired state of each worker.
+
+* Service and Task
+
+	* A service is the definition of a tasks to execute on the manager or
+		worker nodes. When you create a service, you specify which container
+		image use and which commands to execute inside running container.
+	
+	* In the replicated service model, the swarm manager distributes a
+		specific number of replica tasks among the node based upon the scale
+		you set in the desired state.
+
+	* A task carries a docker container and the commands to run inside the
+		container. Manager nodes assign tasks to worker nodes according to
+		the number of replicas set in the service scale. Once a task is
+		assigned to a node, it cannot move to another node. It can only run
+		on the assigned node or fail.
+
+* Load Balancing: The swarm manager uses **ingress load balancing** to
+	exposes the services you want to make available externally to the
+	swarm. The swarm manager can automatically assign the service a
+	**PublishPort** you can configure a PublishPort for the service. If
+	you do not specify a port, the swarm manager assign a service aport in
+	the 30000-32767 range.
+
+	* External components can access the service on the PublishPort of any
+		node in the cluseter whether or not the node is currently running
+		the task for the service. All nodes in the swarm route ingress
+		connction to a running task instance.
+	* Swarm mode has an internal **DNS** component that automatically
+		assign each service in the swarm a **DNS** entry.
+
+# Session 13
+
+### Setup docker swarm
+
+To setup swarm you need to setup the following config on both worker and
+manager nodes:
+
+1. Docker engine latest version
+1. The IP address of nodes
+1. Set different hostname on each node
+1. Open the folloing ports
+	1. TCP port 2377 for cluster management communications
+	1. TCP and UDP port 7946 for communication among nodes
+	1. UDP port 4789 for overlay network traffic
+
+The proccess of building a swarm called initializing a swarm, and the
+high level proccess is this:
+```
+	Initialize the first manager node > Join additional manager nodes >
+	Join worker nodes > Done.
+```
+Docker nodes that are not part of a swarm are said to be in
+**single-engine mode**. Once they're added to a swarm they're switched
+into **swarm mode**.
+
+Initialize a new swarm on manager_1:
+```bash
+docker swarm init --advertise-addr IP_ADDR_OF_MGR_1
+```
+
+**--advertise-addr**: Configure the manager node to publish its IP
+address as IP_ADDR_OF_MGR_1. The other nodes in the swarm must be able
+to access the manager at the IP address.
+
+In case of you forget the join token you can regenerate it again via
+following commands:
+```bash
+# for manager token
+docker swarm join-token manager
+# for worker token
+docker swarm join-token worker
+```
+
+**Note:** In the out put of ```docker node ls``` the ```*``` shows the
+manager node which issued the command.
+
+**Note:** You can change node role by the following commands:
+```bash
+# to promote worker to manager
+docker node pormote <node_name>
+# to demote manager to worker 
+docker node demote <node_name>
+```
+-1:20
