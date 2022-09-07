@@ -38,3 +38,32 @@ java -jar /PATH/TO/atlassian-agent.jar  -m <EMAIL> -o <ORGANIZATION_NAME> -p jsd
 ```
 then use the generated key.
 
+
+## systemd unit
+
+Create a unite file like bellow
+
+```bash
+vim /etc/systemd/system/jira.service
+```
+then put the following lines there
+```bash
+[Unit]
+Description=Atlassian JIRA Software Server
+After=network.target postgresql.service
+
+[Service]
+Type=forking
+User=jira
+ExecStart=/opt/atlassian/jira/bin/start-jira.sh
+ExecStop=/opt/atlassian/jira/bin/stop-jira.sh
+ExecReload=/opt/atlassian/jira/bin/start-jira.sh | sleep 60 | /opt/atlassian/jira/bin/stop-jira.sh
+
+[Install]
+WantedBy=multi-user.target 
+```
+
+**Note:** Don't forget to remove legacy SysV
+```bash
+sudo rm /etc/init.d/jira
+```
