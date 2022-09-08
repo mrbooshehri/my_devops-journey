@@ -292,7 +292,7 @@ usermod -aG docker $USER
 
 ## Traditional Linux container (LXC) vs Docker
 LXC can run multiple aplications in each container while it 
-is recomanded to run only single applications in a docker container.
+is recommanded to run only single applications in a docker container.
 
 ## Docker Engine
 The docker engine the core software that run and manage containers which
@@ -863,7 +863,7 @@ life-cycle of the container. That means deleting the container will
 delete this storage and any data on it.
 
 ### Persistent storage
-The recommaneded way to persist data in containers is using volumes. You
+The recommended way to persist data in containers is using volumes. You
 create a volume, then you create a container, and mount the volume into
 it. If you delete the container the volume and its data still exist and
 available.
@@ -1367,7 +1367,7 @@ ADD [--chown=UID:GID] /PATH/TO/FILE/OR/DIR/ON/HOST/NEAR/DOCKERFILE /PATH/TO/FILE
 * If it's a local tar archive in a recognized Compression format
 	(identity, bzip2, gzip or xz) then it's unpacked as a directory.
 * Resourcese form URLs are not decompressed.
-* Using ```COPY``` is recommaneded where the magicof ```ADD``` is not
+* Using ```COPY``` is recommended where the magicof ```ADD``` is not
 	required.
 
 ### ```RUN```
@@ -2065,4 +2065,68 @@ docker node pormote <node_name>
 # to demote manager to worker 
 docker node demote <node_name>
 ```
--1:20
+
+### Swarm manager high available (HA)
+
+* Swarm manager have native support for high availablity. This means one
+	or more can fail, and the survivors will keep swarm running
+* Swarm implements a form of active-passive multi-manager HA
+* Only one manager is ever considered active, and it called **leader**.
+	Leader is only one that	will ever issue live commands against the
+	swarm.
+* If a passive manager recieve commands for the swarm, it proxies them
+	across to the leader.
+* The following two best practices apply to swarm HA:
+	* Deploy an odd number of managers
+	* Don't deploy to many managers (3 or 5 is recommended)
+* Having an old managers reduce the chance of split-brain conditions.
+	The cluster continues the operate during split-brain conditions, but
+	you are no able to alter the configuration or add and manage
+	application workload.
+* You definitely don't more than 7, as the time taken to achive
+	consensus will be longer.
+
+![split-brain](./assets/splitbrain.png)
+
+**Note:** Swarm and Kubernetes use
+[Raft](http://thesecretlivesofdata.com/raft/) algorithm in order to
+handle failiures. In Raft algorithm you can have (n-1)/2 failiures and
+also you're minimum quorum is (n-1)+1.
+
+**Note:** Read more about [quorum and
+split-brain](https://www.45drives.com/community/articles/what-is-split-brain/)
+
+### Swarm services
+
+With the following command we ca create new service:
+```bash
+docker service create --name <service-name> -p <service-port> --replicas <replication-number> <image-name>
+```
+
+In the following example docker will create a nginx service with 5
+replications
+
+```bash
+docker service create --name mynginx -p 80:80 --replicas 5 nginx
+```
+**Note:** This action only available via manager nodes.
+
+To check runnig services run the following command:
+```bash
+docker service ls
+```
+
+To get information about specific service run the following command:
+```bas
+docker service inspect <service-name>
+```
+
+To get information about container on specific service run the following
+command:
+```bash
+docker service ps <serivce-name>
+```
+# Session 14
+
+
+
