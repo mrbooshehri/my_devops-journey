@@ -2128,5 +2128,93 @@ docker service ps <serivce-name>
 ```
 # Session 14
 
+## Replicated vs golbal services
 
+* Default replication mode of a service is replicated.
+* This will deploy a desired number of replicas and distribute them as
+	evanly as possible across the cluster.
+* The other mode is global, which runs a single replica on every node in
+	the cluster.
 
+Deploy a global service:
+```bash
+docker service create --name <service-name> -p <service-port> --mode
+global <image-name>
+```
+**Note:** To remove a service run the following command:
+```bash
+docker service rm <service-name>
+```
+## Sacling
+
+To perform scale action service must be run in **replicated** mode. Both
+scale up and down available via the following command, and the
+replication number demostrate which one going to happen:
+```bsah
+docker service scale <service-name>=<replication-number>
+```
+## Rollign update
+Roll update provide a situatin which you can update your service with
+0-donwtime.
+```bash
+docker servie update --image <image-name> --update-parallelism <number>
+--update-delay <time>s <service-name>
+```
+* ```--image```: The name image you want to replace with the previous
+	one
+* ```--update-parallelism```: Determin the number of container which
+	going to update at the same time
+* ```--update-delay```: The amount of delay (in seconds) between
+	updateing containers
+
+## Ingress mode vs Host mode
+
+### Ingress mode
+This mode of publishing a port on every node in the swarm - even nodes
+not running service replicas. Ingress mode is the default mode.
+
+### Host mode
+This mode only publishes the service on swarm nodes running the
+replicas.
+
+To run swarm in host mode:
+```bash
+docker service create --name <service-name> --network <overlay-network-name> --published=80,taget=80,mode=host --replicas <replication-number> <image-name>
+```
+## Dreain a node on the swarm
+
+Sometimes, such as planned maintenance time, you need to set a node to
+**DRAIN** availablity. **DRAIN** availablity prevent a node from
+servicing new tasks from the swarm manager. It also means the manager
+stop tasks running on the node and lauched replica tasks on a node with
+**ACTIVE** availablity.
+
+To **DRAIN** a node:
+```bash
+docker node update --availablity drain <node-name>
+```
+**Note** to make the node **ACTIVE** again, just replace ```active```
+with ```drain``` in the previous command.
+
+## Run a container on specific node
+
+To run a container on node based on role:
+```bash
+--constraint node.role==<manager/workger>
+```
+
+## Statless vs Statfull applications
+
+Applicatins which store a data and a state from currnt state are
+statefull and others are stateless
+
+## Deploying apps with Docker Stack
+Stacks let you define complex multi-service apps in a single declarative
+file. They also provide a simple way deploy the app and manage it entire
+lifecycl - initial deployment > health check > scaling > updates >
+rollback, and more. Define your app in a Compose file which includes the
+entire statck of services that make up the app, then deploy and manage
+it with the docker stack deploy command. Stacks build on top of a docker
+swarm.
+
+-42:00
