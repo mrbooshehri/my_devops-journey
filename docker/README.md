@@ -2209,6 +2209,7 @@ Applicatins which store a data and a state from currnt state are
 statefull and others are stateless
 
 ## Deploying apps with Docker Stack
+
 Stacks let you define complex multi-service apps in a single declarative
 file. They also provide a simple way deploy the app and manage it entire
 lifecycl - initial deployment > health check > scaling > updates >
@@ -2217,4 +2218,39 @@ entire statck of services that make up the app, then deploy and manage
 it with the docker stack deploy command. Stacks build on top of a docker
 swarm.
 
--42:00
+## Docker stack - High level architecture
+
+![docker stack](./assets/dcoker\ stack.png)
+
+```docker-stack.yml``` has 4 top level keys:
+* **version**: Indicates the version of the Compose file format.
+* **services**: Where we define the stack of service that make up the
+	app
+* **networks**: Lists the required networks
+* **secrets**: Define the secret the app uses.
+
+**Note:** To make a network traffic encrypt put the following conig in
+```networks``` top level
+```yml
+networks:
+	<network-name>:
+		driver: overlay
+		driver_opts:
+			encrypted: 'yes'
+```
+
+**Note:** In docker stack you are not allowed to build docker image, you
+just can use container image.
+
+**Note:** The secret you use in stack will mount under
+```/run/secrets/<secret-name>``` as ```tmpfs```
+
+### Docker stack example - AtSea shop 
+
+An example [project](https://github.com/dockersamples/atsea-sample-shop-app) 
+
+![docker stack](./assets/dcoker-stack-deploy.png)
+
+
+# Session 15
+
