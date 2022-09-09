@@ -2220,8 +2220,6 @@ swarm.
 
 ## Docker stack - High level architecture
 
-![docker stack](./assets/dcoker stack.png)
-
 ```docker-stack.yml``` has 4 top level keys:
 * **version**: Indicates the version of the Compose file format.
 * **services**: Where we define the stack of service that make up the
@@ -2253,3 +2251,63 @@ An example [project](https://github.com/dockersamples/atsea-sample-shop-app)
 
 # Session 15
 
+## Adding lable to an existing node
+```bash
+docker node update --label-add <lable>=<value> <node-name>
+```
+
+## Docker secret
+To work with ```secret``` command first you need to generate
+```domain.key``` and ```domain.crt``` with ```openssl``` command:
+```bash
+openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt
+```
+now you can create your screts
+```bash
+docker secret create <secret-name> domain.crt
+```
+
+## Deploy a stack
+To deploy your stack you need to have a ```docker-stack.yml``` and all
+related configurations that your stack needs to be run, then run the
+following command:
+```bash
+docker stack deploy -c /PATH/TO/DOCKER-STACK.yml <stack-name>
+```
+
+**Note:** You can update ```docker-stack.yml``` file whenever you want
+and run the previous command to update the clustere.
+
+## Stack related commands
+
+* To list all stacks
+```bash
+docker stack ls
+```
+
+* To remvoe a stack
+```bash
+docker stack rm <stack-name>
+```
+* Get information about stack's containers
+```bash
+docker stack ps <stack-name>
+```
+## Docker Security
+
+![security](../assets/security.png)
+
+### Kernerl namespaces
+Processes running with a container cannot see, and even less effect,
+proccesses running in another container, or in the host system.
+Containers don't get the privilleged access to the sockets ot interfaces
+of another container.
+
+### Cgroups
+![cgroup](../assets/cgroup.png)
+Cgroups let us set implemet resource accounting and limiting on each of
+containers so that a single container cannot use all of the CPU, RAM, or
+storage I/O of the host. A single container cannot bring 	the system
+down by exhausting one of those resources.
+
+1:20:11
