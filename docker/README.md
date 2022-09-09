@@ -2220,7 +2220,7 @@ swarm.
 
 ## Docker stack - High level architecture
 
-![docker stack](./assets/dcoker\ stack.png)
+![docker stack](./assets/dcoker stack.png)
 
 ```docker-stack.yml``` has 4 top level keys:
 * **version**: Indicates the version of the Compose file format.
@@ -2249,8 +2249,7 @@ just can use container image.
 
 An example [project](https://github.com/dockersamples/atsea-sample-shop-app) 
 
-![docker stack](./assets/dcoker-stack-deploy.png)
-
+![docker stack](./assets/docker-stack-deploy.png)
 
 # Session 15
 
