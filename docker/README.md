@@ -2294,7 +2294,8 @@ docker stack ps <stack-name>
 ```
 ## Docker Security
 
-![security](../assets/security.png)
+![security](./assets/security.png)
+
 
 ### Kernel namespaces
 Processes running with a container cannot see, and even less effect,
@@ -2303,7 +2304,8 @@ Containers don't get the privileged access to the sockets to interfaces
 of another container.
 
 ### Cgroups
-![cgroup](../assets/cgroup.png)
+![cgroup](./assets/cgroup.png)
+
 Cgroups let us set implement resource accounting and limiting on each of
 containers so that a single container cannot use all of the CPU, RAM, or
 storage I/O of the host. A single container cannot bring 	the system
