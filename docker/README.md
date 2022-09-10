@@ -2309,6 +2309,120 @@ of another container.
 Cgroups let us set implement resource accounting and limiting on each of
 containers so that a single container cannot use all of the CPU, RAM, or
 storage I/O of the host. A single container cannot bring 	the system
-down by exhausting one of those resources.
+down by exhausting one of those resources. Docker work with capabilities
+so that you can run containers as root, but strip out the root
+capabilities that you don't need. Docker works with major Linux MAC
+technologies such ass AppArmor and SELinux. Docker uses seccomp, in
+filter mode, to limit the syscalls a container can make to the host's
+kernel.
 
-1:20:11
+### Docker daemon attack surface
+Docker daemon requires root privileges so only trusted users should be
+allowed to control the Docker daemon. For example you can start a
+container where the ```/host``` directory is the ```/``` directory on
+the host; and the container can alter your host filesystem without any
+restriction. So malicious user can pass crafted parameters using docker to create
+arbitrary containers.
+
+Docker daemon is also potentially vulnerable to other inputs, such as
+image loading from entire disk with docker load, or from a network with
+```docker pull```. 
+
+### Don't expose the docker daemon socket
+Docker communicates with a UNIX socket called
+```/var/run/docker.sock```. This is the main entry point for Docker API.
+Anyone who has access to the Docker daemon socket also has unrestricted
+toot access. Mounting the Docker socket inside a container does not
+restrict it to privilege access to 	within the container. It allows the
+container full control of the host and all other containers. Therefore,
+**it is not a recommended practice**.
+
+### Capabilities - the root isn't the root
+Docker works with capabilities so that you can run containers as root,
+but strip out the root capabilities that you don't need. Typically
+servers run several processes as root, including SSH daemon, cron
+daemon, logging dealing, kernel modules, network configuration tools,
+and more. But in container world this works handled by the
+infrastructure around the container. That means in most cases,
+containers do not need **real** real root privilege at all, therefore
+containers can run with a reduced capability set; meaning the **root**
+within a container has much less privilege than the real **root**.
+
+**Note:** Using ports under 1024 needs root privilege.
+
+### Adjusting capabilities
+List of capabilities
+* CAP_CHOWN
+* CAP_DAC_OVERRIDE
+* CAP_FSEDIT
+* CAP_FOWNER
+* CAP_MKNOD
+* CAP_NET_RAW
+* CAP_SETGID
+* CAP_SETUID
+* CAP_SETFCAP
+* CAP_SETPCAP
+* CAP_NET_BIND_SERVICE
+* CAP_SYS_CHROOT
+* CAP_KILL
+* CAP_AUDIT_WRITE
+
+In some cases you might want to adjust the previous default list. For
+example if you want to build a container for ntpd or crony which needs
+**CAP_SYS_TIME**, you can add this capability with the following
+command:
+```bash
+docker run -d --cap-add SYS_TIME --cap-add CAP_SYS_NICE ntpd/ntpd
+```
+
+**Note:** Respectably you can remove a capability with ```--cap-drop```
+option.
+
+**Note:** The best practice for user would be to remove all capabilities
+except those explicitly required for their process.
+
+### Seccomp
+Seccomp manages systemcalls which the container can send to your host
+kernel.
+
+Docker uses seccomp, in filter mode, to limit the syscalls a container
+can make to the host's kernel. You can use this feature to restrict your
+applications access. The feature is available only if Docker has been
+build with seccomp and the kernel is configured with
+```CONFIG_SECCOMP``` enabled. To check if your kernel support seccomp:
+```bash
+grep CONFIG_SECCOMP=/boot/config-$(uname -r)
+```
+It is not recommended to change the default seccomp profile.
+
+When you run a container, it uses the default profile unless you
+override it with the ```--security-opt``` option
+```bash
+docker run -it --security-opt seccomp=/PATH/TO/SECCOMP/PROFILE.json <image-name>
+```
+
+### AppArmor
+AppArmor is a Linux security module that protects an operating system
+and it applications from security threats. It protects the operating
+system by applying profiles to individual applications or containers. In
+contrast to managing capabilities with ```CAP_DROP``` and systemcalls
+with seccomp, AppArmor allows for much finer-grained control. For
+example, AppArmor can restrict file operations on specific path. This
+profile is used on containers, not on the Docker daemon. When you run a
+container, it uses the docker-default policy unless you override it with
+the ```--security-opt``` option.
+
+To load a new profile into AppArmor for use with container:
+```bash
+apparmor_parser -r -W /etc/apparmor.d/containers/YOUR_PROFILE
+```
+Run the custom profile with ```--security-opt```
+```bash
+docker run --rm -it	--security-opt apparmor=YOUR_PROFILE <image-name>
+```
+To unload a profile from AppArmor
+```bash
+apparmor_parser -R /etc/apparmor.d/containers/YOUR_PROFILE
+```
+
+# SECCOMP 17
