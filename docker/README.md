@@ -52,7 +52,7 @@ CD pipeline
 * Production
 
 ### Continues Deployment
-All the process form	code to production handel by automation
+All the process form	code to production handle by automation
 mechanisms, if you do anything manually from staging to production it's
 not continues deployment anymore, it's continues delivery.
 
@@ -86,7 +86,7 @@ requests.
 ### Pros and cons of microservice architecture
 Pros:
 * Faster and simpler deployment and rollback
-- Independent scalable services
+- Independent scalabel services
 * Microservice enables the continues delivery and deployment of large
 	and complex applications
 * Improve fault isolation
@@ -146,7 +146,7 @@ image).
 ## Installing Docker
 ```bash
 yum install -y yum-utils
-yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum-config-manager --add-repo https://download.docker.com/Linux/centos/docker-ce.repo
 yum-config-manager --disable docker-ce-edge
 yum makecache fast
 yum install docker-ce
@@ -180,7 +180,7 @@ following command
 ```bash
 docker pull IMAGE_NAME
 ```
-**Note:** It's a good pracitce not to use the ```latest``` version(tag)
+**Note:** It's a good practice not to use the ```latest``` version(tag)
 of images in production phase. 
 
 To see the downloaded images
@@ -194,17 +194,17 @@ list image IDs.
 
 ## Image naming structure
 Each image formed from to part, repository and tag which follow this
-stype ```IMAGE_REPO_NAME:IMAGE_TAG```. Each image has a uniqe ID.
+style ```IMAGE_REPO_NAME:IMAGE_TAG```. Each image has a unique ID.
 
-## Runing an instace from an image
+## Running an instance from an image
 Until here we just pulled an image from docker official registry, to
-creating an instace:
+creating an instance:
 ```bash
 docker run IMAGE_NAME
 ```
 ## Get information about containers
 
-```docker ps``` by default lists the runing containers and get
+```docker ps``` by default lists the running containers and get
 information about them but, ```-a``` option will show all the
 containers. ```-f status=exited``` lists containers with a specific
 status,```-f``` stands for filter and ```-q``` list only the container
@@ -215,7 +215,7 @@ IDs. Also ```-n=N``` list the ```N``` last containers.
 The docker daemon binds to a unix socket instead of a TCP port. By
 default a unix socket owned by root user and other users can only access
 it using sudo. The docker daemon always runs as the root user. To solve
-this problem you should add your user to the ```docker``` gourp.
+this problem you should add your user to the ```docker``` group.
 
 ```bash
 usermod -aG docker $USER
@@ -250,11 +250,11 @@ usermod -aG docker $USER
 ### Why run docker on bare-metal
 1. Access through bare-metal hardware in apps without relying on
 	 pass-through techniques.
-1. Have optimal use of system resources. A host can, distirbute use of
+1. Have optimal use of system resources. A host can, distribute use of
 	 shared system resources
 1. Get bare-metal performance to apps, because there is no hardware
-	 emulation layer saparating them from a host server.
-1. deply apps inside portable environments that can move easily between
+	 emulation layer separating them from a host server.
+1. Deploy apps inside portable environments that can move easily between
 	 host and server
 1. Get app isolation
 
@@ -263,11 +263,11 @@ usermod -aG docker $USER
 1. Most clouds require VMs
 1. Container platforms don't support all hardware and software
 	 configurations
-1. Containers are OS-dependet
+1. Containers are OS-dependent
 1. Bare-metal servers don't offer rollback features
 
-### Advntages of docker on bare-metal vs VM
-1. Fewer layers to manage and simpler trubleshooting
+### Advantages of docker on bare-metal vs VM
+1. Fewer layers to manage and simpler troubleshooting
 1. High efficiency
 1. More containers per server
 1. Better, more predictable performance 
@@ -278,7 +278,7 @@ usermod -aG docker $USER
 1. Free up a huge amount of system resources
 1. Speed
 1. Portability
-1. Reduce potential licencing cost, patching and maintenance of OS
+1. Reduce potential licensing cost, patching and maintenance of OS
 1. Layers and image version control
 1. Rollback
 1. Rapid deployment
@@ -291,8 +291,8 @@ usermod -aG docker $USER
 1. Protecting your computer
 
 ## Traditional Linux container (LXC) vs Docker
-LXC can run multiple aplications in each container while it 
-is recommanded to run only single applications in a docker container.
+LXC can run multiple applications in each container while it 
+is recommended to run only single applications in a docker container.
 
 ## Docker Engine
 The docker engine the core software that run and manage containers which
@@ -303,18 +303,18 @@ follows client-server architecture.
 * Rest API: To instruct docker container what to do
 * Command line interface (CLI)
 
-## Older version of dockr
+## Older version of docker
 * Docker had two major components:
 	* The docker daemon
 	* LXC
 * The docker daemon was a monolithic binary
-* LXC provided the daemon with access to the fundemental
-	building-blocks of containers existed in the linux kernel.
+* LXC provided the daemon with access to the fundamental
+	building-blocks of containers existed in the Linux kernel.
 
 ## What is cgroups
 Cgroups are a kernel mechanism for limiting and measuring the total
-resorces usedd by a group of process runing on a system. For example,
-you can apply CPU, momory, network, or IO quotas
+resources used by a group of process running on a system. For example,
+you can apply CPU, memory, network, or IO quotas
 
 ## What is Namespace
 Namespaces are a kernel measuring for limiting the visibility that a
@@ -331,7 +331,7 @@ or filesystem mounts.
 	stop | pause | rm ..
 * ```shim```: once a container's parent ```runc``` exits, the associated
 	containerd, ```shim``` process becomes the **container's parent**.
-	some of the responsibilites:
+	Some of the responsibilities:
 	* Keeping any STDIN and STDOUT stream open
 	* Reports the container's exit status back to the daemon.
 
@@ -352,7 +352,7 @@ container
 
 **Note:** You can use container in detach mode by ```-d``` option.
 
-**Note:** You can exit the container witout stop the container with
+**Note:** You can exit the container without stop the container with
 ```ctrl+PQ```
 
 # Session 4
@@ -361,15 +361,15 @@ container
 * By removing the code of containers management from the daemon, the
 	entire container runtime is decoupled from the Docker daemon.
 * It makes it possible to perform maintenance and upgrades on the docker
-	daemon without impacting runing containers
+	daemon without impacting running containers
 
 ### Enable live restore
 * By default, when the docker daemon terminates, it shuts down running
 	containers
 * Live restore: containers remain running if the docker becomes
-	unavailable
+	unavailabel
 * Live restore is not supported on windows containers, but it does work
-	for linux containers running on docker desktop for windows.
+	for Linux containers running on docker desktop for windows.
 
 ### How to enable live restore
 Create/open the following file
@@ -405,15 +405,15 @@ systemctl reload docker
 ## Storage drivers
 Every docker container gets its own area of local storage where all
 containers read/write operations occur. This local storage area has been
-managed by the storage driver or graphdriver. Some of the storage driver
-abvailable for docker on Linux include:
+managed by the storage driver or graph driver. Some of the storage driver
+abvailabel for docker on Linux include:
 * aufs - the original and the oldest
 * overlay2 - probably the best choice for the future
 * devicemapper
 * btrfs
 * zfs
 
-On linux you set the storage driver in ```/etc/docker/daemon.json``` and
+On Linux you set the storage driver in ```/etc/docker/daemon.json``` and
 the you need to restart the docker service for any changes to take
 effect.
 ```json
@@ -422,21 +422,21 @@ effect.
 }
 ```
 To change your driver storage 	while you need your images and
-containers to be available after change
+containers to be availabel after change
 * Save them with docker save
-* Pusht the saved images to a repository
-* Chage the storage driver
+* Push the saved images to a repository
+* Change the storage driver
 * Restart docker
 * Pull the images locally
 * Restart your containers
 
 **Note:** It's a good practice to choose your storage driver 
-in design phaze(installation) and before you do anyting with docker.
+in design phase(installation) and before you do anything with docker.
 
-### Chose which storage diver to ues
-| OS | Storage dirver|
+### Chose which storage diver to use
+| OS | Storage driver|
 | :--- | :-----|
-| RHEL with a 4.x kernel or higher + dokcer 17.06 and higher | overlay2|
+| RHEL with a 4.x kernel or higher + docker 17.06 and higher | overlay2|
 | RHEL with an older kernel and older docker 	| devicemapper |
 | Ubuntu with a 4.x kernel or higher | overlay2 |
 | Ubuntu with an earlier kernel | aufs |
@@ -446,7 +446,7 @@ in design phaze(installation) and before you do anyting with docker.
 ## Docker socket
 When you install docker, you get two major components:
 * the docker client
-* teh docker daemon
+* the docker daemon
 On Linux the client talks to the daemon via a local IPC/Unix socket at
 /var/run/docker.sock
 
@@ -454,10 +454,10 @@ On Linux the client talks to the daemon via a local IPC/Unix socket at
 * ```-a``` - list all containers
 * ```-q``` - only lists the container IDs
 * ```-n=N``` - list the last ```N``` containers
-* ```-f``` - fileter the output like ```-f status=exited```
+* ```-f``` - filter the output like ```-f status=exited```
 * ```-l``` - the latest container
 * ```-s``` - show the size of containers, the value inside the ```()```
-	is the image size and the one before it is the container size minuse
+	is the image size and the one before it is the container size minus
 	the image size
 
 ## Container resource management
@@ -477,21 +477,21 @@ will be 600 Mb.
 
 ### CPU
 ```bash
-docker ru -it --cpuset-cpus="1,3" <image> <app>
+docker run -it --cpuset-cpus="1,3" <image> <app>
 ```
 The container will use core #1 and #3 of the cpu. You can give range of
 cpus too, like ```--cpuset-cpus=1-3```
 
 ### Storage
 ```bash
-docker run -it --sotrage-opt size=100G <image> <app>
+docker run -it --storage-opt size=100G <image> <app>
 ```
-**Note:** You can use this option only on ```overlay2``` sotrage driver
+**Note:** You can use this option only on ```overlay2``` storage driver
 with ```xfs``` back filesystem, other back filesystem, like ext4, are not
 supported.
 
 **Note:** You should enable quota on your ```overlay2``` drive with
-```xfs``` back filesystem in order to use this featuer
+```xfs``` back filesystem in order to use this feature
 
 #### Enabling quota
 First check if the quota is enabled or not
@@ -499,7 +499,7 @@ First check if the quota is enabled or not
 mount | grep xfs
 ```
 if it's not open the ```/etc/default/grub``` file, add the following
-strind at end of ```GRUB_CMDLINE_LINUX```
+string at end of ```GRUB_CMDLINE_LINUX```
 ```bash
 rootflags=uquota,pquota
 ```
@@ -512,18 +512,18 @@ then reboot the system.
 **Note:** You can monitor resource that containers are using with
 ```docker stats```
 
-**Note:** ```yes > /dev/null &``` will consume all the cpu, so don't use
-it, just in case you want to test your cpu
+**Note:** ```yes > /dev/null &``` will consume all the CPU, so don't use
+it, just in case you want to test your CPU
 
 ## Tagging
-You can make tags for your desierd image with ```docker tag``` command
+You can make tags for your desired image with ```docker tag``` command
 ```bash
 docker tag <source_image[:tag]> <target_image[:tag]> 
 ```
 
 ## Dangling images
 Dangling images is an image that is no longer tagged, and appears in
-listings as 	<none>:<none>. A common way they occure is when building a
+listings as 	<none>:<none>. A common way they occur is when building a
 new image and tagging it with an existing tag.
 
 To delete all dangling images
@@ -532,9 +532,9 @@ docker image prune
 ```
 > sometimes in developer builds a docker image and add and ```v2``` tag
 on it, then (s)he want to add a feature to the image with the same tag.
-in this case the prious version gets a <none> tag and become dangle
+In this case the previous version gets a <none> tag and become dangle
 
-## Seraching docker hub from the cli
+## Searching docker hub from the cli
 ```bash
 docker search <image_name>
 ```
@@ -550,7 +550,7 @@ docker inspect <docker_name/docker_id>
 ### Image inspect info
 * Id
 * Repo tags
-* Repo digests - it make our image uniqe all over the repository
+* Repo digests - it make our image unique all over the repository
 * Parent info
 * Comment
 * Container config
@@ -563,11 +563,11 @@ Remove a tag (untag) - it doesn't remove any data
 docker rmi <image_name>:<image_tag>
 ```
 **Note:** if you apply the previous command on an image that has only
-one tag, the image becam dangle.
+one tag, the image became dangle.
 **Note:** While an image is using by a container you can't remove it
 from disk, even if you stop the container and remove the image by
 ```-f``` switch and you can't see the image in ```docker images```, the
-stoped container will start again.(you can turn the removed image back
+stopped container will start again.(you can turn the removed image back
 to image list by pull the image from the repository again)
 
 ## Remove container with ```rm```
@@ -592,7 +592,7 @@ docker attach [option] container
 ```
 
 **Note:** If a container runs ```bash``` by default, you can execute
-command in that container, because it gives you a prumpt, but in general
+command in that container, because it gives you a prompt, but in general
 ```attach``` command connect you to the container's iostream.
 
 **Note:** You can only attach to a running container.
@@ -611,13 +611,13 @@ set an environment variable in the current container bash session
 docker exec -it -e myvar=value <container_name> bash
 ```
 ## Docker cp
-Copy files/folders between a container and the local filesystem. the
-container can be **running** or **stoped**.
+Copy files/folders between a container and the local filesystem. The
+container can be **running** or **stopped**.
 ```bash
 docker cp [Option] <container>:<src_path> <des_path>
 docker cp [Option] <src_path> <container>:<des_path>
 ```
-**Note:** To copy a file with its all atributes use ```-a``` swith in cp
+**Note:** To copy a file with its all attributes use ```-a``` switch in cp
 command
 
 ## Docker stop
@@ -629,7 +629,7 @@ docker stop [Option] <container> [container]
 ```bash
 docker stop -t 20 <container>
 ```
-**Note:** With ```-t``` option the main process inside the container will recieve
+**Note:** With ```-t``` option the main process inside the container will receive
 **SIGTERM**, and after a grace period, **SIGKILL*. 
 
 **Note:** If you see ```Exited (137)``` in ```docker ps``` output it
@@ -638,7 +638,7 @@ means the container has gotten kill signal.
 **Note:** You can monitor a container exit code with ```docker wait
 <container>```
 
-Simply you can start any stoped container with ```docker start``` and
+Simply you can start any stopped container with ```docker start``` and
 restart the with ```docker restart``` command
 
 **Note:** stop/start containers **will not** remove stored data on the
@@ -648,7 +648,7 @@ container.
 You can initiate environment variables with ```-e``` option, while you
 are running the container. 
 
-Docker automatically set some environement variables when creating Linux
+Docker automatically set some environment variables when creating Linux
 container.
 | variable | Value|
 | :-----   | :--- |
@@ -657,7 +657,7 @@ container.
 | PATH | Includes popular directories, such as /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin |
 | TERM | xterm if the container is allocated a pesudo-TTY |
 
-**Note:** Docker does not set any environment variables when creatin
+**Note:** Docker does not set any environment variables when certain
 windows container.
 
 To set custom env with ```-e```:
@@ -679,7 +679,7 @@ returned)
 ```bash
 docker event [Option]
 ```
-For example when you stop a container 4 events happen inorder to do so
+For example when you stop a container 4 events happen in order to do so
 1. Container kill
 1. Container die
 1. Network disconnect
@@ -702,7 +702,7 @@ docker events --filter 'type=volume' <container>
 docker events --filter 'scope=swarm' <container>
 ```
 
-## Docker pause/unpause (freez/unfreez)
+## Docker pause/unpause (freeze/unfreeze)
 Pause all processes within one or more containers
 ```bash
 docker pause <container> [container]
@@ -714,9 +714,9 @@ docker unpause <container> [container]
 
 **Note:** When you pause a container, the requests will be send to the
 container and the container will receive them, but it won't answer them
-- it hase no response, as soon as you unpase the container, it will
-	reponse to all requests it received. It's useful when you want to do maintenance and
-	you don't want to reponse to your clients during the proccess.
+- it has no response, as soon as you unpause the container, it will
+	response to all requests it received. It's useful when you want to do maintenance and
+	you don't want to response to your clients during the process.
 
 ## Docker rename
 Rename a container
@@ -739,12 +739,12 @@ documented and maintainable way. Because you can make your changes in a
 small file and push it to a version control service and make different
 versions.
 
-**Note:** By default, the container being commited and its proccess will
-be pause while the image is commited.
+**Note:** By default, the container being committed and its process will
+be pause while the image is committed.
 
 
 ## Docker save
-Save an archive from the given image with all the nessesary layers
+Save an archive from the given image with all the necessary layers
 as a ```.tar.gz``` file. In other words it transforms an image to an archive
 file.
 
@@ -779,7 +779,7 @@ docker import <name.tar>
 ```
 **Note:** When you import an archived file it become dangle image,
 because the value of ```Repository``` and ```TAG``` is ```none```, so
-you need to assign a tag to it with the following commmand
+you need to assign a tag to it with the following command
 ```bash
 docker tag <image_id> <image_name>:<tag>
 ```
@@ -797,8 +797,8 @@ the current logging driver you can run docker info as follow:
 ```bash
 docker info --format'{{.LoggingDriver}}'
 ```
-You can chage the default logging driver in
-```/etc/docker/daemon.json```. for example to set the driver to
+You can change the default logging driver in
+```/etc/docker/daemon.json```. For example to set the driver to
 ```syslog```:
 
 ```json
@@ -820,23 +820,23 @@ If the logging driver has configurable options, you can set them in the
 			}
 	}
 ```
-To run a container with a specific logging dirver use ```--log-driver```
+To run a container with a specific logging driver use ```--log-driver```
 in the docker run command:
 ```bash
 docker run -it --log-driver <logging_driver> alpine sh
 ```
 
-to find out current logging driver for a running container:
+To find out current logging driver for a running container:
 ```bash
 docker inspect -f '{{.HostConfig.LogConfig.Type}}' <container>
 ```
 
 Docker provides two modes for delivering messages from the container to
-the log dirver:
-* direct (defualt) - blocking delivery from container to driver
+the log driver:
+* direct (default) - blocking delivery from container to driver
 * non-blocking - delivery that stores log messages in an intermediate
 	pre-container ring buffer for consumption by driver. (it's useful for
-	those type of applications which has high log generation frequnce, to
+	those type of applications which has high log generation frequency, to
 	optimise I/O problems)
 
 **Note:** When the buffer is full and new messages is enqueued, the
@@ -848,12 +848,12 @@ oldest messages in memory is dropped.
 You can use tag log option to customize the log message. For more info
 see [here](https://docs.docker.com/config/containers/logging/log_tags/)
 
-**Note:** You can find the defualt log file under
+**Note:** You can find the default log file under
 ```/var/lib/docker/container/<container_id>/<container_id>-json.log```
 as docker does.
 
-## Docker vloume
-There are to main catgory of data:
+## Docker volume
+There are to main category of data:
 * non-persistent
 * Persistent - stuff you need to keep
 
@@ -866,19 +866,19 @@ delete this storage and any data on it.
 The recommended way to persist data in containers is using volumes. You
 create a volume, then you create a container, and mount the volume into
 it. If you delete the container the volume and its data still exist and
-available.
+availabel.
 
-By defualt all files created inside a container are stored on a writable
+By default all files created inside a container are stored on a writable
 container layer which means:
 
-* The data doesn't presist when the container no longer exist, and it
+* The data doesn't persist when the container no longer exist, and it
 	can be difficult to get data out of the container if another
-	proccess needs it
+	process needs it
 * The writable 	layer is tightly coupled to the host machine where the
 	container is running. You can't easily move the data somewhere else
-* Writing into a container's storage layer requier a storage driver to
+* Writing into a container's storage layer require a storage driver to
 	manage the filesystem. This extra abstraction reduce the performance
-	as compared to using data volumes, which wirte directly to the host
+	as compared to using data volumes, which write directly to the host
 	filesystem
 
 Docker has two options for containers to store files in the host
@@ -888,13 +888,13 @@ There are there ways to mount data inside a docker container
 
 * volumes
 * bind mount
-* tmpfs (only on linux hosts)
+* tmpfs (only on Linux hosts)
 
 [types-of-mounts-volume](./assets/types-of-mounts-volume.png)
 
 ### Volumes
 Volumes are stored in a part of the host filesystem which is managed by
-docker (/var/lib/docker/volume on linux). Non-Docker proccesses should
+docker (/var/lib/docker/volume on Linux). Non-Docker processes should
 not modify this part of the filesystem. Volumes are the best way to
 persist data in docker.
 
@@ -926,7 +926,7 @@ docker run -d -v myvol:/data --name mycent centos:lates
 **Note:** If the ```container_path``` doesn't exist while container
 creation, docker will create that path automatically
 
-**Note:** You can get all information about the volume with the hlep of
+**Note:** You can get all information about the volume with the help of
 the following command
 ```bas
 docker volume inspect <volume>
@@ -948,11 +948,11 @@ docker volume rm <volume>
 **Note:** You can only remove unused volume, otherwise you can not
 remove it, even the container which use that volume is in stop state.
 
-**Note:** You can remove all unused volumes wiht ```docker volume prune```
+**Note:** You can remove all unused volumes with ```docker volume prune```
 
 
 ### Bind mount
-Bint mount may be stored anywhere on the host system. Non-Docker
+Bind mount may be stored anywhere on the host system. Non-Docker
 processes on the docker host or a docker container can modify them at
 any time.
 
@@ -964,7 +964,7 @@ written to the host system's filesystem
 
 ## Create NFS docker volume
 ```bash
-docke volume create --driver local --opt type=nfs --opt o=addr=<server nfs ip address>,rw --opt device=:<store path on nfs> <NFS_name>
+docker volume create --driver local --opt type=nfs --opt o=addr=<server nfs ip address>,rw --opt device=:<store path on nfs> <NFS_name>
 ```
 
 ## Using --mount flag in docker run command
@@ -991,7 +991,7 @@ docker run -itd --name mycent --read-only --mount type=volume,source=myvol,targe
 ![pic_7.jpg](./assets/pic_7.jpg)
 
 You can write in a single file from different source simultaneously, it
-will handle by os. In some case some apps lock the file and you can't do
+will handle by OS. In some case some apps lock the file and you can't do
 it.
 
 ## Benefits of volumes
@@ -1002,23 +1002,23 @@ services.
 * Volumes are only removed when you explicitly remove them
 * Decouple the configuration of the docker host from the container
 	runtime
-* Store your container's data on a remove host or a cloud provicer,
+* Store your container's data on a remove host or a cloud provider,
 	rather than locally
 * Back up, restore, or migrate data from one docker host to another
 
 **Note:** You can change some container's features by ```docker
-update``` commnad - you can not mount volume to a running container
+update``` command - you can not mount volume to a running container
 
 ## Volume's advantages over bind mount
 * Volume are easier to backup and migrate than bind mounts
-* You can manage volumes using docker CLI commnads or the docker API -
+* You can manage volumes using docker CLI commands or the docker API -
 	like ```docker volume ls``` or ```docker volume inspect```, ...
 * Volumes work on both Linux and Windows containers
-* Volumes can be more safely shared amoung multiple containers - in
+* Volumes can be more safely shared among multiple containers - in
 	terms of security
 * Volume diver let you store volumes on remote hosts or cloud providers,
 	to encrypt the content of the volume, or to add other functionality
-* New volumes can have thier content pre-populated by a container
+* New volumes can have their content pre-populated by a container
 * If you use ```--mount``` to bind-mount a file or directory that does
 	not exist yet on the Docker host, Docker does not automatically create
 	it for you, but generates an error
@@ -1029,14 +1029,14 @@ update``` commnad - you can not mount volume to a running container
 * As opposed to volumes and bind mounts, a tmpfs mount is temporary, and
 	only persists in the host memory. When the container stops, the tmpfs
 	mount is removed, and files written there won't be persisted
-* This is useful to termporarily sotre senstive files that you don't
-	want to persist in either the hsot or the container writable layer.
+* This is useful to temporarily store sensitive files that you don't
+	want to persist in either the host or the container writable layer.
 
-Limitationas:
+Limitations:
 
 * Unlike volumes and bind mounts, you can't share tmpfs between
 	containers
-* This functionality is only available if you're running docker on Linux
+* This functionality is only availabel if you're running docker on Linux
 
 ```bash
 docker run -id --name mycent --tmpfs /tmp centos:latest
@@ -1052,10 +1052,10 @@ Docker networking	comprises three major components:
 * The docker Network model (CNM) - the design specification which is an
 	open-source pluggable architecture
 * Libnetwork - Docker's real-word implementation of the CNM which is
-	writtern in Go, and it provides all of Docker'r core networking
+	written in Go, and it provides all of Docker's core networking
 	functionality
 * Drivers - extend the model by implementing specific network
-	topolgies
+	topologies
 
 ### The container network model (CNM)
 The design guide for Docker networking is the CNM. It defines three
@@ -1072,13 +1072,13 @@ building blocks:
 
 ![cnm](./assets/cnm.png)
 
-* Container Athos communicate with contaienr Porthos via bukingham
+* Container Athos communicate with container Porthos via bukingham
 	netwrokd 
-* Container Aramis communicate with contaienr Porthos via rochfort
-	netwrok 
-* Porthos two endpoints cannot communicate with eachother without the
+* Container Aramis communicate with container Porthos via rochfort
+	network 
+* Porthos two endpoints cannot communicate with each other without the
 	assistance of a layer 3 router
-* If a container needs to connecting to multiple netwroks, it needs
+* If a container needs to connecting to multiple networks, it needs
 	multiple endpoints.
 
 ### Libnetwork
@@ -1089,21 +1089,21 @@ balancing, and network control plane and management palne functionality
 ### Driver
 Drivers implement the data plane. For example, connectivity and
 isolation is all handled by drivers. Each driver is in charge of the
-acutal creation and mangement of all resources on the networks it is
+actual creation and management of all resources on the networks it is
 responsible for.
 
 ![docker-7.5](./assets/docker-7.5.png)
 
 ### Single-host bridge network
 
-* **Single-host:** It only exist on a sigle docker host and can only
+* **Single-host:** It only exist on a single docker host and can only
 connect containers that are on the same host.
 * **Bridge:** It's an implementation of an 802.1d bridge
 
 ### Docker network driver types
 #### Bridge
 The default network driver. They're usually used when your application
-is run in standalone containers that needs to comunicate.
+is run in standalone containers that needs to communicate.
 
 #### Host
 For standalone containers, remove network isolation between container
@@ -1111,12 +1111,12 @@ and the docker host, and used the host network directly.
 
 #### None
 Disable all networking. Usually used in conjunction with a custom
-networking driver. None is not available for swarm services.
+networking driver. None is not availabel for swarm services.
 
 #### Overlay
 Overlay connects multiple docker daemons together and enable swarm
 services to communicate with each other. You can use also overlay
-netwrok to facilitate communicate between a swarm service and a
+network to facilitate communicate between a swarm service and a
 standalone container, or between standalone containers on different
 docker daemons.
 
@@ -1126,7 +1126,7 @@ appear as a physical device on your network. The docker daemon routes to
 containers by their MAC address. Using the macvlan network sometimes is
 the best choice when dealing with legacy applications that expect to be
 directly connected to the physical network, rather than	routed through
-the docker host's netwrok stack.
+the docker host's network stack.
 
 ### Docker Network inspect
 
@@ -1134,7 +1134,7 @@ the docker host's netwrok stack.
 
 # Session 8
 
-## Create docke network
+## Create docker network
 ```bash
 docker network create -d <deeriver_type> <network_name> 
 ```
@@ -1152,8 +1152,8 @@ docker run -it --name <name> --network <network_name> <image>
 * User-defined bridges provide better **isolation**
 	* All containers without a --network specified, are attached to
 		default bridge network. This can be a risk, as unrelated
-		stacks/services/continers are then able to communicate.
-* Contaiener can be **attached and detached from user-defined networks
+		stacks/services/containers are then able to communicate.
+* Container can be **attached and detached from user-defined networks
 	on the fly**
 	* During a container lifetime, you can connect or disconnect it from
 		user-defined networks on the fly. To remove a container from default
@@ -1177,8 +1177,8 @@ to show all used port by a container
 ```bash
 docker port <container_name>
 ```
-## Enabale forwarding from docker containers to outside world
-By default traffic from containers connceted to the default bridge
+## Enable forwarding from docker containers to outside world
+By default traffic from containers connected to the default bridge
 network is not forwarded to the outside world. To enable forwarding:
 ```bash
 sysctl net.ipv4.conf.all.forwarding=1
@@ -1195,16 +1195,16 @@ docker run -itd --name cent2 --network mynet --ip 192.168.100.20 centos
 ```
 
 ## Connecting to existing networks(MACVLAN driver)
-The ability to containerized apps **to external system and pyshical networks**
+The ability to containerized apps **to external system and physical networks**
 
 Pros of using MACVLAN:
-* MACVLAN is good as it doesn't requier port mapping or additional
-	bridges - you connceted the container interface to the host interface
+* MACVLAN is good as it doesn't require port mapping or additional
+	bridges - you connected the container interface to the host interface
 	(or a sub-interface)
 Cons of using MACVLAN:
-* It requiers the host NIC to be in promiscuous mode, which isn't allowd
+* It requires the host NIC to be in promiscuous mode, which isn't allows
 	on most public cloud platforms
-* Assumes we have an existing physical netwrok with two VLANs:
+* Assumes we have an existing physical network with two VLANs:
 	* VLAN 100: 10.0.0.0/24
 	* VLAN 200: 192.168.3.0/24
 
@@ -1212,21 +1212,21 @@ Cons of using MACVLAN:
 
 ## Service discovery
 Service discovery allows all containers and swarm services to locate
-each other with name. The only requierment is that they have to be on the
-same netwrok. All docker containers have a local DNS resolver.
+each other with name. The only requirement is that they have to be on the
+same network. All docker containers have a local DNS resolver.
 
 ![dns](./assets/dns.jpg)
 
 **Note:** Service discovery only works for user-defined networks, and
 not for default network.
 
-## Nerwork Trubleshooting
-If you're having netwrok issue with your application's container, you
+## Network Troubleshooting
+If you're having network issue with your application's container, you
 can launch netshoot with that container's network namesapce like:
 ```bash
 docker run -it --net container:<container_name> nikolaka/netshoot
 ```
-If you think the networking issue is on the host itselt, you can launch
+If you think the networking issue is on the host itself, you can launch
 netshoot with that host network namespace:
 ```bash
 docker run -it --net host nikolaka/network
@@ -1246,7 +1246,7 @@ docker run -it --network container:mynginx nicolaka/netshoot
 netstat -na
 ```
 You can scan a container port with ```nmap``` too, but you need to run a
-```--privileged``` container, a continer that has root access to your
+```--privileged``` container, a container that has root access to your
 host, as bellow
 ```bash
 docker run --it --privileged nicolaka/netshoot nmap -p 1-1024 -dd <container_ip> | grep open
@@ -1266,18 +1266,18 @@ docker run -it -v /var/run/docker.socket:/var/run/docker.socket nicolaka/netshoo
 **Note:** ```netshoot``` needs that volume to get information about
 other containers
 
-### Snif containers with ```termshark```
+### Sniff containers with ```termshark```
 ```bash
 docker run --cap-add NET_ADMIN --cap-add CAP_NET_RAW -it --network container:<container_network> \
 nicolaka/netshoot termshark -i eth0 tcp
 ```
 
-**Note:** ```netshoot``` needs those capablities to snif traffic with
-```termshark```. You can read more about capablities in whitelist
-capablity
+**Note:** ```netshoot``` needs those capabilities to sniff traffic with
+```termshark```. You can read more about capabilities in whitelist
+capability
 
 ### Analyzing network using netcat
-Check if firewall drop a connction or not
+Check if firewall drop a connection or not
 ```bash
 docker run -d --name mynginx -p 80:80 --netwrok <network_name> nginx
 docker -itd --nmae mynetcat --netwrok <network_name> nicolaka/netshoot nc -vz mynginx 80
@@ -1286,9 +1286,9 @@ docker logs mynetcat
 
 ## Build custom docker image
 
-* A ```Dcokerfile``` is a text document that containes all the commnads a user
-could call on the command line to assmble an image.
-* The ```docker build``` commnad builds an image from a
+* A ```Dcokerfile``` is a text document that contains all the commands a user
+could call on the command line to assemble an image.
+* The ```docker build``` command builds an image from a
 	```Dockerfiles```  and a context. The build is run by the Docker
 	daemon, not by the CLI. The first thing a build process does is send
 	the entire context to the daemon.
@@ -1316,7 +1316,7 @@ docker build -t myimage:v1 .
 ```
 **Note:** ```-t``` will tag/name your image.
 
-**Note:** The ```.``` in ```dcoker build``` command is the path of your
+**Note:** The ```.``` in ```docker build``` command is the path of your
 dockerfile
 
 **Note:** In this example the image ID of ```cnetos``` and ```myimage```
@@ -1330,7 +1330,7 @@ FROM scratch
 ADD IMAGE_FILE.tar.xz /
 ```
 
-### ```LABLE```
+### ```LABEL```
 Labels are some metadata for more information about our image, nothing
 more.
 ```dockerfile
@@ -1366,11 +1366,11 @@ ADD [--chown=UID:GID] /PATH/TO/FILE/OR/DIR/ON/HOST/NEAR/DOCKERFILE /PATH/TO/FILE
 * ```ADD``` allows <src> to be a URL
 * If it's a local tar archive in a recognized Compression format
 	(identity, bzip2, gzip or xz) then it's unpacked as a directory.
-* Resourcese form URLs are not decompressed.
-* Using ```COPY``` is recommended where the magicof ```ADD``` is not
+* Resources form URLs are not decompressed.
+* Using ```COPY``` is recommended where the magic of ```ADD``` is not
 	required.
 
-### ```RUN```
+### ```RUN``
 The ```RUN``` instruction will execute any commands in a new layer on
 top of the current image and commit the result.
 
@@ -1408,7 +1408,7 @@ USER 	<user>[:<group>]
 USER 	<UID>[:<GID>]
 ```
 **Note:** Remember you should add the user before you run ```USER```
-commnad.
+command.
 ```dockerfile
 RUN useradd mohammad
 USER mohammad
@@ -1502,7 +1502,7 @@ docker run <image_name>:<tag> 4.2.2.4
 
 #### ```CMD``` vs ```ENTRYPOINT```
 * Containers are designed for running specific task and process, not for
-	hosting and oprating system.
+	hosting and operating system.
 * Once the process stops, the container stops as well
 * There are two types of instructions that can define the process
 	running in the container:
@@ -1514,7 +1514,7 @@ docker run <image_name>:<tag> 4.2.2.4
 
 ### ```SHELL```
 * It allows the default shell used for the shell form of command to be
-overriden.
+overridden.
 * The default shell on Linux is ```["bin/bash","-c"]```, and on windows
 	is ["cmd","/S","/C"]
 * The ```SHELL``` instruction must be written in JSON format in
@@ -1524,13 +1524,13 @@ overriden.
 SHELL ["executable","param"]
 ```
 ### ```HEALTHCHEACK```
-It tells docker how to test a container to ckeck that it is still
+It tells docker how to test a container to check that it is still
 working. This can detect cases such as a web server that is stuck an
-infinit loop and unable to handle new connections, even though the
-server process is still runnign.
+infinite loop and unable to handle new connections, even though the
+server process is still running.
 
 ```dockerfile
-HEALTHCHECK [option] CMD command
+HEALTHCHEACK [option] CMD command
 ```
 
 The options that can be appear before ```CMD```:
@@ -1539,23 +1539,23 @@ The options that can be appear before ```CMD```:
 1. ```--start-period```=DURATION (default: 0s)
 1. ```--retries```=N (default: 3)
 
-## Dockerfile besr practice
+## Dockerfile best practice
 
 * Incremental (build time)
 * Image size
-* Maintaiability
+* Maintainability
 * Security
-* Consistancy/Repeatability
+* Consistency/Repeatability
 * Areas of improvement
-* Order from least to most frequently changing contect, in case of using
+* Order from least to most frequently changing connect, in case of using
 	docker cashed stages.
 * Only copy what needed. Avoid ```copy .``` if possible.
 * prevent to using outdated package cache
 * Remove unnecessary dependencies
-* Remve package manager cache
+* Remove package manager cache
 * Use official images when possible
 * The ```latest``` tag is a rolling tag. Be specific, to prevent
-	unxpected changes in your base image.
+	unexpected changes in your base image.
 * looking for minimal flavors of your image
 
 ## Port expose vs port publish
@@ -1568,9 +1568,9 @@ from outside your docker machine
 
 ## Docker history
 
-Show the histroy of an image
+Show the history of an image
 ```bash
-docker histroy [option] <image_name>
+docker history [option] <image_name>
 ```
 
 **Note:** You can find out how the image had build in case of you don't
@@ -1589,23 +1589,23 @@ docker run -it --name <name> --restart [flag] <image:tag>
 | ---- | ----------- |
 | no | Do not automatically restart the container. (default) |
 | on-failure | Restart the container if it exits due to an error, which manifests as non-zero exit code.|
-| always | Always restarts the container when it stops. If it manualy stoped, it is restarted only when docker daemon restarts on the container itself is manually restarted.|
-| unless-stopped | Simillart to always, except that when the container is stopped (manually or otherwise), it is not restared even after docker daemon restarts.|
+| always | Always restarts the container when it stops. If it manually stopped, it is restarted only when docker daemon restarts on the container itself is manually restarted.|
+| unless-stopped | Similar to always, except that when the container is stopped (manually or otherwise), it is not restored even after docker daemon restarts.|
 
 | Exit code | Description |
 | 0 | indicates that the specific container does not have a foreground process attached.|
-| 1 | indicates failiure due to application error |
+| 1 | indicates failure due to application error |
 | 137 | indicates that container received SIGTERM |
 | 139 | indicates that the container received SIGSEGV. SIGSEGV indicates a segmentation fault. This occurs when a program attempts to access a memory location that it's not allowed to access.|
 | 143 | initiates that the container received SIGTERM |
 | 126 | indicates permission problem or command is not executable.|
-| 127 | indicates posible typo in shell script with unrecognizable character.|
+| 127 | indicates possible typo in shell script with unrecognizable character.|
 | 225 | indicates that there was an error in running the ENTRYPOINT/CMD.|
 
 ## Deploy a registry server
 
-A registry is a storage and contect delivery system, holding name Docker
-images, available in different tag versions.
+A registry is a storage and contact delivery system, holding name Docker
+images, availabel in different tag versions.
 
 ### Run a local registry
 
@@ -1616,22 +1616,22 @@ docker run -d -p 5000:5000 --restart=always --name registry registry:2
 The registry now is ready to use in test environment.
 
 **Note:** When you want to push your image to registry, you should add a
-tag to it as the folloing format:
+tag to it as the folioing format:
 ```bash
-docker tag <image_name>:<label> <rgistry_address>[:<registry_port>]/<image_name>:<lable>
+docker tag <image_name>:<label> <registry_address>[:<registry_port>]/<image_name>:<label>
 ```
 then push that to the repo.
 ```bash
-docker push <rgistry_address>[:<registry_port>]/<image_name>:<lable>
+docker push <registry_address>[:<registry_port>]/<image_name>:<label>
 ```
 ### Run a web interface for local docker registry
 ```bash
-docker run -d -p 8080:8080 --restart=alwys --name registry-web --link <registry_container_name> -e REGISTRY_URL=http://registry:5000/v2 -e REGISTRY_NAME=localhost:5000 hyper/docker-registry-web 
+docker run -d -p 8080:8080 --restart=always --name registry-web --link <registry_container_name> -e REGISTRY_URL=http://registry:5000/v2 -e REGISTRY_NAME=localhost:5000 hyper/docker-registry-web 
 ```
 
 ## Docker Compose
 
-### Installing docker compose on linux
+### Installing docker compose on Linux
 
 ```bash
 yum install -y nss curl libcurl
@@ -1640,17 +1640,17 @@ sudo chmod +x /usr/local/bin/docker-compose
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 ```
 
-**Note:** In ```yaml``` file the lines which start witout any indent or
+**Note:** In ```yaml``` file the lines which start without any indent or
 whitespace called **top level**.
 
 ### Write your first ```docker-compose```
 
-write a docker-compose file which runs a flask app with two services
+Write a docker-compose file which runs a flask app with two services
 (web and redis). The app is a simple web server that count the number of
 visits and store the value in redis.
 
 **Note:** Put your ```docker-compose``` file in a meaningful named
-directory, beacuse all the containers which made from your file will get
+directory, because all the containers which made from your file will get
 a prefix which is the directory name. Also the network will create by
 compose follows this rule.
 
@@ -1668,15 +1668,15 @@ services:
 * The web service use an image that's build from the Dockerfile in the
 	current directory. It then binds the container and the host machine to
 	exposed port, 5000.
-* The **redis** service use a public Redise image pulled from the Docker
+* The **redis** service use a public Redis image pulled from the Docker
 	Hub registry.
 
-**Note:** Services defined in compose can call eachother by thier name
+**Note:** Services defined in compose can call each other by their name
 
 **Note:** The previous example is not complete and needs other files.
 you can find them [here](https://github.com/mrbooshehri/lab/tree/master/docker/docker_compose/ex_1)
 
-you can run the compose file with the following cammnds:
+you can run the compose file with the following commands:
 ```bsah
 cd /PATH/TO/YOUR/DOCKER-COMPOSE
 docker-compse up
@@ -1711,7 +1711,7 @@ docker-compose down -v
 
 # Services 12
 
-## Explainging ```docker-compose.yml```
+## Explaining ```docker-compose.yml```
 
 * ```version```: It's mandatory and always place at the first line. This
 	defines the version of the compose file format. You should normally
@@ -1722,8 +1722,8 @@ docker-compose down -v
 
 ## Docker compose network
 
-* By default compse will create bridge network. Each container for a
-	service joint the default network and is both realible by other
+* By default compose will create bridge network. Each container for a
+	service joint the default network and is both reliable by other
 	containers on that network, discoverable by them at a hostname
 	identical to the container name.
 * Network service-to-service communication use the CONTAINER_PORT. whe
@@ -1749,7 +1749,7 @@ service:
 ```
 ### Specify custom network
 The top level network key tells Docker to create new networks. Each
-service can specifiy a network to connect to with the service level
+service can specific a network to connect to with the service level
 network key, which is a list of names referencing entries under the top
 level networks key.
 
@@ -1792,7 +1792,7 @@ networks:
 		attachable: true
 ```
 
-**Note:** This sloution used when you want to connect containers on your
+**Note:** This solution used when you want to connect containers on your
 cluster with a swarm.
 
 To join a pre-existing network, use the external option:
@@ -1866,7 +1866,7 @@ It will be ignored when deploying a stack in swarm mode.
 #### Manage containers dependence chain
 
 Express dependence between services. Services dependencies cause the
-following behavirs:
+following behaviors:
 * docker-compose up **starts/stops services in dependence order**.
 ```yaml
 version: 3
@@ -1890,12 +1890,12 @@ environment:
 	MYSQL_DATABASE=db
 	MYSQL_USER=user
 ```
-If service specifies a build optiond, variables defined in
+If service specifies a build options, variables defined in
 ```environment``` are not automatically visible during the build. Use
 the args sub-options of build to defined build-time environment
 variables.
 
-#### Helthchek
+#### Healthchek
 Configure a check that's run to determine whether or not containers for
 this service are healthy:
 
@@ -1917,7 +1917,7 @@ healthcheck:
 	restart: "unless-stopped" # always restart container/service except manually stop
 ```
 #### Mount ```tmpfs```
-Mount a temprory file system inside the container. Can be a single value
+Mount a temporary file system inside the container. Can be a single value
 or a list.
 
 ```yaml
@@ -1935,15 +1935,15 @@ or
 ## Docker Swarm
 
 A swarm consists of multiple docker host which run in swarm mode and act
-as manager and workder. A given host can be a manager, a worker, or
+as manager and worker. A given host can be a manager, a worker, or
 perform both roles. When you create a service, you define its optimal
 state. Docker swarm works to maintain that desire state.
 
-**Note:** A comination of workers and **master(s)** form a cluster
+**Note:** A commination of workers and **master(s)** form a cluster
 
 **Note:** Master gets a desired state and perform it as current/actual
 state on worker nodes, then it monitors all workers to be sure your
-desired state is working. The proccess of monitoring of workers call
+desired state is working. The process of monitoring of workers call
 **watch loop** 
 
 **Note:** swarm doesn't have auto scaling and you should do it by other
@@ -1955,18 +1955,18 @@ in your monitoring system.
 * A secure cluster
 * An orchestration engine
 
-On the clustering front, it gourps one or more docker nodes and lets you
+On the clustering front, it gorps one or more docker nodes and lets you
 manage them as an encrypted distributed cluster.
 
-On the 	the orchestration front, swarm exposes a ritch API that allows
-you to deploy and manage complicated microservices apps with ease. You
+On the orchestration front, swarm exposes a ritch API that allows
+you to deploy and manage complicated microservice apps with ease. You
 can even perform rolling updates, rollback and scaling operations.
 
 ### Conceptes relating to docker swarm services
 
 * Node: A swarm consists of one or more docker nodes. These can be
-	physical servers, VMs, Rasperry Pi's, or cloud instances. Nodes are
-	configured as **manager** or **workder**.
+	physical servers, VMs, Raspberry Pi's, or cloud instances. Nodes are
+	configured as **manager** or **worker**.
 	
 	* Managers look after the control plane of the cluster, meaning things
 		like the state of the cluster and dispatching tasks to the workers.
@@ -1980,7 +1980,7 @@ can even perform rolling updates, rollback and scaling operations.
 		manager-only nodes. An agent	runs on each worker node and reports
 		on the task assign to it. The work node notifies the manager node of
 		the current state of it assigned task so that the manager can
-		maitain the desired state of each worker.
+		maintain the desired state of each worker.
 
 * Service and Task
 
@@ -2002,13 +2002,13 @@ can even perform rolling updates, rollback and scaling operations.
 	exposes the services you want to make available externally to the
 	swarm. The swarm manager can automatically assign the service a
 	**PublishPort** you can configure a PublishPort for the service. If
-	you do not specify a port, the swarm manager assign a service aport in
+	you do not specify a port, the swarm manager assign a service a port in
 	the 30000-32767 range.
 
 	* External components can access the service on the PublishPort of any
-		node in the cluseter whether or not the node is currently running
+		node in the cluster whether or not the node is currently running
 		the task for the service. All nodes in the swarm route ingress
-		connction to a running task instance.
+		connection to a running task instance.
 	* Swarm mode has an internal **DNS** component that automatically
 		assign each service in the swarm a **DNS** entry.
 
@@ -2022,13 +2022,13 @@ manager nodes:
 1. Docker engine latest version
 1. The IP address of nodes
 1. Set different hostname on each node
-1. Open the folloing ports
+1. Open the folioing ports
 	1. TCP port 2377 for cluster management communications
 	1. TCP and UDP port 7946 for communication among nodes
 	1. UDP port 4789 for overlay network traffic
 
-The proccess of building a swarm called initializing a swarm, and the
-high level proccess is this:
+The process of building a swarm called initializing a swarm, and the
+high level process is this:
 ```
 	Initialize the first manager node > Join additional manager nodes >
 	Join worker nodes > Done.
@@ -2061,20 +2061,20 @@ manager node which issued the command.
 **Note:** You can change node role by the following commands:
 ```bash
 # to promote worker to manager
-docker node pormote <node_name>
+docker node promote <node_name>
 # to demote manager to worker 
 docker node demote <node_name>
 ```
 
 ### Swarm manager high available (HA)
 
-* Swarm manager have native support for high availablity. This means one
+* Swarm manager have native support for high availability. This means one
 	or more can fail, and the survivors will keep swarm running
 * Swarm implements a form of active-passive multi-manager HA
 * Only one manager is ever considered active, and it called **leader**.
 	Leader is only one that	will ever issue live commands against the
 	swarm.
-* If a passive manager recieve commands for the swarm, it proxies them
+* If a passive manager receive commands for the swarm, it proxies them
 	across to the leader.
 * The following two best practices apply to swarm HA:
 	* Deploy an odd number of managers
@@ -2083,7 +2083,7 @@ docker node demote <node_name>
 	The cluster continues the operate during split-brain conditions, but
 	you are no able to alter the configuration or add and manage
 	application workload.
-* You definitely don't more than 7, as the time taken to achive
+* You definitely don't more than 7, as the time taken to archive
 	consensus will be longer.
 
 ![split-brain](./assets/splitbrain.png)
@@ -2111,7 +2111,7 @@ docker service create --name mynginx -p 80:80 --replicas 5 nginx
 ```
 **Note:** This action only available via manager nodes.
 
-To check runnig services run the following command:
+To check running services run the following command:
 ```bash
 docker service ls
 ```
@@ -2128,11 +2128,11 @@ docker service ps <serivce-name>
 ```
 # Session 14
 
-## Replicated vs golbal services
+## Replicated vs global services
 
 * Default replication mode of a service is replicated.
 * This will deploy a desired number of replicas and distribute them as
-	evanly as possible across the cluster.
+	evenly as possible across the cluster.
 * The other mode is global, which runs a single replica on every node in
 	the cluster.
 
@@ -2145,27 +2145,27 @@ global <image-name>
 ```bash
 docker service rm <service-name>
 ```
-## Sacling
+## Scaling
 
 To perform scale action service must be run in **replicated** mode. Both
 scale up and down available via the following command, and the
-replication number demostrate which one going to happen:
+replication number demonstrate which one going to happen:
 ```bsah
 docker service scale <service-name>=<replication-number>
 ```
-## Rollign update
-Roll update provide a situatin which you can update your service with
+## Rolling update
+Roll update provide a situating which you can update your service with
 0-donwtime.
 ```bash
-docker servie update --image <image-name> --update-parallelism <number>
+docker service update --image <image-name> --update-parallelism <number>
 --update-delay <time>s <service-name>
 ```
 * ```--image```: The name image you want to replace with the previous
 	one
-* ```--update-parallelism```: Determin the number of container which
+* ```--update-parallelism```: Determine the number of container which
 	going to update at the same time
 * ```--update-delay```: The amount of delay (in seconds) between
-	updateing containers
+	updating containers
 
 ## Ingress mode vs Host mode
 
@@ -2179,19 +2179,18 @@ replicas.
 
 To run swarm in host mode:
 ```bash
-docker service create --name <service-name> --network <overlay-network-name> --published=80,taget=80,mode=host --replicas <replication-number> <image-name>
-```
-## Dreain a node on the swarm
+docker service create --name <service-name> --network <overlay-network-name> --published=80,target=80,mode=host --replicas <replication-number> <image-name> ```
+## Drain a node on the swarm
 
 Sometimes, such as planned maintenance time, you need to set a node to
-**DRAIN** availablity. **DRAIN** availablity prevent a node from
+**DRAIN** availability. **DRAIN** availability prevent a node from
 servicing new tasks from the swarm manager. It also means the manager
-stop tasks running on the node and lauched replica tasks on a node with
-**ACTIVE** availablity.
+stop tasks running on the node and latched replica tasks on a node with
+**ACTIVE** availability.
 
 To **DRAIN** a node:
 ```bash
-docker node update --availablity drain <node-name>
+docker node update --availability drain <node-name>
 ```
 **Note** to make the node **ACTIVE** again, just replace ```active```
 with ```drain``` in the previous command.
@@ -2200,13 +2199,13 @@ with ```drain``` in the previous command.
 
 To run a container on node based on role:
 ```bash
---constraint node.role==<manager/workger>
+--constraint node.role==<manager/worker>
 ```
 
-## Statless vs Statfull applications
+## Stateless vs Stateful applications
 
-Applicatins which store a data and a state from currnt state are
-statefull and others are stateless
+Applications which store a data and a state from current state are
+stateful and others are stateless
 
 ## Deploying apps with Docker Stack
 
@@ -2214,7 +2213,7 @@ Stacks let you define complex multi-service apps in a single declarative
 file. They also provide a simple way deploy the app and manage it entire
 lifecycl - initial deployment > health check > scaling > updates >
 rollback, and more. Define your app in a Compose file which includes the
-entire statck of services that make up the app, then deploy and manage
+entire stack of services that make up the app, then deploy and manage
 it with the docker stack deploy command. Stacks build on top of a docker
 swarm.
 
@@ -2227,7 +2226,7 @@ swarm.
 * **networks**: Lists the required networks
 * **secrets**: Define the secret the app uses.
 
-**Note:** To make a network traffic encrypt put the following conig in
+**Note:** To make a network traffic encrypt put the following config in
 ```networks``` top level
 ```yml
 networks:
@@ -2251,9 +2250,9 @@ An example [project](https://github.com/dockersamples/atsea-sample-shop-app)
 
 # Session 15
 
-## Adding lable to an existing node
+## Adding label to an existing node
 ```bash
-docker node update --label-add <lable>=<value> <node-name>
+docker node update --label-add <label>=<value> <node-name>
 ```
 
 ## Docker secret
@@ -2262,7 +2261,7 @@ To work with ```secret``` command first you need to generate
 ```bash
 openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt
 ```
-now you can create your screts
+now you can create your secret
 ```bash
 docker secret create <secret-name> domain.crt
 ```
@@ -2276,7 +2275,7 @@ docker stack deploy -c /PATH/TO/DOCKER-STACK.yml <stack-name>
 ```
 
 **Note:** You can update ```docker-stack.yml``` file whenever you want
-and run the previous command to update the clustere.
+and run the previous command to update the cluster.
 
 ## Stack related commands
 
@@ -2285,7 +2284,7 @@ and run the previous command to update the clustere.
 docker stack ls
 ```
 
-* To remvoe a stack
+* To remove a stack
 ```bash
 docker stack rm <stack-name>
 ```
@@ -2297,15 +2296,15 @@ docker stack ps <stack-name>
 
 ![security](../assets/security.png)
 
-### Kernerl namespaces
+### Kernel namespaces
 Processes running with a container cannot see, and even less effect,
-proccesses running in another container, or in the host system.
-Containers don't get the privilleged access to the sockets ot interfaces
+processes running in another container, or in the host system.
+Containers don't get the privileged access to the sockets to interfaces
 of another container.
 
 ### Cgroups
 ![cgroup](../assets/cgroup.png)
-Cgroups let us set implemet resource accounting and limiting on each of
+Cgroups let us set implement resource accounting and limiting on each of
 containers so that a single container cannot use all of the CPU, RAM, or
 storage I/O of the host. A single container cannot bring 	the system
 down by exhausting one of those resources.
