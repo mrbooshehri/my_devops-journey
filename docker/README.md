@@ -1,3 +1,214 @@
+Table of Contents
+=================
+
+* [Session 1](#session-1)
+   * [DevOps](#devops)
+   * [Continues Integration(CI)](#continues-integrationci)
+      * [Continues Delivery(CD)](#continues-deliverycd)
+      * [Continues Deployment](#continues-deployment)
+* [Session 2](#session-2)
+   * [Monolithic Architecture](#monolithic-architecture)
+   * [Pros and cons of monolithic architecture](#pros-and-cons-of-monolithic-architecture)
+   * [Microservice Architecture](#microservice-architecture)
+      * [Pros and cons of microservice architecture](#pros-and-cons-of-microservice-architecture)
+   * [What is docker](#what-is-docker)
+   * [What is a docker image](#what-is-a-docker-image)
+      * [Docker image architecture(layered architecture)](#docker-image-architecturelayered-architecture)
+      * [What is a docker container](#what-is-a-docker-container)
+      * [What is a docker registry](#what-is-a-docker-registry)
+   * [Installing Docker](#installing-docker)
+   * [Get information about docker installed version](#get-information-about-docker-installed-version)
+   * [Get an image from docker registry](#get-an-image-from-docker-registry)
+   * [Image naming structure](#image-naming-structure)
+   * [Running an instance from an image](#running-an-instance-from-an-image)
+   * [Get information about containers](#get-information-about-containers)
+* [Session 3](#session-3)
+   * [Manage docker as a non-root user](#manage-docker-as-a-non-root-user)
+   * [Virtual machine vs Docker](#virtual-machine-vs-docker)
+      * [Differences](#differences)
+      * [Similarities](#similarities)
+   * [Where should you run docker containers?](#where-should-you-run-docker-containers)
+      * [Why run docker on bare-metal](#why-run-docker-on-bare-metal)
+      * [Why don't run docker on bare-metal](#why-dont-run-docker-on-bare-metal)
+      * [Advantages of docker on bare-metal vs VM](#advantages-of-docker-on-bare-metal-vs-vm)
+   * [Benefits Docker containers](#benefits-docker-containers)
+   * [What problems docker solve?](#what-problems-docker-solve)
+   * [Traditional Linux container (LXC) vs Docker](#traditional-linux-container-lxc-vs-docker)
+   * [Docker Engine](#docker-engine)
+      * [Docker engine components](#docker-engine-components)
+   * [Older version of docker](#older-version-of-docker)
+   * [What is cgroups](#what-is-cgroups)
+   * [What is Namespace](#what-is-namespace)
+   * [Docker engine architecture](#docker-engine-architecture)
+   * [Let's run a container](#lets-run-a-container)
+* [Session 4](#session-4)
+   * [Daemonless containers](#daemonless-containers)
+      * [Enable live restore](#enable-live-restore)
+      * [How to enable live restore](#how-to-enable-live-restore)
+      * [Docker components on Linux system](#docker-components-on-linux-system)
+      * [Docker daemon responsibilities](#docker-daemon-responsibilities)
+   * [Storage drivers](#storage-drivers)
+      * [Chose which storage diver to use](#chose-which-storage-diver-to-use)
+   * [Docker socket](#docker-socket)
+   * [Container resource management](#container-resource-management)
+      * [Memory and Swap](#memory-and-swap)
+      * [CPU](#cpu)
+      * [Storage](#storage)
+         * [Enabling quota](#enabling-quota)
+   * [Tagging](#tagging)
+   * [Dangling images](#dangling-images)
+   * [Searching docker hub from the cli](#searching-docker-hub-from-the-cli)
+* [Session 5](#session-5)
+   * [Show details of an image or container](#show-details-of-an-image-or-container)
+      * [Image inspect info](#image-inspect-info)
+   * [Remove image with rmi](#remove-image-with-rmi)
+   * [Remove container with rm](#remove-container-with-rm)
+   * [Docker attach](#docker-attach)
+   * [Docker exec](#docker-exec)
+   * [Docker cp](#docker-cp)
+   * [Docker stop](#docker-stop)
+   * [Environment variables](#environment-variables)
+* [Session 6](#session-6)
+   * [Docker log](#docker-log)
+   * [Docker event](#docker-event)
+      * [Docker events examples](#docker-events-examples)
+   * [Docker pause/unpause (freeze/unfreeze)](#docker-pauseunpause-freezeunfreeze)
+   * [Docker rename](#docker-rename)
+   * [Docker commit](#docker-commit)
+   * [Docker save](#docker-save)
+   * [Docker load](#docker-load)
+   * [Docker export](#docker-export)
+   * [Docker import](#docker-import)
+   * [Docker flow](#docker-flow)
+   * [Docker logging](#docker-logging)
+   * [Docker volume](#docker-volume)
+      * [non-persistent storage](#non-persistent-storage)
+      * [Persistent storage](#persistent-storage)
+      * [Volumes](#volumes)
+         * [Creating docker volumes](#creating-docker-volumes)
+         * [Removing docker volume](#removing-docker-volume)
+      * [Bind mount](#bind-mount)
+      * [tmpfs](#tmpfs)
+* [Session 7](#session-7)
+   * [Create NFS docker volume](#create-nfs-docker-volume)
+   * [Using --mount flag in docker run command](#using---mount-flag-in-docker-run-command)
+   * [Sharing volumes](#sharing-volumes)
+   * [Benefits of volumes](#benefits-of-volumes)
+   * [Volume's advantages over bind mount](#volumes-advantages-over-bind-mount)
+   * [Tmpfs usage](#tmpfs-usage)
+   * [Docker Networking](#docker-networking)
+      * [The container network model (CNM)](#the-container-network-model-cnm)
+      * [Libnetwork](#libnetwork)
+      * [Driver](#driver)
+      * [Single-host bridge network](#single-host-bridge-network)
+      * [Docker network driver types](#docker-network-driver-types)
+         * [Bridge](#bridge)
+         * [Host](#host)
+         * [None](#none)
+         * [Overlay](#overlay)
+         * [Macvlan](#macvlan)
+      * [Docker Network inspect](#docker-network-inspect)
+* [Session 8](#session-8)
+   * [Create docker network](#create-docker-network)
+   * [Join container to a specific network](#join-container-to-a-specific-network)
+   * [Docker default bridge vs user-defined bridge](#docker-default-bridge-vs-user-defined-bridge)
+   * [Connect or disconnect a container to/from network(s)](#connect-or-disconnect-a-container-tofrom-networks)
+   * [Port mapping/publishing](#port-mappingpublishing)
+   * [Enable forwarding from docker containers to outside world](#enable-forwarding-from-docker-containers-to-outside-world)
+   * [Set static IP on containers](#set-static-ip-on-containers)
+   * [Connecting to existing networks(MACVLAN driver)](#connecting-to-existing-networksmacvlan-driver)
+* [Session 9](#session-9)
+   * [Service discovery](#service-discovery)
+   * [Network Troubleshooting](#network-troubleshooting)
+      * [Checking containers network performance](#checking-containers-network-performance)
+      * [Check container's ports with netstat](#check-containers-ports-with-netstat)
+      * [Check interface traffic with iftop](#check-interface-traffic-with-iftop)
+      * [Check containers function with ctop](#check-containers-function-with-ctop)
+      * [Sniff containers with termshark](#sniff-containers-with-termshark)
+      * [Analyzing network using netcat](#analyzing-network-using-netcat)
+   * [Build custom docker image](#build-custom-docker-image)
+   * [Dockerfile instructions](#dockerfile-instructions)
+      * [From](#from)
+      * [LABEL](#label)
+      * [COPY](#copy)
+      * [ADD](#add)
+      * [```RUN``](#run)
+      * [ENV](#env)
+      * [USER](#user)
+* [Session 10](#session-10)
+   * [Continue of Dockerfile instructions](#continue-of-dockerfile-instructions)
+      * [WORKDIR](#workdir)
+      * [VOLUME](#volume)
+      * [EXPOSE](#expose)
+      * [ENTRYPOINT](#entrypoint)
+      * [SHELL](#shell)
+      * [HEALTHCHEACK](#healthcheack)
+   * [Dockerfile best practice](#dockerfile-best-practice)
+   * [Port expose vs port publish](#port-expose-vs-port-publish)
+* [Session 11](#session-11)
+   * [Docker history](#docker-history)
+   * [Start container automatically](#start-container-automatically)
+   * [Deploy a registry server](#deploy-a-registry-server)
+      * [Run a local registry](#run-a-local-registry)
+      * [Run a web interface for local docker registry](#run-a-web-interface-for-local-docker-registry)
+   * [Docker Compose](#docker-compose)
+      * [Installing docker compose on Linux](#installing-docker-compose-on-linux)
+      * [Write your first docker-compose](#write-your-first-docker-compose)
+* [Services 12](#services-12)
+   * [Explaining docker-compose.yml](#explaining-docker-composeyml)
+   * [Docker compose network](#docker-compose-network)
+      * [links](#links)
+      * [Specify custom network](#specify-custom-network)
+         * [Set a custom name to your build](#set-a-custom-name-to-your-build)
+         * [Pass dockerfile from other locations](#pass-dockerfile-from-other-locations)
+         * [Override CMD](#override-cmd)
+         * [Set custom name to your container](#set-custom-name-to-your-container)
+         * [Manage containers dependence chain](#manage-containers-dependence-chain)
+         * [Environment variables in compose](#environment-variables-in-compose)
+         * [Healthchek](#healthchek)
+         * [Restart policy](#restart-policy)
+         * [Mount tmpfs](#mount-tmpfs)
+   * [Docker Swarm](#docker-swarm)
+      * [Swarm components](#swarm-components)
+      * [Conceptes relating to docker swarm services](#conceptes-relating-to-docker-swarm-services)
+* [Session 13](#session-13)
+      * [Setup docker swarm](#setup-docker-swarm)
+      * [Swarm manager high available (HA)](#swarm-manager-high-available-ha)
+      * [Swarm services](#swarm-services)
+* [Session 14](#session-14)
+   * [Replicated vs global services](#replicated-vs-global-services)
+   * [Scaling](#scaling)
+   * [Rolling update](#rolling-update)
+   * [Ingress mode vs Host mode](#ingress-mode-vs-host-mode)
+      * [Ingress mode](#ingress-mode)
+      * [Host mode](#host-mode)
+   * [Run a container on specific node](#run-a-container-on-specific-node)
+   * [Stateless vs Stateful applications](#stateless-vs-stateful-applications)
+   * [Deploying apps with Docker Stack](#deploying-apps-with-docker-stack)
+   * [Docker stack - High level architecture](#docker-stack---high-level-architecture)
+      * [Docker stack example - AtSea shop](#docker-stack-example---atsea-shop)
+* [Session 15](#session-15)
+   * [Adding label to an existing node](#adding-label-to-an-existing-node)
+   * [Docker secret](#docker-secret)
+   * [Deploy a stack](#deploy-a-stack)
+   * [Stack related commands](#stack-related-commands)
+   * [Docker Security](#docker-security)
+      * [Kernel namespaces](#kernel-namespaces)
+      * [Cgroups](#cgroups)
+      * [Docker daemon attack surface](#docker-daemon-attack-surface)
+      * [Don't expose the docker daemon socket](#dont-expose-the-docker-daemon-socket)
+      * [Capabilities - the root isn't the root](#capabilities---the-root-isnt-the-root)
+      * [Adjusting capabilities](#adjusting-capabilities)
+      * [Seccomp](#seccomp)
+      * [AppArmor](#apparmor)
+* [Session 17](#session-17)
+   * [Privileged container](#privileged-container)
+   * [Container security chech](#container-security-chech)
+   * [Check image vulnerabilities - Trivy](#check-image-vulnerabilities---trivy)
+      * [Install <a href="https://aquasecurity.github.io/trivy/v0.18.3/installation/" rel="nofollow">Trivy</a>](#install-trivy)
+   * [More topics to follow](#more-topics-to-follow)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 # Session 1
 
 **Note:** Docker offers good solutions to manage microservice based
@@ -2292,6 +2503,7 @@ docker stack rm <stack-name>
 ```bash
 docker stack ps <stack-name>
 ```
+
 ## Docker Security
 
 ![security](./assets/security.png)
@@ -2425,4 +2637,65 @@ To unload a profile from AppArmor
 apparmor_parser -R /etc/apparmor.d/containers/YOUR_PROFILE
 ```
 
-# SECCOMP 17
+# Session 17
+
+## Privileged container
+Privileged docker containers are containers that are run with the
+```--privileged``` flag, Unlike regular containers, these containers
+have **root privilege to the host machine***. By default continues are
+**unprivileged**. Privileged containers are often used when the
+container need direct hardware access to complete their tasks.
+
+## Container security chech
+
+* Check the container volumes mounted on related volumes
+```bash
+cat /proc/1/cgroup
+```
+If your output is like ```<mount-point-name>:/docker/<container-id>```
+your in the container but if it's like ```<mount-point-name>:/``` your
+in the host machine.
+
+* Check the container is **privileged** or not
+```bash
+ip link add dummy0 type dummy
+```
+If you get operation not permitted in the output the container is not
+privileged, if it runs successfully your in a privileged container.
+
+## Check image vulnerabilities - Trivy
+Trivy is a simple and comprehensive vulnerability scanner for containers
+and other artifacts. It is considered to bi used in CI. Before pushing
+to a container registry or deploying your application, you can scan your
+local container image and other artifacts easily. Suitable for CI such
+as Travis CI, Circle CI, jenkins, GitLab CI, etc.
+
+### Install [Trivy](https://aquasecurity.github.io/trivy/v0.18.3/installation/)
+1. Add the repository
+```bash
+cat > trivy.repo < EOF
+[trivy]
+name=Trivy repository
+baseurl=https://aquasecurity.github.io/trivy-repo/rpm/releases/$releasever/$basearch/
+gpgcheck=0
+enabled=1
+```
+2. Install Trivy
+```bsah
+sudo yum -y update
+sudo yum -y install trivy
+```
+3. Check your images
+```bash
+trivy image <image-name>
+```
+
+## More topics to follow 
+1. Swarm TLS and mutual authentication
+1. Swarm cluster store
+1. Detecting vulnerabilities with docker security scanner
+1. Docker content trust
+1. Docker Trusted Registry
+1. Docker Secrets
+1. Swarm lock
+
