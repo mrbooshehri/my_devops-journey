@@ -154,5 +154,23 @@ roles/
 		modified
 	* **meta**: Where placed dependencies and preprocessing in it, for
 		example install specific package, or disable ```selinux```
-	
-	1:31
+
+## Hot to run Ansible Playbook with parameters and error handling in playbooks 
+
+```bash
+ansible-playbook -i /PATH/TO/<inventory-file-name> <playbook-name>.yml --<switches>
+```
+
+**Switches**:
+* ```-v```: Verbose for view details(```-v```,```-vv```,```-vvv```)
+* ```--tags=<tag-name>```: Run only <tag-name> used into task/main.yml
+* ```--tags "<tag-name-1>,<tag-name-2>,..."```: Select tags for RUN
+* ```--tags-skip "<tag-name-1>,<tag-name-2>,..."```: Select tags for not RUN 
+* ```--step```: (y/n/c) (yes/no/continue) ask to RUN each step
+* ```--list-tasks```: List of tasks in yaml file without RUN
+* ```--extra-vars <var-name>="<value>"```: Create variable
+* ```--syntax-check```: Yaml file syntax check
+* ```--check``` (Dry-run mode): Check yaml file without RUN and Download
+  make sure it's runnable
+
+2:08
