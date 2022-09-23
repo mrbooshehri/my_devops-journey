@@ -45,6 +45,8 @@ The design goal and features of Yaml:
 
 ## Ansible architecture
 ![architecture](assetes/architecture.png)
+![provission](assetes/provission.png)
+
 
 * **Playbook**: It demonstrate what job should run in which host
 * **Role**: It's set of task which lead to perform a job
@@ -173,4 +175,166 @@ ansible-playbook -i /PATH/TO/<inventory-file-name> <playbook-name>.yml --<switch
 * ```--check``` (Dry-run mode): Check yaml file without RUN and Download
   make sure it's runnable
 
-2:08
+## Generate key
+To connect to remote servers ansible needs to have a password-less ssh
+connection, to do so we need to generate a ssh key:
+```bash
+ssh-keygen -t rsa
+ssh-copy-id root@<remote-address/remote-name>
+```
+> Note: Remember ansible default user is ```root``` user, so you need to
+add generate key for your root user
+
+Know let's test ansible can communicate with hosts
+```bash 
+ansible -m ping <group-name>/all
+```
+## Running command on remote with ansible
+In ansible we can run our commands on the remote machine via the two
+following ways:
+1. Ad-hoc commands: something you want to do quick, but don't need to
+   save it
+   * Parallelism and shell commands
+   * File transfer
+   * Managing packages
+   * Users and groups
+   * Deploying from source control
+   * Managing services
+   * Gathering informations
+1. Playbook: Works with yaml files
+
+### Ad-hoc
+
+#### Check network connection with ```ping``` module
+```bash 
+ansible -m ping <group-name>/all
+```
+
+#### Gathering informations with ```shell``` module
+```bash
+ansible -m shell -a "<shell-command>" <group-name>/all
+```
+
+#### Transfer file with ```copy``` module
+```bash
+ansible -m copy -a "src=<file-path> dest=<file-path> " <group-name>/all
+```
+
+#### Change file permission with ```file``` module
+```bash
+ansible -m file -a "dest=<file-path> mode=<chmod>" <group-name>/all
+```
+for example:
+```bash
+ansible -m file -a "dest=/root/file.txt mode=0600" all
+```
+#### Managing packages with ```yum``` module
+```bash
+ansible -m yum -a "name=net-tools state=present"  <group-name>/all
+```
+> Note: ```state``` demonstrate the ```install/remove``` situation which
+```present``` means install the package and ```absent``` means remove
+the package
+
+#### Creating user with ```user``` module
+```bash
+ansible -m user -a "name=<username> state=present"  <group-name>/all
+```
+> Note: ```present``` means create the user and ```absent``` means
+remove it
+
+#### Deploy from source with ```git``` module
+```bash
+ansible -m git -a "repo=<repo-url> dest=<destination>"  <group-name>/all
+```
+
+#### Managing services with ```service``` module
+```bash
+ansible -m service -a "name=<service-name> state=<state>"  <group-name>/all
+```
+> Note: states here can be  ```started```, ```stopped```,
+```restarted```, and ```reloaded```
+
+#### Gathering facts with ```setup``` or ```gather_facts```
+```bash
+ansible -m setup <group-name>/all
+# or
+ansible -m gather_facts <group-name>/all
+```
+### Playbook
+
+#### Define and use variables
+
+Variables can be define in the following files
+* Playbook 
+* vars
+* defaults
+
+Variables can be used in the following files
+* jinja2
+* tasks
+* meta
+* handlers 
+
+Creating variable in vars and defaults:
+```yaml
+    <var-name>: <var-value>
+```
+Creating variable in playbook:
+```yaml
+vars:
+  <var-name>: <var-value>
+```
+
+Using the defined variable
+```yaml
+call:
+    {{<var-name>}}
+
+```
+
+## Setup Ansible
+To set up ansible you need the following files and directories:
+
+1. ```~/ansible/provision``` directory
+1. ```~/ansible/provision/roles``` directory
+1. ```~/ansible/provision/inventory``` directory
+1. ```~/ansible/provision/project.yml``` file
+
+### Inventory
+In this directory we can add hosts that we want to manage as file(s)
+```bash
+mkdir ~/ansible/provision/inventory/hosts
+cat > ~/ansible/provision/inventory/hosts << EOF
+# [GROUP_NAM]
+# IP_ADDRESS
+# DOMAIN_NAME
+EOF
+```
+
+### Roles
+This directory contains seven sub-directories which mentioned before,
+they are
+1. tasks
+1. defaults
+1. vars
+1. meta
+1. templates
+1. files
+1. handlers
+
+### project.yaml (your playbooks) 
+In the ansible root directory we can define various projects as yaml
+playbooks and run them when we need:
+```bash
+ansible-playbook -i inventory/hosts project.yaml
+```
+> Note: with ```-i``` flag we can pass our desired inventory host file
+inside the project.yaml file there is something like:
+```yaml
+---
+- hosts: <group_name in hosts file>
+  roles:
+    - nginx
+```
+
