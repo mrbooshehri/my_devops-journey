@@ -56,3 +56,27 @@ Related:
 ```
 * https://www.linuxbuzz.com/create-lvm-partition-in-linux/
 ```
+
+# Extend LVM
+
+## Scan added list
+```bash
+rescan-scsi-bus.sh -a
+```
+## Create pv
+```bash
+pvcreate /dev/sdc
+```
+## Extend volume group
+```bash
+vgextend ubuntu-vg /dev/sdc
+```
+## Extend logical volumek
+```bash
+lvextend /dev/ubuntu-vg/ubuntu-lv -L 75G
+```
+## resize filysystem
+```bash
+resize2fs /dev/ubuntu-vg/ubuntu-lv
+```
+
