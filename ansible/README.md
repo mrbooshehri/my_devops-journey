@@ -1,6 +1,4 @@
-# Session 2
-
-## Introduction to ansible 
+# Introduction to ansible 
 Ansible is an automation platform that makes your application and
 systems easier to deploy
 
@@ -20,7 +18,7 @@ IaaC ansible can handle the following situations:
 1. Install Physical/virtual server on bare metal - for example only ILO
 	 exists
 
-## Why ansible
+# Why ansible
 1. It's free and open source application
 1. Agent-less - No need for agent installation and management, only
 	 needs IP and SSH
@@ -32,7 +30,7 @@ IaaC ansible can handle the following situations:
 1. Simple and human readable
 1. Self documenting
 
-## Introduction to YAML
+# Introduction to YAML
 Yaml includes a markup language with important construct
 
 The design goal and features of Yaml:
@@ -43,7 +41,7 @@ The design goal and features of Yaml:
 1. Supporting one-direction	processing
 1. Ease of implementation and usage
 
-## Ansible architecture
+# Ansible architecture
 ![architecture](assetes/architecture.png)
 ![provission](assetes/provission.png)
 
@@ -52,7 +50,7 @@ The design goal and features of Yaml:
 * **Role**: It's set of task which lead to perform a job
 * **Tasks**: Procedure of your desired job
 
-## Ansible playbook structure
+# Ansible playbook structure
 In ansible everything places in a provision(a directory).
 
 Directory layout based on [official documentation](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html)
@@ -157,7 +155,7 @@ roles/
 	* **meta**: Where placed dependencies and preprocessing in it, for
 		example install specific package, or disable ```selinux```
 
-## Hot to run Ansible Playbook with parameters and error handling in playbooks 
+# Hot to run Ansible Playbook with parameters and error handling in playbooks 
 
 ```bash
 ansible-playbook -i /PATH/TO/<inventory-file-name> <playbook-name>.yml --<switches>
@@ -175,7 +173,7 @@ ansible-playbook -i /PATH/TO/<inventory-file-name> <playbook-name>.yml --<switch
 * ```--check``` (Dry-run mode): Check yaml file without RUN and Download
   make sure it's runnable
 
-## Generate key
+# Generate key
 To connect to remote servers ansible needs to have a password-less ssh
 connection, to do so we need to generate a ssh key:
 ```bash
@@ -203,24 +201,24 @@ following ways:
    * Gathering informations
 1. Playbook: Works with yaml files
 
-### Ad-hoc
+## Ad-hoc
 
-#### Check network connection with ```ping``` module
+### Check network connection with ```ping``` module
 ```bash 
 ansible -m ping <group-name>/all
 ```
 
-#### Gathering informations with ```shell``` module
+### Gathering informations with ```shell``` module
 ```bash
 ansible -m shell -a "<shell-command>" <group-name>/all
 ```
 
-#### Transfer file with ```copy``` module
+### Transfer file with ```copy``` module
 ```bash
 ansible -m copy -a "src=<file-path> dest=<file-path> " <group-name>/all
 ```
 
-#### Change file permission with ```file``` module
+### Change file permission with ```file``` module
 ```bash
 ansible -m file -a "dest=<file-path> mode=<chmod>" <group-name>/all
 ```
@@ -228,7 +226,7 @@ for example:
 ```bash
 ansible -m file -a "dest=/root/file.txt mode=0600" all
 ```
-#### Managing packages with ```yum``` module
+### Managing packages with ```yum``` module
 ```bash
 ansible -m yum -a "name=net-tools state=present"  <group-name>/all
 ```
@@ -236,34 +234,34 @@ ansible -m yum -a "name=net-tools state=present"  <group-name>/all
 ```present``` means install the package and ```absent``` means remove
 the package
 
-#### Creating user with ```user``` module
+### Creating user with ```user``` module
 ```bash
 ansible -m user -a "name=<username> state=present"  <group-name>/all
 ```
 > Note: ```present``` means create the user and ```absent``` means
 remove it
 
-#### Deploy from source with ```git``` module
+### Deploy from source with ```git``` module
 ```bash
 ansible -m git -a "repo=<repo-url> dest=<destination>"  <group-name>/all
 ```
 
-#### Managing services with ```service``` module
+### Managing services with ```service``` module
 ```bash
 ansible -m service -a "name=<service-name> state=<state>"  <group-name>/all
 ```
 > Note: states here can be  ```started```, ```stopped```,
 ```restarted```, and ```reloaded```
 
-#### Gathering facts with ```setup``` or ```gather_facts```
+### Gathering facts with ```setup``` or ```gather_facts```
 ```bash
 ansible -m setup <group-name>/all
 # or
 ansible -m gather_facts <group-name>/all
 ```
-### Playbook
+## Playbook
 
-#### Define and use variables
+### Define and use variables
 
 Variables can be define in the following files
 * Playbook 
@@ -293,7 +291,7 @@ call:
 
 ```
 
-## Setup Ansible
+# Setup Ansible
 To set up ansible you need the following files and directories:
 
 1. ```~/ansible/provision``` directory
@@ -301,7 +299,7 @@ To set up ansible you need the following files and directories:
 1. ```~/ansible/provision/inventory``` directory
 1. ```~/ansible/provision/project.yml``` file
 
-### Inventory
+## Inventory
 In this directory we can add hosts that we want to manage as file(s)
 ```bash
 mkdir ~/ansible/provision/inventory/hosts
@@ -312,7 +310,7 @@ cat > ~/ansible/provision/inventory/hosts << EOF
 EOF
 ```
 
-### Roles
+## Roles
 This directory contains seven sub-directories which mentioned before,
 they are
 1. tasks
@@ -323,7 +321,7 @@ they are
 1. files
 1. handlers
 
-### project.yaml (your playbooks) 
+## project.yaml (your playbooks) 
 In the ansible root directory we can define various projects as yaml
 playbooks and run them when we need:
 ```bash
@@ -337,4 +335,137 @@ inside the project.yaml file there is something like:
   roles:
     - nginx
 ```
+# Session 3
 
+# Writing task
+All ansible modules have an structure as below
+```yml
+- name: [it's just for clarification, documentation, and it's not mandatory]
+  MODULES: [here as hierarchy we should define module's components]
+  tags: [it use when we just want to run a block from a playbook]
+```
+
+## Creating a directory
+```yml
+- name: Create a directory
+  files:
+    path: <dir-path>/<dir-name> # path of the directory we want to create
+    state: directory 
+    owner: root
+    group: root
+    mode: 0775
+  tags: [createdir]
+```
+> **Note:** To remove directory use ```state: absent```
+> **Note:** To create ```/dir/subdir/subdir/``` user ```recursive: yes```
+
+## Creating a file
+```yml
+- name: Create a directory
+  files:
+    path: <dir-path>/<dir-name> # path of the directory we want to create
+    state: touch 
+    owner: root
+    group: root
+    mode: 0775
+  tags: [createdir]
+```
+> **Note:** To remove file use ```state: absent```
+
+> **Note:** In order to run ansible playbook on a windows machine you
+need to use ```win_file``` module, like
+
+```yaml
+- name: Create a file
+  win_file:
+    path: C:\Temp\foo.conf
+    state: file
+```
+
+## Create a config file and copy form ```templates``` directory
+
+1. Create and copy ```<filename>.conf.j2``` file to /PATH/TO/provision/roles/<project-name>/templates
+2. Add the following block in ```..../tasks/main.yaml```
+```yaml
+- name: <some description>
+  template:
+    src: <filename>.conf.j2
+    dest: /PATH/ON/TARGET
+  notify: <some handling action>
+  tags: []
+```
+Real world example:
+```yaml
+- name: Copy httpd.conf to /etc/httpd/conf
+  template:
+    src: httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
+  notify: Restart httpd
+  tags: [httpd]
+```
+
+> **Note:** If you want to have a backup file form the file that going
+to override add ```backup=yes``` in template level
+
+## Copy file and ```files``` directory
+```files``` directory is used to hold type of files which they are
+not going to change, at lease soon, like binaries, compressed files, and
+etc. 
+
+To copy file ```copy``` module is available and it works by the
+following steps:
+1. Check the ```files``` directory for the file you are going to use in
+   ```yaml``` file
+1. Perform the defined task
+
+```yaml
+- name: Copy file.gz to /tmp
+  copy:
+    src: file.gz
+    dest: /tmp
+  tags: [copy_gz_file]
+```
+
+## Download file from URL with ```get_url```
+This module will download file from a URL and place in given destination
+
+```yaml
+- name: Download RPM
+  get_url: 
+    url: http://URL
+    dest: /tmp
+  tags: [get_rpm]
+```
+
+> **Note:** before running your playbook check the URL with ```wget```
+or other similar tools to check URL availability.
+
+## Unzip compressed files with ```unarchive``` module
+
+```yaml
+- name: unzip file.gz in /tmp
+  unarchive: 
+    src: /tmp/file.gz
+    dest: /tmp
+    copy: no
+  tags: [unzip]
+```
+| src = Ansible | src = Ansible | dest = Host |
+| --- | --- | --- |
+| copy = no | - | file.gz + unzip |
+| copy = yes | file.gz | unzip |
+
+> **Note:** In case of using ```copy: no``` you should give the file
+address on the host machine, and vis a versa, if you are using ```copy:
+yes``` you should put your file in ```files``` directory.
+
+# Example project 1
+1. Create a directory to ```/etc/config```
+1. Create a directory to ```/etc/config/config.d```
+1. Create a file ```stp.conf```
+1. Copy ```stp.conf``` file to ```/etc/config/config.d/stp.conf``` with
+   backup
+1. Create ```.my.stp.file```
+1. Copy ```.my.stp.file``` to ```/etc/config```
+1. Copy and rename ```zabbix.tar.gz``` to ```/app/source.tar.gz```
+1. Unzip ```source.tar.gz``` to ```/apps/``` from host
