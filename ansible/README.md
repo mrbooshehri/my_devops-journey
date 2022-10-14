@@ -348,7 +348,7 @@ All ansible modules have an structure as below
 ## Creating a directory
 ```yml
 - name: Create a directory
-  files:
+  file:
     path: <dir-path>/<dir-name> # path of the directory we want to create
     state: directory 
     owner: root
@@ -359,10 +359,12 @@ All ansible modules have an structure as below
 > **Note:** To remove directory use ```state: absent```
 > **Note:** To create ```/dir/subdir/subdir/``` user ```recursive: yes```
 
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html)
+
 ## Creating a file
 ```yml
 - name: Create a directory
-  files:
+  file:
     path: <dir-path>/<dir-name> # path of the directory we want to create
     state: touch 
     owner: root
@@ -382,6 +384,8 @@ need to use ```win_file``` module, like
     state: file
 ```
 
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html)
+
 ## Create a config file and copy form ```templates``` directory
 
 1. Create and copy ```<filename>.conf.j2``` file to /PATH/TO/provision/roles/<project-name>/templates
@@ -390,7 +394,7 @@ need to use ```win_file``` module, like
 - name: <some description>
   template:
     src: <filename>.conf.j2
-    dest: /PATH/ON/TARGET
+    dest: /PATH/ON/TARGET/<filename>[.file-extension]
   notify: <some handling action>
   tags: []
 ```
@@ -406,6 +410,8 @@ Real world example:
 
 > **Note:** If you want to have a backup file form the file that going
 to override add ```backup=yes``` in template level
+
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html)
 
 ## Copy file and ```files``` directory
 ```files``` directory is used to hold type of files which they are
@@ -426,6 +432,8 @@ following steps:
   tags: [copy_gz_file]
 ```
 
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html)
+
 ## Download file from URL with ```get_url```
 This module will download file from a URL and place in given destination
 
@@ -439,6 +447,8 @@ This module will download file from a URL and place in given destination
 
 > **Note:** before running your playbook check the URL with ```wget```
 or other similar tools to check URL availability.
+
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/get_url_module.html)
 
 ## Unzip compressed files with ```unarchive``` module
 
@@ -459,7 +469,211 @@ or other similar tools to check URL availability.
 address on the host machine, and vis a versa, if you are using ```copy:
 yes``` you should put your file in ```files``` directory.
 
-# Example project 1
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/unarchive_module.html)
+
+## Create group and user
+```yaml
+- name: create a group
+  group:
+    name: test
+    state: present
+  tags: [create_group]
+```
+
+```yaml
+- name: create a user
+  user:
+    name: test
+    state: present
+    comment: test user
+    group: test
+  tags: [create_user]
+```
+
+> **Note:** To delete both user and group just change their state to
+```absent```. 
+
+> **Note:** To remove created home directory in case of removing user,
+use ```remove: yes```. On the other hand you can use ```create_home:
+no``` when you are creating user.
+
+> **Note:** In case of creating a not existing group and user you should
+first create group then the user, but in case of removing them you
+should fist remove user then group.
+
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html)
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/group_module.html)
+
+
+## Using yum
+Installing a package
+```yaml
+- name: install epe-release
+  yum:  
+    name: epe-release
+    state: present
+  tags: [pre_install]
+```
+Updating a package
+```yaml
+- name: install epe-release
+  yum:  
+    name: epe-release
+    state: latest
+  tags: [update]
+```
+updating yum
+```yaml
+- name: yum update
+  yum:  
+    name: *
+    state: latest
+  tags: [yum_update]
+```
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html)
+
+## Loops
+In ansible loops define like bellow
+```yaml
+- name: Install many packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - net-tools
+    - vim
+  tags: [install_essentials]
+```
+> **Note:** ```item``` is the only variables loops work with.
+> **Note:** In newer versions of ansible ```with_item``` is deprecated
+and you should use ```loop``` instead.
+
+Create multiple item in loop
+```yaml
+- name: more complex item
+  module_name:
+    name: "{{ item.name }}"
+    family: "{{ item.family }}"
+    code: "{{ item.code }}"
+  with_items:
+    - { name: var1, family: var2, code: var3 }
+    - { name: var4 }
+```
+
+> **Note:** item variables should be written between ```"{{ HERE }}"```
+> **Note:** Remember you have to make space between ```:``` and your
+value like ```key: value``` 
+
+[More info](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html)
+
+## Service modules
+In ansible we can start, stop, enable, disable, and remove services with
+```service``` module
+
+Started service:
+```yaml
+- name: start firewalld
+  service:
+    name: firewalld
+    state: started
+  tags: [iptables]
+```
+
+Disable service:
+```yaml
+- name: disable firewalld
+  service:
+    name: firewalld
+    state: stopped
+    enabled: no
+  ignore_errors: True # When firewalld is stopped
+  tags: [iptables]
+```
+
+Enable service:
+```yaml
+- name: enable firewalld
+  service:
+    name: firewalld
+    enabled: yes
+  ignore_errors: True # When firewalld is stopped
+  tags: [iptables]
+```
+
+Remove service:
+```yaml
+- name: remove firewalld
+  service:
+    name: firewalld
+    state: absent
+  tags: [iptables]
+```
+
+Restart service:
+```yaml
+- name: restart firewalld
+  service:
+    name: firewalld
+    state: restarted
+  tags: [iptables]
+```
+
+Reloaded service:
+```yaml
+- name: reload firewalld
+  service:
+    name: firewalld
+    state: reloaded
+  tags: [iptables]
+```
+
+## Run existing shell script with ```shell``` and ```command``` module
+```yaml
+- name: Running command
+  shell: "{{ item }}"
+  args:
+    chdir: /opt/
+  with_items:
+    - ./com1
+    - ./com2
+    - ./com3
+  tags: [commands]
+```
+
+```yaml
+- name: command run
+  command: touch /root/test.txt
+  tags: [commands]
+```
+
+> **Note:** The command module is more secure, because it will not
+affected by user's environment.
+> **Note:** ```command``` runs the instruction remotely, you can't do
+much with output, but ```shell``` do it like it's there and you can do
+anything you want like you are logged in to the host.
+
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html)
+
+## Conditional loops
+```yaml
+- name: Create many files in /home
+  file:
+    path: /home/file{{ item }}
+    state: touch
+  with_sequence: start=57 end=67
+  tags: [touch_many]
+```
+
+> **Note:** you can define hope count with ```stride: NUMBER```, for
+example create odd indexes.
+> **Note:** you cannot use waterfall structure for ```with_sequence```
+and you should use the one liner style like above.
+
+
+# Examples
+
+## Example project 1
+
 1. Create a directory to ```/etc/config```
 1. Create a directory to ```/etc/config/config.d```
 1. Create a file ```stp.conf```
@@ -469,3 +683,20 @@ yes``` you should put your file in ```files``` directory.
 1. Copy ```.my.stp.file``` to ```/etc/config```
 1. Copy and rename ```zabbix.tar.gz``` to ```/app/source.tar.gz```
 1. Unzip ```source.tar.gz``` to ```/apps/``` from host
+
+## Example project 2
+
+1. Create group (g1, g2)
+1. Create user (testuser1, testuser2 ) with UID (9902, 9903)
+1. Join testuser1 to group g1 and g2, join testuser2 to g1
+1. Test on host
+
+## Example project 3
+
+1. Copy 2 config files jinja2 to ```/opt``` without extension file j2
+
+## Example project 4
+
+1. Install maraiadb-server
+1. Install Mysql-python
+1. Start service
