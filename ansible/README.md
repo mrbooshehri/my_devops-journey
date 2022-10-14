@@ -669,6 +669,72 @@ example create odd indexes.
 > **Note:** you cannot use waterfall structure for ```with_sequence```
 and you should use the one liner style like above.
 
+## Mysql modules
+### Create database
+```yaml
+-name: create database
+ mysql_db:
+   name: DBName
+   state: present
+ tags: [create_db]
+```
+
+> **Note:** your msql database should be started.
+
+### Create user
+```yaml
+-name: Create dbuser
+ mysql_user:
+   name: <db_name>
+   password: <db_password>
+   host: "{{ item }}"
+   login_user: root
+   login_password: ""
+   priv: <db_name>.*.ALL
+   state: present
+ with_item:
+   - 127.0.0.1
+   - ::1
+   - localhost
+ tags: [dbuser]
+```
+
+### Created related privileges
+```yaml
+-name: Related privilege tables
+ command: 'mysql -ne "{{ item }}"'
+ with_items:
+   - FLUSH PRIVILEGES
+ changed_when: False
+ tags: [flush]
+```
+
+> **Note:** when you modified the database to apply the changes you
+should flush the database
+
+> **Note:** ```changed_when``` responsible to executing the
+```command```, when it's ```True``` the command will be execute and vis
+a versa.
+
+### Import clean database structure into MyDataBase
+Fist you need to copy the database to the host machine
+```yaml
+-name: copy create.sql.gz
+ copy:
+   src: create.sql.gz
+   dest: /tmp
+ tags: [db]
+```
+then import it
+```yaml
+-name: import db
+ mysql_db:
+   state: present
+   name: <db_name>
+   target: /tmp/create.sql.gz
+ tags: [import_db]
+
+```
 
 # Examples
 
@@ -700,3 +766,6 @@ and you should use the one liner style like above.
 1. Install maraiadb-server
 1. Install Mysql-python
 1. Start service
+
+
+2:13:53
