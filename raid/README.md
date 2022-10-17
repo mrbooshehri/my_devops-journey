@@ -100,7 +100,8 @@ to data. Although RAID 5 can be achieved in software, a hardware
 controller is recommended. Often extra cache memory is used on these
 controllers to improve the write performance.
 
-![RAID 5 – Striping with parity](./RAID 5 – Striping with parity)
+![RAID 5 – Striping with parity](./assets/raid-level-5-striping-with-parity.svg)
+
 
 ### Advantages of RAID 5
 
