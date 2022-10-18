@@ -736,6 +736,112 @@ then import it
 
 ```
 
+## Declare variables
+
+You can define your variables in three places:
+* playbook
+* tasks
+* vars
+
+In the following example we declare the variables in ```playbook```
+```yaml
+---
+- hosts: myhosts
+  vars:
+    path:
+      url: 'http://ftp.rpm.org/release/rpm-4.14.x'
+      minor_version: 4
+      major_version: 14.1
+  user: root
+  roles:
+    - myplaybook
+```
+and then ```task/main.yaml```
+```yaml
+- name: Download RPM
+  get_url:
+    url: {{path.url}}/rpm-{{path.major_version}}.{{path.minor_version}}.tar.bz2
+    dest: /tmp
+    tags: [download_rpm]
+```
+
+## Create Variable User_List in vars directory and use it in to task directory
+
+In the previous sections we used ```with_item``` with a list of values
+just after defining it, with this way we can keep our variables in
+```var/main.yaml``` and pass them to the other files. Definition and
+usage is exactly the same as we use variables in ```with_item```.
+It's useful when we want to use these variables in several blocks. We
+can also keep all variables in vars and encrypt the file to increase
+security.
+
+1. vars/main.yaml
+```yaml
+---
+user_list:
+  - { name: 'var1' }
+  - { name: 'var2' }
+  - { name: 'var3' }
+```
+2. task/main.yaml
+```yaml
+- name: module 1
+  module:
+    name: {{ item.name }}
+  with_item: '{{ user_list }}'
+  tags: [module1]
+
+- name: module 2
+  module:
+    name: {{ item.name }}
+    attribute: {{ item.name }}
+  with_item: '{{ user_list }}'
+  tags: [module2]
+```
+
+> **Note:** ```user_list```, in ```vars/main.yaml```, is just a name an you can name it whatever
+you want.
+> **Note:** Remember you still have to use ```item.parameter``` in your
+yaml, you only **PASS THE USER LIST** to ```with_item```.
+> **Note:** We can use our variables in j2 files under ```templates```
+directory.
+
+## Handlers
+
+1. In ```task/main.yaml```
+```yaml
+- name: Install apache
+  yum:  
+    name: httpd
+    state: latest
+  tags: [httpd]
+
+- name: copy config
+  template:
+    src: httpd.conf.j2 
+    dest: /etc/httpd/conf/httpd.conf
+  notify: Restart Apache
+  tags: [httpd]
+```
+
+2. In ```handlers/main.yaml```
+```yaml
+---
+- name: Restart Apache
+  service:
+    name: httpd
+    state: restarted
+  tags: [restarted]
+
+```
+
+> **Note:** Remember you have to use the same ```name``` value in
+```handlers/main.yaml``` as  you used in ```notify``` section in your
+```task/main.yaml```.
+
+> **Note:** ```notify``` only triggers when the block makes change.
+
+
 # Examples
 
 ## Example project 1
@@ -767,5 +873,6 @@ then import it
 1. Install Mysql-python
 1. Start service
 
+## Example project 5
 
-2:13:53
+Install Apache
