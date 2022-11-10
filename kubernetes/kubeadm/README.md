@@ -22,7 +22,7 @@ sudo apt update -y
 ```yaml
 # vim /etc/netplan/00-installer-config.yaml
 
-# For master
+### For master
 network:
   version: 2
   renderer: networkd
@@ -34,7 +34,7 @@ network:
      nameservers:
        addresses: [8.8.8.8,8.8.4.4]
 
-# For worker
+### For worker
 network:
   version: 2
   renderer: networkd
@@ -72,7 +72,7 @@ sed -i '/swap/s/^/#/' /etc/fstab
 **Note:** Please check ```/etc/fstab``` to eliminate any probable
 problem.
 
-### Install Docker
+## Install Docker
 You can follow the [official docker
 documentation](https://docs.docker.com/engine/install/ubuntu/) to
 install docker or to install it on ubuntu follow these commands:
@@ -94,7 +94,7 @@ apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
 systemctl enable --now docker
 ```
 
-### Install Kubernetes
+## Install Kubernetes
 ```bash
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
 echo 'deb https://apt.kubernetes.io/ kubernetes-xenial main' | sudo tee /etc/apt/sources.list.d/kubernetes.list
@@ -114,7 +114,7 @@ It can be solved by below command :
 sudo chmod 666 /var/run/docker.sock
 ```
 
-### Configure master node
+## Configure master node
 ```bsah
 kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address=192.168.48.128
 ```
@@ -142,7 +142,41 @@ then run your ```kubeadm init``` command with all your desier flags
 again. After it's done copy the output ```token``` and run it in worker
 nodes
 
-### Related
+Now copy the config files into ```$HOME/.kube``` dir
+
+```bash
+mkdir -p $HOME/.kube 
+cp -i /etc/kubernetes/admin.conf $HOME/.kube/config 
+chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+Check all nodes
+
+```bash
+kubectl get nodes
+```
+
+In the above output, you should see that Master Node is listed as not
+ready. Because the cluster does not have a Container Networking
+Interface (CNI).
+
+Deploying Calico CNI for the Master Node with the following command:
+
+```bash
+curl https://docs.projectcalico.org/manifests/calico.yaml -O
+kubectl apply -f calico.yaml
+```
+
+## Configure worker node
+
+Just run the join command you've got in the output of ```kubeadm
+init```, something like following:
+```bash
+kubeadm join 192.168.74.137:6443 --token ocbdbr.ghcbi8pw2xgbxqai \
+         --discovery-token-ca-cert-hash sha256:11666d5f78f76f3c5b697839460a92eac1f7fd012bcd667d2e879aa5ac6eaa44
+```
+
+Related: 
 ```
 * https://thinkvirtualblog.wordpress.com/2021/04/25/install-kubernetes-on-vmware-workstation/
 * https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
