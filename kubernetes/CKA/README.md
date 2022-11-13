@@ -347,12 +347,80 @@ and etcd interaction.
 
 For more information head over [here](https://betterprogramming.pub/a-closer-look-at-etcd-the-brain-of-a-kubernetes-cluster-788c8ea759a5)
 
-## Kube API Server
+# Kube API Server
+
+It's the main component of control-plane node, and it monitor all the
+components of the cluster and manage them.
 
 ![api-server](./assets/api-server.png)
 
 For more information head over [here](https://michalswi.medium.com/introduction-to-kubernetes-api-the-way-to-understand-the-concept-of-kubernetes-operators-ed667385caf4)
 
+> **Note:** if you want to reconfig a node run ```kubeadm reset``` on
+that node.
+
+> **Note:** All the cluster's yaml configuration files are under
+```/etc/kubernetes/manifest```.
+
+
+# Kube Control manager
+
+It formed from several components which each component manage and
+monitor a resource. For example one of the components watches the status
+of nodes, check desired state in a watch loop. In general all the
+controllers monitor something in a watch loop, and looking for desired
+state.
+
+Controllers list:
+1. Deployment controller
+1. Namespace controller
+1. Endpoint controller
+1. cronJob
+1. Job controller
+1. PV  protection-controller
+1. Service account controller
+1. Stateful-set controller
+1. Replicaset controller
+1. Node controller
+1. PV-binder controller
+1. Replication controller
+
+## Node controller
+
+* ```Node monitor period``` - interval to check nodes status
+* ```Node monitor grace period``` - if the node is not in the desired
+  state, node controller labels it as ```unreachable```
+* ```POD eviction timeout``` - if the node stays ```unreachable``` after
+  specified time, node controller terminates all the pods on
+  ```unreachable``` node then runs all the pods, that was running on
+  the ```unreachable``` node, on the other nodes and change the status
+  of the ```unreachable``` node ```not ready```.
+
+## Replication controller
+
+It monitors the status of our replica sets
+
+# Kubelet
+
+It manges the node which it existed on and send reports from the status
+of it's node to master node, all the communications perform via
+kube-apiserver.
+
+> **Note:** if you get ```not ready``` label in nodes status, one of the
+causes could be, kublet service is not running on the node.
+
+# Kube proxy
+
+Because of the IP address assign to a pod is not fixed and it changes
+each time a new pod run, there is a ```service``` item that you can
+assign a name to it, like db, application, etc. and kube proxy will
+store these information, so each time you need to communicate with a
+pod, you don't have to remember its IP address, you just need call its
+domain name which is the name you used in ```service```
+
+# API Primitives
+
+1:26:47
 
 
 # Related
