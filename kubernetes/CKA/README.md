@@ -942,8 +942,65 @@ http://$SERVER/api/v1/namespace/default/pods/$PODNAME/binding/
 
 # Label selectors and annotations
 
+* Labels:
+  * Standard method to group things together
+  * Are properties attached to each resource/object
+* Selectors:
+  * Enable user to filter based on some criteria
 
-2:55
+* Annotations:
+  * You can use Kubernetes annotations to attach arbitrary
+    non-identifying metadata to objects. Clients such as tools and
+    libraries can retrieve this metadata. It's useful **Prometeus**
+    service discovery.
+
+# Taints and Toleration
+
+Node affinity is a property of Pods that attracts them to a set of nodes
+(either as a preference or a hard requirement). Taints are the opposite
+-- they allow a node to repel a set of pods. Tolerations are applied to
+pods. Tolerations allow the scheduler to schedule pods with matching
+taints. Tolerations allow scheduling but don't guarantee scheduling: the
+scheduler also evaluates other parameters as part of its function.
+Taints and tolerations work together to ensure that pods are not
+scheduled onto inappropriate nodes. One or more taints are applied to a
+node; this marks that the node should not accept any pods that do not
+tolerate the taints.
+
+![taint_tolleration](./assets/taint_tolleration.png)
+
+## How to taint a node
+
+```bash
+kubectl taint node <node-name> <key>=[<value>]:taint-effect
+```
+
+```taint-effect```:
+* NoSchdule
+  * **New pods** are not schedule on the node
+  * **Existing pods** stay
+* Prefer NoSchdule
+  * Like NoSchdule but are not guaranteed
+* NoExecute
+  * **New pods** are not schedule on the node
+  * **Existing pods** evicted
+  
+Toleration on pod:
+```yaml
+...
+spec:
+...
+  containers:
+  ....
+  tolerations:
+  - key: "<key>"
+    operator: "Equal"
+    value: "<value>"
+    effect: "NoSchdule"
+```
+
+> **Note:** You can ignore ```value``` only you are using ```Exists``` as
+your ```operator``` value.
 
 # Top Questions
 
