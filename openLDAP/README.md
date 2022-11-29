@@ -1,5 +1,12 @@
 # openLDAP terminology
 
+* LDAP - Light weight directory access protocol (kind of storage to
+	store user identities)
+* It's an application protocol for querying and modifying items in
+	directory services.
+
+
+
 ## LDIF fields
 
 * dn - distinguished name
