@@ -1002,6 +1002,98 @@ spec:
 > **Note:** You can ignore ```value``` only you are using ```Exists``` as
 your ```operator``` value.
 
+# NodeSelector
+
+nodeSelector is the simplest recommended form of node selection
+constraint. You can add the nodeSelector field to your Pod specification
+and specify the node labels you want the target node to have. Kubernetes
+only schedules the Pod onto nodes that have each of the labels you
+specify.
+
+> It specifies the new pod will run on which node, based on node label.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app
+spec:
+  containers:
+  - name: my-app
+    image: nginx
+  nodeSelecotr:
+    <node-label-name>: <node-label-value>
+    size: large
+```
+
+> **Note:** You cannot make **OR** or **NOT** conditions, It's
+nodeSelecotr limitation. To solve this problem using **Node Affinity**
+
+> **Note:** To label a node use ```kubectl label node <node-name>
+<label-name>``` and to remove the label ```kubectl label node
+<node-name> <label-name>-```
+
+# Node Affinity
+
+Node affinity is conceptually similar to nodeSelector, allowing you to
+constrain which nodes your Pod can be scheduled on based on node
+labels.
+
+> It makes sure that pods are hosted on particular nodes.
+
+## Node Affinity types
+
+*Available
+  * requiredDuringSchedualingIgnoredDuringExecution - 
+The scheduler can't schedule the Pod unless the rule is met. This
+functions like nodeSelector, but with a more expressive syntax.
+  * prefeddedDuringSchedualingIgnoredDuringExecution - The scheduler
+    tries to find a node that meets the rule. If a matching node is not
+    available, the scheduler still schedules the Pod.
+
+* Planned - It's on alpha branch
+  * requiredDuringSchedualingRequiredDuringExecution
+
+A brief table view of Node Affinity
+
+| | DuringSchedauling | DuringExecution |
+| Type 1 | Required | Ignored |
+| Type 2 | Proffered | Ignored |
+| Type 3 | Required | Required |
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-app
+spec:
+  containers:
+  - name: my-app
+    image: nginx
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedualingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpresions:
+          - key: <label-name>
+            operator: 
+            values: In # or other operators like (NotIn, Exists)
+            - <label-value>
+```
+
+
+# Node Affinity vs Taints and Tolerations
+
+By ```taint and toleration``` you can limit nodes to run specific pods,
+pods still can run on other nodes, and with the help of
+```nodeAffinity``` you can decide the pods run on which nodes.
+
+![taint vs affinity](./assets/taint_vs_affinity.jpg)
+
+
+58:49
+
+
 # Top Questions
 
 ## Why we should define ```template``` in our manifest files?
