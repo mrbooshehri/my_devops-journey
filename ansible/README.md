@@ -187,6 +187,10 @@ Know let's test ansible can communicate with hosts
 ```bash 
 ansible -m ping <group-name>/all
 ```
+example:
+```bash
+ansible lab -i inventory/host -m ping -u mhmd
+```
 ## Running command on remote with ansible
 In ansible we can run our commands on the remote machine via the two
 following ways:
@@ -841,6 +845,27 @@ directory.
 
 > **Note:** ```notify``` only triggers when the block makes change.
 
+
+## Ansible remote user
+In ansible ```project.yaml``` you can define a ```remote_user``` like:
+```yaml
+---
+- name: my lovely project
+  hosts: servers
+  remote_user: admin
+  roles:
+    - elasticesearch
+```
+
+## Ansible troubleshooting
+```yaml
+- name: debug error
+  debug:
+    msg: "this is a message for test"
+
+```
+
+[More info](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html)
 
 # Examples
 
