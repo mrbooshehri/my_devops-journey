@@ -1091,8 +1091,190 @@ pods still can run on other nodes, and with the help of
 ![taint vs affinity](./assets/taint_vs_affinity.jpg)
 
 
-58:49
+# Resource requirements and limits
 
+* Every pod consumes a set of resources
+* Whenever a pod is placed on a node, it consumes resources available to
+  the node
+* It is k8s scheduler that decide, which node the pod should be placed
+  on
+* The scheduler considers the amount of resources required by a pod and
+  those available on the nodes.
+  * If the node has no sufficient resources the scheduler avoids placing
+    the pod on that node
+  * If there is no sufficient resources available at all, pod wait in
+    ```pending``` state, and the reason is mentioned in the ```events```
+
+## Resource request
+
+* The minimum amount of CPU or Memory requested by a Container
+* By default k8s assume that each pod requires 0.5(cores of) CPU and 256Mi Memory
+* When a scheduler tries to place a pod on a node, it uses this numbers
+  to identify which node has sufficient amount of resources 
+
+### CPU
+
+* 0.5 = 500m (milicore)
+* 1m is the lowest value 
+* 1 CPU is equivalent to 1 vCPU
+* The maximum limitation is the maximum amount of CPU the node has
+
+### Memory
+
+* 256Mi = 256*1024*1024
+* 256M = 256*1000*1000
+
+| Unit | Full name |
+| ---- | --------- |
+| G | Gigabyte |
+| M | Megabyte |
+| K | Kilobyte |
+| Gi | Gibibyte |
+| Mi | Mibibyte |
+| Ki | Kibibyte |
+
+
+## Resource limits
+
+A docker container has no limit to the resources that it can use, for
+example, if a node has 1 CPUs free, a container without limit can use
+all of that. By default k8s set 1 vCPU and 512 Mi of memory limits on a
+container
+
+## Exceed limits
+
+What happen when a pod exceed beyond its limits?
+* CPU: K8s throttles the CPU for the pod
+* Memory: K8s terminate the pod (OOM-killed, error message)
+
+> **Note:** By describing node we can find out the node all/available
+capacity ```kubectl describe node <node-name>```
+
+> **Note:** It's a best practice to divide memory in three parts, one
+for OS processes, one for kubelet, and one for your cluster. Remember if
+kubelet stops working the node wont be managed anymore.
+
+> **Note:** It's a standard to define ```resource limit``` and
+```resource request``` for all pods, to manage and troubleshooting
+better
+
+## How to find out what amount of resources we should allocate?
+
+First we allocate some value, then we start to monitor the pod's
+resource usage, and finally allocate the proper value to our pods
+
+# Demon sets
+
+It deploys one pod on each node like bellow:
+
+![deamonset](./assets/deamonset.jpeg)
+
+It can be use for different purposes like monitoring and log viewing.
+Its yaml structure is exactly as the same as deployment with small
+changes, ```kind``` value is ```DaemonSet``` and there is no ```replicas```
+
+# Static pod
+
+* The kubelet can manage the node independently
+* Kubelet periodically checks a specific directory
+  (```/etc/kubernetes/manifest```) for files, then read
+  them and creates pods on the host
+* Kubelet ensure that the pod stays available
+  * If the application crashes the kubelet attempts to restart it
+* By changing/removing/adding a pod, kubelet changes/removes/adds the
+  pod
+* The kubelet works at the pod level, it means, only understand pods
+
+> **Note:** In ```/etc/kubernetes/manifest``` only pod(yaml files) can
+place. The pods which create by the yaml files under the mentioned
+directory called, static pods.
+
+> **Note:** The static pod path could change by changing the address in
+```kubelet.service``` under systemd files.
+
+# Logging and monitoring
+
+## Monitor
+
+* Node level metrics
+  * The number of the nodes of the cluster
+  * How many of them are healthy
+  * Performance metrics
+    * CPU and Memory
+    * Network
+    * Disk utilization
+* Pod level metrics
+  * The number of pods
+  * Performance metrics
+    * CPU and Memory
+    * The number of restarts
+
+### Metric server - A monitoring solution
+
+* Enable monitoring and analyze features foe k8s
+* Retrieves metrics from each k8s nodes and pods
+* Aggregates and stores metrics in memory
+* The metrics exposed by the metric server is used by
+  HorizontalPodAutoscaler and VerticalPodAutoscaler
+* Metrics are accessible via ```kubectl top``` command
+
+![cadvisor.jpeg](./assets/cadvisor.jpeg)
+
+[Official documentations](https://github.com/kubernetes-sigs/metrics-server)
+
+> **Note:** ```kubectl top``` command can apply on both ```node``` and
+```pod```
+
+```bash
+kubectl top node
+kubectl -n <namespace-name> top pod
+```
+
+## Managing application logs
+
+* Getting pod logs
+```bash
+kubectl -n <namespace-name> get logs [-f] <pod-name>
+```
+* Getting events
+```bash
+kubectl -n <namespace-name> get events [-c <container-name>]
+```
+
+# Application lifecycle management
+
+## Deployment strategies
+
+There are two different ways to setup the deployment
+1. Recreate
+1. Rolling update
+
+![recreaterolllingupdate.png](./assets/recreaterolllingupdate.png)
+
+### Some useful commands
+
+* Rollout status
+```bash
+kubectl rollout status <deployment-name>
+```
+* Rollout history
+```bash
+kubectl rollout history <deployment-name>
+```
+
+> **Note:** You can get and roll back to last 4 deployment you applied,
+it cloud be possible for other replication controllers too, I didn't
+checked :)
+
+> **Note:** By adding ```change cause``` annotation in your deployment
+file, the ```CHANGE-CAUSE``` column in ```kubectl deployment``` history
+will get value, and everything going to be meaningful :D
+
+* Rollback
+```bash
+kubectl rollout undo deployment <deployment-name> [--to-revision
+<number>]
+```
 
 # Top Questions
 
