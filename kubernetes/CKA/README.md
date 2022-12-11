@@ -1276,6 +1276,65 @@ kubectl rollout undo deployment <deployment-name> [--to-revision
 <number>]
 ```
 
+# Configure applications
+
+## Commands and arguments
+
+Like dockerfiles, kubernetes containers have ```ENTRYPOINT```s and
+```CMD```, named ```Command``` and ```args``` respectively with the same
+functionality. 
+![commands-kubernetes.png](./assets/commands-kubernetes.png)
+
+## Environment variables
+
+Definition:
+
+![kubernetes-env.png](./assetes/kubernetes-env.png)
+
+Types:
+* Plain key value
+* ConfigMap - In case of having a large number of environments, we can
+  define a ConfigMap file and put all the variables in it.
+* Secret - In order to pass sensitive, it's a better practice to use
+  Secret
+
+![kubernetes-env-types.png](./assetes/kubernetes-env-types.png)
+
+### ConfigMap
+
+Imperative implementation
+![configmap.png](./assetes/configmap.png)
+
+Declarative  implementation
+![configmap-file.png](./assetes/configmap-file.png)
+
+Usage in pod
+![pod-env.png](./assetes/pod-env.png)
+![config-pods.png](./assetes/config-pods.png)
+
+### Secret
+
+Imperative implementation
+![secret-1.png](./assetes/secret-1.png)
+
+Declarative  implementation
+![secret-2.png](./assetes/secret-2.png)
+
+Encoding
+![secret-encoding.png](./assetes/secret-encoding.png)
+
+Decoding
+![secret-decoding.png](./assetes/secret-decoding.png)
+
+Usage in pod
+![secret-inject.png](./assetes/secret-inject.png)
+
+> **Note:** Like ```configMap``` you can use ```secret``` as env,
+single env, or volume.
+
+# Multi-container pods
+59:45
+
 # Top Questions
 
 ## Why we should define ```template``` in our manifest files?
