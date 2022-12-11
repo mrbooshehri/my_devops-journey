@@ -1325,7 +1325,8 @@ Encoding
 ![secret-encoding.png](./assets/secret-encoding.png)
 
 Decoding
-![secret-decoding.png](./assets/secret-decoding.png)
+![secret-decoding.png](./assets/secret-decode.png)
+
 
 Usage in pod
 ![secret-inject.png](./assets/secret-inject.png)
