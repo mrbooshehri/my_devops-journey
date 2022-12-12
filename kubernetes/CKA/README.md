@@ -1335,7 +1335,36 @@ Usage in pod
 single env, or volume.
 
 # Multi-container pods
-59:45
+
+The multi-container pods are the pods that contain two or more related
+containers that share resources like network space, shared volumes, etc
+and work together as a single unit. Basically, these helper processes or
+containers enhance the main containers by providing additional
+functionality.
+
+## Multi-container pods design pattern
+
+![multi-container-pod-design.png](./assets/multi-container-pod-design.png)
+
+[Full article](https://medium.com/bb-tutorials-and-thoughts/understanding-multi-container-pods-12f5780f3956)
+
+# InitContainers
+* In the multi-container pods, if one of the containers fails, pod is
+  restarted
+* InitContainer run and complete before the app containers are started
+* They are executed one by one sequentially - order is important
+* They are one-time tasks that are executed at first the pod is created
+* The app container starts when all the InitContainer containers are
+  successfully done
+* If any of the InitContainers fail to complete, the pod is repeatedly
+  restart until it succeeds
+
+## Use-case
+
+* A process that waits for and external service to be up
+* A process that prepares some data for the app containers
+
+1:40
 
 # Top Questions
 
