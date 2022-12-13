@@ -142,3 +142,30 @@ or
 ```bash
 MNIO_VOLUMES="/PATH/TO/minio/foobar /PATH/TO/minio/barfoo /PATH/TO/minio/faabor /PATH/TO/minio/borfaa"
 ```
+
+## Jail user to bucket with limited access in MinIO portal
+
+1. Create a bucket or use existed bucket
+2. Add new policy under ```Administrator > Identity > Policies``` like bellow 
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:PutObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::<bucket-name>",
+                "arn:aws:s3:::<bucket-name>/*"
+            ]
+        }
+    ]
+}
+```
+> **Note:** To see list of all actions see [here](https://min.io/docs/minio/linux/administration/identity-access-management/policy-based-access-control.html)
+
+3. Add new user under ```Administrator > Identity > Users```  and the policy you just added in the previouse step
