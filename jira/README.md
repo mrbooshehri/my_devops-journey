@@ -84,7 +84,10 @@ ExecReload=/opt/atlassian/jira/bin/start-jira.sh | sleep 60 | /opt/atlassian/jir
 WantedBy=multi-user.target 
 ```
 
-**Note:** Don't forget to remove legacy SysV
+> **Note:** Don't forget to remove legacy SysV
 ```bash
 sudo rm /etc/init.d/jira
 ```
+
+> **Note:** Get ```obr``` files from [here](https://marketplace.atlassian.com/apps)
+
