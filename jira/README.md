@@ -14,7 +14,7 @@ flush privileges;
 Enter ```mysql``` command then run the following query.
 
 ```mysql
-CREATE DATABASE jiradb CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE jiradb CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 CREATE USER 'jirauser'@'%' IDENTIFIED BY '<password>'; 
 ALTER USER 'jrauser'@'%' IDENTIFIED WITH mysql_native_password BY '<password>';
 GRANT ALL PRIVILEGES ON jiradb.* TO 'jirauser'@'%'; 
