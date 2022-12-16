@@ -1414,9 +1414,11 @@ Read more about [readiness and liveness](https://vocon-it.com/2019/11/12/cka-lab
 specification, so they define as a child of `containers`, same level
 with `image`
 
-# Drain - Cluster maintenance 
+# Cluster maintenance 
 
-## Why do you need to drain nodes?
+## Drain
+
+### Why do you need to drain nodes?
 
 There might be different reasons a worker node becomes unusable such as
 because of a hardware problem, a cloud provider problem, or if there are
@@ -1428,7 +1430,7 @@ pods.
 The draining is the process for safely evicting all the pods from a
 node. This way, the containers running on the pod terminate gracefully.
 
-## How to properly drain nodes in Kubernetes
+### How to properly drain nodes in Kubernetes
 
 1. Mark the node as unschedulable (cordon)
 
@@ -1465,9 +1467,9 @@ Kubernetes use semantic versioning in order to version it components.
 
 Read more about [semantic versioning](https://semver.org/)
 
-# Cluster upgrading process
+## Cluster upgrading process
 
-## Permissible version skew
+### Permissible version skew
 
 In order you want to install kubernetes manually, the hard way!, you
 need to pay attention to the components version correlation
@@ -1487,7 +1489,7 @@ then 1.15, and so on to 1.17 - one minor version per upgrade
 node, it means first of all add a node to your cluster, then drain your
 desired node.
 
-## How to upgrade cluster
+### How to upgrade cluster
 
 There are three different upgrade strategies:
 
@@ -1512,7 +1514,7 @@ To apply changes
 kubeadm upgrade apply
 ```
 
-### Upgrade master node
+#### Upgrade master node
 
 ```bash
 kubectl upgrade plan
@@ -1525,7 +1527,7 @@ kubectl get nodes
 
 ```
 
-### Upgrade master node
+#### Upgrade master node
 
 ```bash
 kubectl drain node <node-name>
@@ -1538,6 +1540,103 @@ kubectl get nodes
 
 ```
 
+## Backup and restore
+
+Backup candidates
+
+* Resource configuration
+* ETCD cluster
+* Persistent volumes
+
+### Resource configuration
+It's a better practice to follow gitops principles and store all the
+files on git, but there are another option to take:
+
+```bash
+kubectl get all --all-namespaces - o yaml > <desire-name>.yml
+```
+
+> **Note:** `all` keyword in the previous command returns all resources
+including, services, deployments, deamonset, and others. But it cannot
+backup everything on your cluster. There are other tools like [velero](https://velero.io)
+
+### ETCD cluster
+
+#### Backup
+
+You should find the location that etcd store its values there in font of
+`--data-dir` by checking the init command running it:
+
+```bash
+systemctl cat etcd.serivce
+```
+
+There is another way to backup etcd data
+
+```bash
+etcdctl snapshot save snabpshot.db \
+  --endpoint=https://127.0.0.1:2379 \
+  --cacert=/etc/etcd/ca.cert \
+  --cert=/etc/etcd/etcd-server.cert \
+  --key=/etc/etcd/etcd-server.key
+```
+
+To see the status:
+```bash
+etcdctl snapshot status snabpshot.db
+```
+
+#### Restore
+
+1. Stop `kube-apiserver`
+```bash
+service kube-apiserver stop
+```
+2. Restore etcd
+```bash
+etcdctl snapshot save snabpshot.db \
+  --data-dir=<backup-path> \
+  --initial-cluster master-1=https://<master-1-ip>:2380 master-2=https://<master-2-ip>:2380 \
+  --initial-cluster-token etcd-cluster-1 \
+  --initial-advertise-peer-urls https://${INTERNAL_IP}:2380
+```
+> **Note:** `data-dir` and `token` should be new
+
+3. systemctl daemon-reload
+4. Restart etcd
+```bash
+service etcd restart
+```
+5. Start `kube-apiserver`
+```bash
+service kube-apiserver start
+```
+
+# Installation, configuration, and validation K8s cluster
+
+## Design a K8s cluster
+
+You should consider the following questions in order to design a
+cluster suits your need
+
+* Purpose
+  * Education
+  * Development and testing
+  * Hosting production applications
+* Cloud or On-Permise?
+* Workload
+  * How many?
+  * What kind?
+    * Web
+    * Big data
+  * Application resource requirements
+    * CPU intensive
+    * Memory intensive
+  * Network traffic
+    * Continuous heavy
+    * Burst
+
+40:35
 
 # Top Questions
 
