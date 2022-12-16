@@ -1349,7 +1349,8 @@ functionality.
 [Full article](https://medium.com/bb-tutorials-and-thoughts/understanding-multi-container-pods-12f5780f3956)
 
 # InitContainers
-* In the multi-container pods, if one of the containers fails, pod is
+
+* In the multi-container pods, if one of the containers fails, the pod is
   restarted
 * InitContainer run and complete before the app containers are started
 * They are executed one by one sequentially - order is important
@@ -1359,12 +1360,184 @@ functionality.
 * If any of the InitContainers fail to complete, the pod is repeatedly
   restart until it succeeds
 
+> **Note:** InitContainer defines in pod level, it's a pod's
+specification, so it defines under spec in pod definition and it's
+sibling of `containers`
+
 ## Use-case
 
 * A process that waits for and external service to be up
 * A process that prepares some data for the app containers
 
-1:40
+# Self-healing applications
+
+## Container probes
+
+* Describe a health check to the performed against the container to
+  determine whether it is alive or ready to receive traffic.
+* Perform diagnostic periodically by the kubelet on a container
+* Type of probes
+  * livenessProbe
+    * Indicate whether the container is running
+    * If it fails kubelet kill the container
+  * readinessProbe
+    * Indicates weather the container is ready to response to request
+    * If it fails, Pod's IP address is removed from the endpoints of all
+      services
+  * startupProbe
+    * Indicate weather the application is started
+    * If it fails, the kubelet kill the container
+    * When it succeed other probes start to evaluation
+
+![liveness](./assets/assets/liveness-probe.png)
+![readiness](./assets/assets/rediness-probe.png)
+![healthcheck](./assets/assets/assets/pod-health-check.png)
+![element](./assets/assets/assets/probes-elements.png)
+
+Read more about [readiness and liveness](https://vocon-it.com/2019/11/12/cka-labs-17-kubernetes-readiness-and-liveness-probes/)
+
+
+## Container probe diagnostics
+
+* To perform a diagnostic, the kubelet triggers a handler
+* Type of handlers
+  * ExecAction
+    * Execute a specific command inside the container
+  * TCPSocketAction
+    * Performs a TCP check against the pod's IP address on a specific
+      port
+  * HTTPGetAction
+    * Perform a HTTP get request against the pod's IP address on a
+      specified port and path
+      
+> **Note:** All probes define in container level, it's a container's
+specification, so they define as a child of `containers`, same level
+with `image`
+
+# Drain - Cluster maintenance 
+
+## Why do you need to drain nodes?
+
+There might be different reasons a worker node becomes unusable such as
+because of a hardware problem, a cloud provider problem, or if there are
+network issues between worker and master node, the Kubernetes master
+handles it effectively. But that doesn’t mean it will always be the
+case. And this is when you need to drain the nodes and remove all the
+pods.
+
+The draining is the process for safely evicting all the pods from a
+node. This way, the containers running on the pod terminate gracefully.
+
+## How to properly drain nodes in Kubernetes
+
+1. Mark the node as unschedulable (cordon)
+
+To perform maintenance on a node, you should unschedule and then drain a node.
+```bash
+kubectl cordon <node-name>
+```
+
+> **Note:** Kubernetes taint the cordoned node as ```unschedulable```
+
+2. Drain the node to prepare for maintenance
+```bash
+kubectl drain <node-name> --grace-period=<seconds> --ignore-deamonsets=true
+```
+
+> **Note:** kubectl drain cannot delete Pods not managed by
+ReplicationController, ReplicaSet, Job, DaemonSet or StatefulSet. You
+need to use --force to override that and by doing that the individual
+pods will be deleted permanently.
+
+3. Uncordon the node after maintenance completes
+```bash
+kubectl uncordon <node-name>
+```
+
+> **Note:** A good practice to avoid pods over use resources is
+reserving some resources to your OS and some to kubelet.
+
+# K8s release
+
+Kubernetes use semantic versioning in order to version it components.
+
+[versioning](./assets/semantic-versioning.png)
+
+Read more about [semantic versioning](https://semver.org/)
+
+# Cluster upgrading process
+
+## Permissible version skew
+
+In order you want to install kubernetes manually, the hard way!, you
+need to pay attention to the components version correlation
+
+[versioning](./assets/assets/kubernetes\ version.png)
+
+> **Note:** Kubernetes always release patches for the last thee minor
+versions, so take care your cluster and keep it update.
+
+> **Note:** A recommended way to upgrade a kubernetes cluster is
+upgrading it incrementally, it means if your current version is 1.13 and
+the latest stable release is 1.17, you should first upgrade to 1.14,
+then 1.15, and so on to 1.17 - one minor version per upgrade
+
+
+> **Note:** It's a good practice to take +1/-1 strategy to drain a
+node, it means first of all add a node to your cluster, then drain your
+desired node.
+
+## How to upgrade cluster
+
+There are three different upgrade strategies:
+
+* All at once - the fastest way but not the safest with downtime
+* -1/+1 - take out a node, upgrade it, take it bake to the cluster.
+  There is no downtime but it has the risk of (recourse)overloading 
+* +1/-1 - Add a upgraded node to the cluster, take out a node, update
+  it, take back to the last node. You can keep or remove the extra node
+  you've added to the cluster according to your need. There is no
+  downtime or overloading but you need more resources. It's a good
+  practice for production environment
+
+During upgrade process you should first upgrade master nodes then the
+workers
+
+To dry run:
+```bash
+kubeadm upgrade plan
+```
+To apply changes
+```bash
+kubeadm upgrade apply
+```
+
+### Upgrade master node
+
+```bash
+kubectl upgrade plan
+apt install kubeadm=<new-version>
+kubeadm upgrade apply <new-version>
+kubectl get nodes
+apt install kubelet=<new-version>
+systemctl restart kubelet
+kubectl get nodes
+
+```
+
+### Upgrade master node
+
+```bash
+kubectl drain node <node-name>
+apt install kubeadm=<new-version>
+apt install kubelet=<new-version>
+kubectl upgrade node
+systemctl restart kubelet
+kubelet uncordon node <node-name>
+kubectl get nodes
+
+```
+
 
 # Top Questions
 
