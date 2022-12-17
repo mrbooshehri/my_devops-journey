@@ -1636,8 +1636,75 @@ cluster suits your need
     * Continuous heavy
     * Burst
 
-40:35
+## K8s solution
 
+* Turnkey 
+  * You provision/configure/maintain VMs
+  * You use scripts to deploy cluster
+  * e.g. K8s on your on-perm using kubeadm
+* Hosted solution
+  * K8s as a service
+  * Provider provisions VMs
+  * Provider installs
+  * Provider maintains cluster
+  * e.g.
+    * GKE
+    * EKS
+    * AKS
+
+### Turnkey solutions
+
+* Openshift
+  * An on-perm K8s platform by redhat
+  * An open-source container application platform
+  * Built on top of K8s
+  * Provides a set of additional tools and a nice GUI
+  * Easily integrates with CI/CD pipelines
+* Vagrant
+
+## HA K8s cluster
+
+### HA kube-apiserver
+
+1. Add a load balancer
+1. Give it and Address
+1. Assign kube-apiservers to it
+
+![ha-apiserver](assets/ha-apiserver.png)
+
+### HA Scheduler and Control Manager
+
+Both scheduler and control manager are kind of monitoring components,
+they don't give any requests, and they take proper action according to
+the situation they faced with. So in terms of high availability we don't
+need multiple scheduler and control manager working at the same time, we
+need an active and some passive scheduler and control manager to cover
+the failover. The process of selecting other active scheduler or control
+manager performing by leader election.
+
+![ha-apiserver](assets/ha-scheduler-cm.png)
+
+To add leader election functionality:
+```bash
+kube-controller-manager --leader-elect true \
+                        --leader-elect-lease-duration 15s \
+                        --leader-elect-renew-duration 10s \
+                        --leader-elect-retry-period 2s
+```
+
+![leader elect](assets/ha-leader-elect-cm.png)
+
+> **Note:** There is a `kube-controller-manager` endpoint which each node of the
+cluster can get it first, will be the current manager
+
+### Stacked etcd
+
+![stacked](assets/stacked-etcd.png)
+
+### External etcd
+![external](assets/external-etcd.png)
+
+1:28
 # Top Questions
 
 ## Why we should define ```template``` in our manifest files?
