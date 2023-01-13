@@ -1704,7 +1704,88 @@ cluster can get it first, will be the current manager
 ### External etcd
 ![external](assets/external-etcd.png)
 
-1:28
+## Cluster E2E test
+
+* Full test has around 1000 checks - takes ages (12h)
+* Conformance test has around 160 checks - enough to be certified (1.5h)
+* Examples
+  * Networking should working for intra-pod communication
+  * Services should serve a basic endpoints from pods
+  * Services endpoints latency should not be very high
+  * DNS should provide DNS for services
+  * Secrets should be consumable in multiple volumes in a pod
+  * Secrets should be consumable from pods in volume with mapping
+  * ConfigMap should be consumable from pods in volumes
+
+There are various tools to perform E2E tests on the kubernetes cluster,
+like `sonobuoy`
+
+## Upgrading cluster
+
+The update process always begins with master nodes, then the workers. You can
+always apply patch updates without checking any changelogs, but you
+should have checked the changelogs before applying minor updates.
+
+### Updating master nodes
+
+First, get the update information via the following command:
+```
+kubeadm upgrade plan
+```
+Typically, you should first update `kubeadm` then, `kubelet` according to
+the Linux distribution your cluster is deployed on, then, restart the
+`kublet` service.
+
+### Updating worker nodes
+
+First, you should take an update strategy according to your cluster and
+resources condition. In the following example the +1 -1 strategy used is to
+update worker node
+
+1. Drain the worker pod
+```
+kubectl drain <worker-name>
+```
+2. Like master nodes update `kubeadm` and `kubelet`
+3. Uncordon the worker node
+```
+kubectl uncordon <worker-name>
+```
+
+## Backup ETCD
+
+1. Install [etcdctl](https://github.com/etcd-io/etcd/releases/)
+2. Create and snapshot
+```bash
+etcdctl snapshot save <snapshot-name>.db \
+--cert="/etc/kubernetes/pki/etcd/ca.cert" \
+--cacert="/etc/kubernetes/pki/etcd/ca.cert" \
+--key="/etc/kubernetes/pki/etcd/server.key"
+```
+3. Check the status
+```bash
+etcdctl snapshot save <snapshot-name>.db \
+--cert="/etc/kubernetes/pki/etcd/ca.cert" \
+--cacert="/etc/kubernetes/pki/etcd/ca.cert" \
+--key="/etc/kubernetes/pki/etcd/server.key"
+```
+
+## Restore ETCD
+1. Make `apiserver` unreachable 
+```
+mv /etc/kubernetes/manifests/kube-apiserver.yaml /etc/kubernetes/
+```
+2. Restore the snapshot
+```bash
+etcdctl snapshot restore <snapshot-name>.db \
+  --data-dir /var/lib/etcd-from-backup --initial-cluster \
+  <master-name>=https://<master-ip>:2380 \
+  --initial-advertise-peer-urls https://<master-ip>:2380 \
+  --name=<master-name>
+```
+3. Edit `etcd` data directory in `etcd.yml` 
+4. Restore `api-server.yml`
+
 # Top Questions
 
 ## Why we should define ```template``` in our manifest files?
