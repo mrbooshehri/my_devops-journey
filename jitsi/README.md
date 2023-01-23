@@ -1,5 +1,9 @@
 # Install on Ubuntu/Debian
 
+1. [Requirements](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-requirements)
+1. [Debian/Ubuntu server](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-quickstart)
+1. [Docker](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-docker)
+1. [Manual installation](https://jitsi.github.io/handbook/docs/devops-guide/devops-guide-manual)
 
 # Archive Messages on MySQL
 
