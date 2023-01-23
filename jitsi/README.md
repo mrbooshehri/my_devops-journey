@@ -40,34 +40,34 @@ luarocks install luajwtjitsi
 			modules_enabled = { "mod_muc_mam"; }
 	```
 	2. Adding `mod_mam` [More info](https://prosody.im/doc/modules/mod_mam)
-		```bash
-		Component "conference.example.com" "muc"
-				restrict_room_creation = true
-				storage = "sql"
-				sql = {
-					driver = "MySQL"; -- May also be "MySQL" or "SQLite3" (case sensitive!)
-					database = "prosody"; -- The database name to use. For SQLite3 this the database filename (relative to the data storage directory).
-					host = "localhost"; -- The address of the database server (delete this line for Postgres)
-					port = 3306; -- For databases connecting over TCP
-					username = "prosody"; -- The username to authenticate to the database
-					password = "VASLPass@123456"; -- The password to authenticate to the database
-					}
-
-				modules_enabled = {
-						"muc_meeting_id";
-						"muc_domain_mapper";
-						"polls";
-						"muc_mam";
-						"websocket";
-						--"token_verification";
-						"muc_rate_limit";
+	```bash
+	Component "conference.example.com" "muc"
+			restrict_room_creation = true
+			storage = "sql"
+			sql = {
+				driver = "MySQL"; -- May also be "MySQL" or "SQLite3" (case sensitive!)
+				database = "prosody"; -- The database name to use. For SQLite3 this the database filename (relative to the data storage directory).
+				host = "localhost"; -- The address of the database server (delete this line for Postgres)
+				port = 3306; -- For databases connecting over TCP
+				username = "prosody"; -- The username to authenticate to the database
+				password = "VASLPass@123456"; -- The password to authenticate to the database
 				}
-				admins = { "focus@auth.meet.vaslapp.com" }
-				muc_room_locking = false
-				muc_room_default_public_jids = true
-				muc_room_default_persistent = true
-				sql_manage_tables = true
-		```
+
+			modules_enabled = {
+					"muc_meeting_id";
+					"muc_domain_mapper";
+					"polls";
+					"muc_mam";
+					"websocket";
+					--"token_verification";
+					"muc_rate_limit";
+			}
+			admins = { "focus@auth.meet.vaslapp.com" }
+			muc_room_locking = false
+			muc_room_default_public_jids = true
+			muc_room_default_persistent = true
+			sql_manage_tables = true
+	```
 	
 # Enable web socket 
 
@@ -169,9 +169,6 @@ service nginx restart && service prosody restart && service jicofo restart
 1. [WebSockets – Prosody IM](https://prosody.im/doc/websocket)
 
 # Enable authentication
-
-
-
 
 
 # Handle specific errors
