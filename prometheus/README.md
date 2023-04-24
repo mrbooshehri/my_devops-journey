@@ -15,7 +15,7 @@ tar xvfz prometheus-2.33.1.linux-amd64.tar.gz
 3. Move the extracted directory to /usr/local using the following command:
 
 ```bash
-$ sudo mv prometheus-2.33.1.linux-amd64 /usr/local/prometheus
+sudo mv prometheus-2.33.1.linux-amd64 /usr/local/prometheus
 ```
 
 4. Create a new user for Prometheus using the following command:
@@ -30,13 +30,20 @@ sudo useradd --no-create-home --shell /bin/false prometheus
 sudo chown -R prometheus:prometheus /usr/local/prometheus
 ```
 
-6. Create a systemd service file for Prometheus using the following command:
+6. Create libs directory and change the ownership to prometheus
+
+```bash
+sudo mkdir /var/lib/prometheus/
+sudo chown -R prometheus:prometheus /var/lib/prometheus/
+```
+
+7. Create a systemd service file for Prometheus using the following command:
 
 ```bash
 sudo nano /etc/systemd/system/prometheus.service
 ```
 
-7. Paste the following configuration into the file:
+8. Paste the following configuration into the file:
 
 ```
 [Unit]
