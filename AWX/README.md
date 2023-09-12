@@ -70,6 +70,8 @@ you can easily create new project under ```Resources > Projects```.
 > **Note:** If you want to use a ```path```, in kubernetes or docker,
 you should make ```/var/lib/awx/projects``` persists.
 
+# Install AWX using helm chart on kubernetes
+
 # Templates
 
 Template let's you define a set of parameters for your playbook. 
