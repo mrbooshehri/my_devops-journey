@@ -169,3 +169,9 @@ MNIO_VOLUMES="/PATH/TO/minio/foobar /PATH/TO/minio/barfoo /PATH/TO/minio/faabor 
 > **Note:** To see list of all actions see [here](https://min.io/docs/minio/linux/administration/identity-access-management/policy-based-access-control.html)
 
 3. Add new user under ```Administrator > Identity > Users```  and the policy you just added in the previouse step
+
+## MinIO [crashcours](https://www.youtube.com/playlist?list=PLYrn63eEqAzaS7mHcJh7GPOFWcLHLxlfE)
+
+### Different types of storage
+
+![./assets/crashcours-01.png]
