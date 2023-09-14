@@ -170,8 +170,143 @@ MNIO_VOLUMES="/PATH/TO/minio/foobar /PATH/TO/minio/barfoo /PATH/TO/minio/faabor 
 
 3. Add new user under ```Administrator > Identity > Users```  and the policy you just added in the previouse step
 
+<<<<<<< HEAD
 ## MinIO [crashcours](https://www.youtube.com/playlist?list=PLYrn63eEqAzaS7mHcJh7GPOFWcLHLxlfE)
 
 ### Different types of storage
 
 ![./assets/crashcours-01.png]
+=======
+## MinIO crachcoures
+
+### Types of storage
+
+1. File Storage: File storage is a storage method that organizes data into a hierarchical structure of files and folders. It is commonly used in traditional file systems and allows for easy organization and retrieval of files. Examples of file storage include local hard drives, network-attached storage (NAS), and file servers.
+
+2. Block Storage: Block storage divides data into fixed-sized blocks and stores them individually. It is commonly used in storage area networks (SAN) and allows for efficient and direct access to specific blocks of data. Examples of block storage include hard disk drives (HDDs), solid-state drives (SSDs), and storage arrays.
+
+3. Object Storage: Object storage organizes data as objects, each with a unique identifier, metadata, and the actual data itself. It is commonly used in cloud storage systems and allows for scalable and flexible storage of unstructured data. Examples of object storage include Amazon S3, Google Cloud Storage, and Azure Blob Storage.
+
+### Compare different types of storage
+
+File Storage:
+- Use Cases: File storage is ideal for situations where hierarchical organization and file-level access are important. It is commonly used for file sharing and collaboration, document management systems, and media storage (e.g., photos, videos).
+- Example: Storing and sharing files within a local network using a file server.
+
+Block Storage:
+- Use Cases: Block storage is suitable for scenarios that require low-level direct access and a high degree of control over data. It is commonly used for databases, virtual machines, and enterprise applications that demand high performance and low latency.
+- Example: Configuring a storage area network (SAN) to provide block-level storage for a database server.
+
+Object Storage:
+- Use Cases: Object storage is well-suited for scenarios that involve large-scale storage of unstructured or semi-structured data, such as backups, archives, content distribution, and web applications.
+- Example: Storing and retrieving multimedia content (images, videos, documents) on a cloud storage platform like Amazon S3 for a web application.
+
+In summary, file storage is best for file-based access and organization, block storage offers direct access and control at the block level, while object storage is designed for scalable, flexible, and cost-effective storage of unstructured data. The choice of storage type depends on the specific requirements and use case of the application or system.
+
+![img1](./assets/Object-Storage-vs-Block-Storage.png)
+
+![img2](./assets/morty.ononoki.png)
+
+### Why MinIO
+
+1. Compatibility: MinIO is designed to be compatible with the widely adopted Amazon S3 API. This allows you to use existing S3-compatible applications and tools with MinIO without making any significant changes to your code.
+
+2. Scalability: MinIO is built to scale horizontally, meaning you can add more servers to your MinIO cluster as your storage needs grow. This enables you to handle large amounts of data and handle increased traffic and workload.
+
+3. Flexibility: MinIO can be deployed in various environments, including on-premises, in the cloud, or in a hybrid setup. This flexibility allows you to choose the deployment model that best suits your requirements and infrastructure.
+
+4. High Performance: MinIO is designed to provide high performance and low latency for object storage. It leverages modern hardware and technologies to optimize data access and retrieval, making it suitable for use cases that require fast and efficient storage operations.
+
+5. Data Protection: MinIO offers features for data protection and security, such as server-side encryption, access control policies, and versioning. These features help ensure the integrity and confidentiality of your stored data.
+
+
+### Minio Architectures
+
+1. MinIO Server:
+   - A MinIO server is an independent instance that can run on a separate machine or container.
+   - Each server acts as a node within the MinIO cluster and is responsible for storing and retrieving objects.
+   - It exposes a RESTful API that follows the Amazon S3 API specification, allowing clients to interact with the storage system using familiar S3-compatible tools and libraries.
+
+2. Distributed Mode:
+   - In distributed mode, multiple MinIO servers come together to form a single logical storage pool.
+   - Objects are divided into smaller parts called "strips" and distributed across the servers in the cluster for load balancing and improved performance.
+   - Distributed mode ensures that the storage capacity and workload are evenly distributed across the nodes, allowing for horizontal scaling as more servers are added to the cluster.
+
+3. Erasure Coding:
+   - MinIO uses erasure coding techniques to provide data redundancy and protection against failures.
+   - Erasure coding splits data into smaller fragments and generates additional parity fragments.
+   - The fragments and parity information are distributed across multiple MinIO servers in the cluster.
+   - This allows MinIO to reconstruct the original data even if some servers are unavailable or experience failures.
+   - Erasure coding reduces the storage overhead compared to simple replication while providing similar levels of data protection.
+
+4. High Availability:
+   - MinIO supports various deployment modes to ensure high availability and fault tolerance.
+   - In a single-site deployment, multiple MinIO servers are distributed across different physical or virtual machines within a data center.
+   - Each server stores a portion of the data, and objects are replicated across multiple servers for redundancy.
+   - This setup ensures that if one server fails, the data can still be accessed from other servers in the cluster.
+   - In a multi-site deployment, MinIO servers are deployed across multiple data centers or geographic regions, providing geographic redundancy and protection against site-level failures.
+
+5. Gateway Mode:
+   - MinIO can also be deployed in Gateway mode, where it acts as a gateway or proxy between clients and other object storage services like Amazon S3 or Azure Blob Storage.
+   - In this mode, MinIO translates client requests in the S3 API format to the underlying storage service's API format.
+   - Gateway mode allows you to leverage MinIO's compatibility and features while using an existing cloud storage provider, providing a unified interface for accessing different storage backends.
+
+### Best Practices according to offical documentaions
+
+Here are some best practices for using MinIO, based on the official MinIO documentation:
+
+1. Distributed Deployment:
+   - Deploy MinIO servers across multiple physical or virtual machines to distribute the storage and workload.
+   - Use a load balancer or DNS round-robin to distribute client requests across the MinIO servers.
+   - Ensure that the servers have sufficient network bandwidth and low latency for optimal performance.
+
+2. Data Protection and Backup:
+   - Enable erasure coding for data protection and efficient storage utilization.
+   - Configure the erasure coding scheme based on your desired level of data redundancy and storage efficiency.
+   - Regularly backup your MinIO data to an external storage system or a separate MinIO cluster to protect against data loss.
+
+3. Security:
+   - Enable data encryption at rest to protect sensitive data stored in MinIO.
+   - Use SSL/TLS encryption for data in transit to secure communication between clients and MinIO servers.
+   - Implement access control policies to restrict and manage user access to buckets and objects.
+
+4. Monitoring and Metrics:
+   - Enable MinIO's built-in metrics and monitoring features to track the performance and health of your MinIO deployment.
+   - Utilize monitoring tools like Prometheus and Grafana to visualize and analyze the collected metrics.
+   - Set up alerts and notifications to proactively identify and address any issues or anomalies.
+
+5. Scalability and Performance:
+   - Monitor the performance of your MinIO cluster and adjust the configuration as needed.
+   - Consider adding more MinIO servers to the cluster to meet increased storage and performance requirements.
+   - Optimize your MinIO deployment by adjusting parameters like thread pool size, network settings, and buffer sizes.
+
+6. Client Applications:
+   - Utilize S3-compatible libraries and tools to interact with MinIO effectively.
+   - Leverage multipart upload for large objects to improve upload/download performance and resumability.
+   - Take advantage of MinIO's client-side acceleration features like parallelism and multi-threading to optimize data transfer speed.
+
+### Attached Or Network storage?
+
+When it comes to attaching storage or using network storage with MinIO, there are a few considerations to keep in mind:
+
+1. Directly Attached Storage:
+   - Directly attaching storage means connecting physical drives directly to the MinIO servers.
+   - This approach can provide higher performance and lower latency compared to network storage.
+   - It is suitable for scenarios where you have local storage available and want to maximize performance.
+
+2. Network Storage:
+   - Network storage refers to using storage devices that are accessed over a network, such as Network Attached Storage (NAS) or Storage Area Network (SAN).
+   - Network storage offers scalability, centralized management, and can be easily shared across multiple servers.
+   - It is suitable for scenarios where you need shared storage or when you want to separate storage from compute resources.
+
+When deciding between directly attached storage and network storage for MinIO, consider the following factors:
+
+1. Performance: Directly attached storage typically offers better performance due to lower latency and higher bandwidth compared to network storage. If performance is a critical factor for your use case, directly attached storage may be the better choice.
+
+2. Scalability: Network storage provides flexibility and scalability as you can easily add more storage capacity by expanding the storage devices on the network. This can be beneficial if you anticipate significant data growth or require shared storage across multiple MinIO servers.
+
+3. Redundancy and Data Protection: Both directly attached and network storage can offer redundancy and data protection features. Consider the availability and reliability requirements of your data when choosing the storage option. Replication and erasure coding can be used with both types of storage to ensure data durability.
+
+4. Cost: Directly attached storage may require additional hardware costs, such as purchasing physical drives for each MinIO server. Network storage, on the other hand, can be shared among multiple servers, potentially reducing the hardware investment required.
+
+>>>>>>> 8ba79eb2ba68e9fb19d6d37308bcdff8b44b7d38
