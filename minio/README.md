@@ -170,13 +170,12 @@ MNIO_VOLUMES="/PATH/TO/minio/foobar /PATH/TO/minio/barfoo /PATH/TO/minio/faabor 
 
 3. Add new user under ```Administrator > Identity > Users```  and the policy you just added in the previouse step
 
-<<<<<<< HEAD
 ## MinIO [crashcours](https://www.youtube.com/playlist?list=PLYrn63eEqAzaS7mHcJh7GPOFWcLHLxlfE)
 
 ### Different types of storage
 
-![./assets/crashcours-01.png]
-=======
+![crashcours](./assets/crashcours-01.png)
+
 ## MinIO crachcoures
 
 ### Types of storage
@@ -308,5 +307,3 @@ When deciding between directly attached storage and network storage for MinIO, c
 3. Redundancy and Data Protection: Both directly attached and network storage can offer redundancy and data protection features. Consider the availability and reliability requirements of your data when choosing the storage option. Replication and erasure coding can be used with both types of storage to ensure data durability.
 
 4. Cost: Directly attached storage may require additional hardware costs, such as purchasing physical drives for each MinIO server. Network storage, on the other hand, can be shared among multiple servers, potentially reducing the hardware investment required.
-
->>>>>>> 8ba79eb2ba68e9fb19d6d37308bcdff8b44b7d38
