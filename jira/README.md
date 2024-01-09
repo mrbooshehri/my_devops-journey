@@ -91,3 +91,57 @@ sudo rm /etc/init.d/jira
 
 > **Note:** Get ```obr``` files from [here](https://marketplace.atlassian.com/apps)
 
+
+# Upgrade/Migrage Jira
+
+## On old Jira machine
+
+1. Stop `jira.service`
+```bash
+systemctl stop jira.service
+```
+
+2. Backup all the `application-data`
+```bash
+cd /var/atlassian/
+zip -r application-data.zip application-data/*
+```
+
+3. Transfer `application-data.zip` to your new jira server
+4. Backup your database
+	1. For `mysql` use `mysqldump`
+	1. For `postgresql` use `pg_dump`
+
+Example of bakup and restore a `postgresql` database:
+```bash
+pg_dump -U <jira-username> -d <jira-db> -h <postgresql-host-address> -W  > jira-dumpfile
+```
+
+## On new Jira machine
+
+1. Backup the `application-data` in the new machine
+```bash
+cd /var/atlassian/
+cp application-data application-data.bak
+```
+2. Extract `application-data.zip` file you brought from the old Jira
+	 server
+```bash
+mv /PATH/TO/application-data.zip /var/atlassian
+unzip application-data.zip
+```
+3. Fix the user permission
+```bash
+chown -R jira:jira application-data/jira
+```
+4. Restore your database
+
+Example of bakup and restore a `postgresql` database:
+```bash
+psql -U <jira-db-user> -d <jira-db> -h <postgresql-host-address> -W -f jira-dumpfile
+```
+5. Start `jira.service`
+```bash
+systemctl start jira.service
+```
+6. Login to the Jira panel
