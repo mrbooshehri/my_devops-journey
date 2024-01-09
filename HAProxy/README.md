@@ -1,5 +1,8 @@
-# Proxy types
 
+Table of Contents
+=================
+
+* [Tabl of Contents](#tabl-of-contents)
 * [Proxy types](#proxy-types)
    * [Forward proxy](#forward-proxy)
    * [Reverse proxy](#reverse-proxy)
@@ -8,6 +11,7 @@
       * [Loadbalancer](#loadbalancer)
    * [Layer 4 Loadbalancer](#layer-4-loadbalancer)
    * [Layer 7 Loadbalancer](#layer-7-loadbalancer)
+* [HAProxy](#haproxy)
    * [HAProxy features](#haproxy-features)
    * [Things HAProxy is not](#things-haproxy-is-not)
    * [Install HAProxy](#install-haproxy)
@@ -24,24 +28,23 @@
       * [Additional Notes:](#additional-notes)
       * [Example Configuration Snippet:](#example-configuration-snippet)
    * [HAProxy timeouts](#haproxy-timeouts)
-   * [<a href="http://docs.haproxy.org/2.8/configuration.html#7" rel="nofollow">HAProxy Access Control List (ACL) and fetching samples</a>](#haproxy-access-control-list-acl-and-fetching-samples)
+   * [HAProxy Access Control List (ACL) and fetching samples <a href="http://docs.haproxy.org/2.8/configuration.html#7" rel="nofollow">[Official Documentation]</a>](#haproxy-access-control-list-acl-and-fetching-samples-official-documentation)
       * [Basic ACL Syntax:](#basic-acl-syntax)
       * [Example:](#example-1)
       * [Using ACLs in Configuration:](#using-acls-in-configuration)
       * [Types of ACL Conditions:](#types-of-acl-conditions)
       * [Combining ACLs:](#combining-acls)
-         * [HAProxy Matching Methods](#haproxy-matching-methods)
-         * [Path-related criteria in HAProxy ACLs:](#path-related-criteria-in-haproxy-acls)
+      * [HAProxy Matching Methods](#haproxy-matching-methods)
+      * [Path-related criteria in HAProxy ACLs:](#path-related-criteria-in-haproxy-acls)
       * [Fetching Samples:](#fetching-samples)
       * [Combined Example:](#combined-example)
    * [Directives in HAProxy](#directives-in-haproxy)
       * [Example Configuration Snippet:](#example-configuration-snippet-1)
-   * [Tips](#tips)
    * [HAProxy stickiness](#haproxy-stickiness)
       * [Basic Stickiness Configuration:](#basic-stickiness-configuration)
       * [Additional Stickiness Options:](#additional-stickiness-options)
       * [Example with Cookie Stickiness:](#example-with-cookie-stickiness)
-* [Health checks in HAProxy](#health-checks-in-haproxy)
+   * [Health checks in HAProxy](#health-checks-in-haproxy)
       * [1. <strong>Backend Server Health Checks:</strong>](#1-backend-server-health-checks)
       * [2. <strong>option httpchk Directive:</strong>](#2-option-httpchk-directive)
       * [3. <strong>option tcp-check Directive:</strong>](#3-option-tcp-check-directive)
@@ -57,10 +60,28 @@
    * [HAProxy disabled otption](#haproxy-disabled-otption)
       * [Common Use Cases:](#common-use-cases)
       * [Enabling a Disabled Server:](#enabling-a-disabled-server)
+   * [Redirections](#redirections)
+      * [1. HTTP Redirection using http-request redirect:](#1-http-redirection-using-http-request-redirect)
+      * [2. SSL/TLS Redirection:](#2-ssltls-redirection)
+      * [3. Path-Based Redirection:](#3-path-based-redirection)
+      * [4. Custom Redirection Logic:](#4-custom-redirection-logic)
+      * [5. Using errorfile for Redirection:](#5-using-errorfile-for-redirection)
+      * [6. Dynamically Computed Redirects:](#6-dynamically-computed-redirects)
+   * [http-request](#http-request)
+   * [set-header](#set-header)
+      * [Syntax:](#syntax)
+      * [Examples:](#examples)
+         * [1. Basic Header Modification:](#1-basic-header-modification)
+         * [2. Conditional Header Modification:](#2-conditional-header-modification)
+         * [3. Using Variables:](#3-using-variables)
+         * [4. Combining Conditions:](#4-combining-conditions)
+   * [Backup backend](#backup-backend)
    * [Log formatting](#log-formatting)
+   * [Tips](#tips)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
+# Proxy types
 ## Forward proxy
 
 Forward proxies are typically used internally by large organizations, such as universities and enterprises, to:
@@ -149,6 +170,8 @@ isn't capable of doing so as it has no clue of what's in the packets.
 
 ![assests/lbv4v7](assests/lbv4v7.png)
 
+
+# HAProxy
 
 ## HAProxy features
 
@@ -498,7 +521,10 @@ HAProxy deployment. The values should be chosen based on the expected
 response times of your backend servers and the characteristics of your
 application.
 
-## [HAProxy Access Control List (ACL) and fetching samples](http://docs.haproxy.org/2.8/configuration.html#7)
+> **Note:** Usually you need to set a large amount of timeout for
+> databases.
+
+## HAProxy Access Control List (ACL) and fetching samples [\[Official Documentation\]](http://docs.haproxy.org/2.8/configuration.html#7)
 
 Access Control Lists (ACLs) are used to define conditions that help in
 making routing and forwarding decisions based on various factors such as
@@ -604,7 +630,7 @@ decision-making in HAProxy configurations. They allow you to implement
 fine-grained control over how requests are processed based on various
 attributes and conditions.
 
-#### HAProxy Matching Methods
+### HAProxy Matching Methods
 
 Here is a table summarizing some common matching methods in HAProxy, often used in Access Control Lists (ACLs) for making decisions based on request characteristics:
 
@@ -631,7 +657,7 @@ Here is a table summarizing some common matching methods in HAProxy, often used 
 | `res.fhdr`             | Matches against the first occurrence of a header in a response.                                                   | `acl has_custom_res_header res.fhdr(X-Custom-Res-Header) -m found`                         |
 | `tcp-request connection`| Matches against properties of the TCP connection.                                                                | `acl is_ipv6 tcp-request connection reject if !{ src -f ipv6_whitelist.lst }`              |
 
-#### Path-related criteria in HAProxy ACLs:
+### Path-related criteria in HAProxy ACLs:
 
 | Criterion     | Description                                                | Example                                           |
 |---------------|------------------------------------------------------------|---------------------------------------------------|
@@ -765,15 +791,6 @@ manage connections, and distribute requests across backend servers.
 
 > In the other words, each line of the config file is a directive.
 
-## Tips
-
-* Install `vim-haproxy`
-* Check `haproxy.cfg` file validity with
-
-```bash
-haproxy -c -f /etc/haproxy/haproxy.cfg
-```
-
 ## HAProxy stickiness
 
 Stickiness, often referred to as session persistence or affinity, is a
@@ -835,25 +852,35 @@ In this example, stickiness is based on a cookie named `sessionid`, and the stic
 
 Stickiness in TCP mode ensures that connections with the same key (such as IP address or cookie value) are consistently directed to the same server, maintaining session persistence across multiple requests.
 
-# Health checks in HAProxy
+## Health checks in HAProxy
 
-Health checks in HAProxy refer to the process of regularly monitoring the status and availability of backend servers. The purpose of health checks is to ensure that HAProxy is sending traffic only to healthy servers, improving the overall reliability and availability of the application.
+Health checks in HAProxy refer to the process of regularly monitoring
+the status and availability of backend servers. The purpose of health
+checks is to ensure that HAProxy is sending traffic only to healthy
+servers, improving the overall reliability and availability of the
+application.
 
 Here are the key components and concepts related to health checks in HAProxy:
 
 ### 1. **Backend Server Health Checks:**
-   - Health checks involve periodically testing the health of each backend server in a backend pool.
-   - HAProxy sends test requests to the servers and evaluates their responses to determine if the servers are healthy.
+   - Health checks involve periodically testing the health of each
+     backend server in a backend pool.
+   - HAProxy sends test requests to the servers and evaluates their
+     responses to determine if the servers are healthy.
 
 ### 2. **`option httpchk` Directive:**
-   - The `option httpchk` directive is used to enable HTTP health checks. It specifies that HAProxy should perform an HTTP health check by sending an HTTP request and checking the response.
+   - The `option httpchk` directive is used to enable HTTP health
+     checks. It specifies that HAProxy should perform an HTTP health
+     check by sending an HTTP request and checking the response.
    - Example:
      ```plaintext
      option httpchk GET /healthcheck HTTP/1.1\r\nHost:\ example.com
      ```
 
 ### 3. **`option tcp-check` Directive:**
-   - The `option tcp-check` directive is used for TCP health checks. It sends a basic TCP connection request and checks if the connection is successful.
+   - The `option tcp-check` directive is used for TCP health checks. It
+     sends a basic TCP connection request and checks if the connection
+     is successful.
    - Example:
      ```plaintext
      option tcp-check
@@ -904,7 +931,39 @@ combination of directives and parameters to define the check type,
 expected responses, and the conditions for considering a server healthy
 or unhealthy.
 
-
+> **Note:**
+>
+> The `default_server` option is used within a backend
+> configuration to designate a default server that will be used when no
+> other server in the backend matches the criteria specified in the load
+> balancing algorithm or other conditions.
+> 
+> ```plaintext
+> backend your_backend
+>     mode http
+>     balance roundrobin
+> 
+>     server server1 192.168.1.10:80 check
+>     server server2 192.168.1.11:80 check
+>     server server3 192.168.1.12:80 check backup
+>     server server4 192.168.1.13:80 check backup
+> 
+>     default-server inter 3s fall 3 rise 2
+> ```
+> 
+> In this example:
+> 
+> - The `server` directives define multiple backend servers (`server1`,
+>   `server2`, `server3`, `server4`) with their respective IP addresses
+>   and ports.
+> 
+> - Two of the servers (`server3` and `server4`) are designated as
+>   backup servers using the `backup` keyword.
+> - The `default-server` line specifies default settings for servers
+>   within the backend. In this case, it sets parameters for server
+>   health checks. The `inter 3s` option specifies that health checks
+>   are performed every 3 seconds.
+ 
 ## HAProxy Load Balancing Algorithms
 
 HAProxy supports various load balancing algorithms, also known as load
@@ -1172,9 +1231,458 @@ This command dynamically enables the `server2` that was previously disabled.
 
 The `disabled` option provides a flexible way to control the availability of servers in real-time without modifying the configuration file. It is a helpful feature for managing server lifecycle events, ensuring smooth operations during maintenance, and providing a controlled rollout for new servers.
 
+## Redirections
+
+Redirection refers to the process of instructing the client to navigate
+to a different location. This can be done for various reasons, such as
+redirecting to a different domain, enforcing HTTPS, handling URL
+rewrites, or sending users to a maintenance page. HAProxy provides
+several mechanisms for performing redirections, and the choice of method
+depends on the specific use case.
+
+Here are a few ways to implement redirection in HAProxy:
+
+### 1. HTTP Redirection using `http-request redirect`:
+
+```plaintext
+frontend http_frontend
+  bind *:80
+  http-request redirect location https://example.com%[capture.req.uri] code 301 if !{ ssl_fc }
+```
+
+Explanation:
+- Redirects any HTTP request to the corresponding HTTPS URL.
+- `%[capture.req.uri]` captures the requested URI and appends it to the target URL.
+- `code 301` indicates a permanent redirect.
+
+### 2. SSL/TLS Redirection:
+
+```plaintext
+frontend https_frontend
+  bind *:443 ssl crt /etc/ssl/private/example.pem
+  http-request redirect scheme https if !{ ssl_fc }
+```
+
+Explanation:
+- Redirects any request received on port 443 to the HTTPS scheme if it's not already using SSL/TLS.
+
+### 3. Path-Based Redirection:
+
+```plaintext
+frontend http_frontend
+  bind *:80
+  acl is_old_path path_beg /oldpath
+  http-request redirect location /newpath%[capture.req.uri] if is_old_path
+```
+
+Explanation:
+- Redirects requests starting with "/oldpath" to "/newpath" while preserving the rest of the path.
+
+### 4. Custom Redirection Logic:
+
+```plaintext
+frontend http_frontend
+  bind *:80
+  acl is_legacy_host hdr(host) -i legacy.example.com
+  http-request redirect location https://new.example.com%[capture.req.uri] code 301 if is_legacy_host
+```
+
+Explanation:
+- Redirects requests with the host "legacy.example.com" to "https://new.example.com."
+
+### 5. Using `errorfile` for Redirection:
+
+```plaintext
+frontend http_frontend
+  bind *:80
+  acl is_old_path path_beg /oldpath
+  errorfile 301 /etc/haproxy/errors/301-custom.http if is_old_path
+```
+
+Explanation:
+- Sends a custom 301 HTTP response for requests matching the condition using the specified error file.
+
+### 6. Dynamically Computed Redirects:
+
+```plaintext
+frontend http_frontend
+  bind *:80
+  use_backend %[req.hdr(Host),lower,map_dom(/etc/haproxy/domain_redirect.map)] if { req.hdr(Host),lower,map_dom(/etc/haproxy/domain_redirect.map) -m found }
+```
+
+Explanation:
+- Uses a map file (`domain_redirect.map`) to dynamically compute the target backend based on the Host header for redirection.
+
+These are just a few examples, and the choice of redirection method depends on the specific requirements of your application or infrastructure. Always refer to the HAProxy documentation for the most up-to-date and comprehensive information: [HAProxy Documentation](http://www.haproxy.org/#docs).
+
+
+#### `prefix`, `location`, and `scheme` directives
+
+1. **`prefix` Directive:**
+   - The `prefix` directive is used to specify a prefix for a
+     redirection. It allows you to define a fixed string that will be
+     prepended to the requested URI during redirection.
+
+     ```plaintext
+     frontend http_frontend
+       bind *:80
+       http-request redirect prefix /newpath if { path_beg /oldpath }
+     ```
+
+     In this example, requests with a path beginning with "/oldpath" will be redirected to "/newpath" plus the rest of the original URI.
+
+2. **`location` Directive:**
+   - The `location` directive is used to specify the target location to
+     which the client should be redirected. It can include variables and
+     captures to dynamically compute the redirection URL.
+
+     ```plaintext
+     frontend http_frontend
+       bind *:80
+       http-request redirect location /newpath%[capture.req.uri] if { path_beg /oldpath }
+     ```
+
+     In this example, requests with a path beginning with "/oldpath" will be redirected to "/newpath" plus the rest of the original URI.
+
+3. **`scheme` Directive:**
+   - The `scheme` directive is used to specify the scheme (HTTP or
+     HTTPS) for a redirection.
+
+     ```plaintext
+     frontend http_frontend
+       bind *:80
+       http-request redirect scheme https if { hdr(Host) -i www.example.com } !{ ssl_fc }
+     ```
+
+     In this example, requests with the host header "www.example.com" and not using SSL/TLS will be redirected to the HTTPS scheme.
+
+**Combining `prefix`, `location`, and `scheme` for Redirection:**
+
+```plaintext
+frontend http_frontend
+  bind *:80
+  http-request redirect scheme https code 301 if !{ ssl_fc }
+
+frontend https_frontend
+  bind *:443 ssl crt /etc/ssl/private/example.pem
+  http-request redirect location /secure%[capture.req.uri] code 301 if !{ path_beg /secure } !{ ssl_fc }
+```
+
+Explanation:
+- The first frontend (`http_frontend`) redirects HTTP traffic to HTTPS using the `scheme` directive.
+- The second frontend (`https_frontend`) handles HTTPS traffic and redirects requests with a path starting with "/secure" to the same path under the "/secure" prefix.
+
+These directives provide flexibility for implementing various redirection scenarios based on the specific needs of your application or infrastructure. Always refer to the official HAProxy documentation for the most up-to-date and comprehensive information: [HAProxy Documentation](http://www.haproxy.org/#docs).
+
+
+| Directive    | Description                                   | Example                                                                                                          |
+|--------------|-----------------------------------------------|------------------------------------------------------------------------------------------------------------------|
+| `prefix`     | Specifies a fixed prefix for redirection.      | `http-request redirect prefix /newpath if { path_beg /oldpath }`                                                 |
+| `location`   | Specifies the target location for redirection. | `http-request redirect location /newpath%[capture.req.uri] if { path_beg /oldpath }`                               |
+| `scheme`     | Specifies the scheme (HTTP or HTTPS) for redirection. | `http-request redirect scheme https code 301 if !{ ssl_fc }`                                                    |
+
+**Use Cases:**
+
+1. **Changing URI Path:**
+   - Use `prefix` or `location` when you want to change or add a fixed prefix to the URI path during redirection.
+
+2. **Dynamic Path with Captures:**
+   - Use `location` when you need to construct the redirection target
+     dynamically based on variables or captured content from the
+     original request.
+
+3. **Scheme Redirection:**
+   - Use `scheme` when you want to redirect requests to a different scheme (e.g., from HTTP to HTTPS).
+
+**Example:**
+
+Consider an example where HTTP requests to "/oldpath" are redirected to HTTPS and the URI path is changed to "/newpath":
+
+```plaintext
+frontend http_frontend
+  bind *:80
+  http-request redirect scheme https code 301 if !{ ssl_fc }
+
+frontend https_frontend
+  bind *:443 ssl crt /etc/ssl/private/example.pem
+  http-request redirect location /newpath%[capture.req.uri] if { path_beg /oldpath }
+```
+
+In this example, `scheme` is used in the HTTP frontend to enforce HTTPS,
+and `location` is used in the HTTPS frontend to construct the
+redirection target dynamically with a new path.
+
+[HAProxy Documentation](http://www.haproxy.org/#docs).
+
+
+## `http-request`
+
+`http-request` directive is used to perform actions based on HTTP
+requests. It allows you to define conditions and take specific actions
+when those conditions are met. This directive is commonly used within
+frontend or backend sections of the HAProxy configuration file.
+
+Here's a basic syntax of the `http-request` directive:
+
+```plaintext
+http-request action [ [ if | unless ] condition ]
+```
+
+- **`action`:** Specifies the action to be performed. This could be
+  various things, such as adding headers, redirecting requests, blocking
+  requests, etc.
+
+- **`if` or `unless`:** Optional keywords that introduce a condition.
+  The action is executed only if the specified condition is true (`if`)
+  or false (`unless`). If neither `if` nor `unless` is provided, the
+  action is always executed.
+
+- **`condition`:** Specifies a condition that, if true, triggers the
+  execution of the specified action. Conditions can be based on various
+  factors like ACLs (Access Control Lists), request headers, request
+  methods, etc.
+
+Here are a few examples to illustrate the use of `http-request`:
+
+1. **Adding a custom header:**
+   
+   ```plaintext
+   http-request add-header X-Example-Header "Hello, World!"
+   ```
+
+   This adds a custom HTTP header (`X-Example-Header`) with the value "Hello, World!" to every HTTP request.
+
+2. **Blocking requests from a specific IP:**
+
+   ```plaintext
+   http-request deny if { src -f /etc/haproxy/ip_blacklist.lst }
+   ```
+
+   This denies requests from IP addresses listed in the file `/etc/haproxy/ip_blacklist.lst`.
+
+3. **Redirecting HTTP to HTTPS:**
+
+   ```plaintext
+   http-request redirect scheme https if !{ ssl_fc }
+   ```
+
+   This redirects HTTP requests to HTTPS if they are not already secured.
+
+4. **Custom ACL-based condition:**
+
+   ```plaintext
+   acl is_mobile hdr_sub(user-agent) -i Mobile
+   http-request set-header X-Device-Type mobile if is_mobile
+   ```
+
+   This sets a custom header (`X-Device-Type`) to "mobile" if the
+   request's User-Agent header indicates a mobile device.
+
+## `set-header`
+
+The `set-header` directive in HAProxy is used to modify or add HTTP
+headers in the request or response. It allows you to customize the
+headers based on certain conditions. Here is a detailed explanation of
+the `set-header` directive:
+
+### Syntax:
+
+```plaintext
+http-request | http-response set-header header_name value [if condition]
+```
+
+- **`http-request` or `http-response`:** Specifies whether the action is
+  applied to the request or response phase.
+- **`set-header`:** Indicates that the directive is used to modify or
+  set an HTTP header.
+- **`header_name`:** Specifies the name of the HTTP header to be
+  modified or added.
+- **`value`:** Specifies the new value for the header.
+- **`if condition`:** (Optional) Specifies a condition under which the
+  header modification should occur.
+
+### Examples:
+
+#### 1. Basic Header Modification:
+
+```plaintext
+http-request set-header X-Custom-Header "Hello, World!"
+```
+
+This sets the `X-Custom-Header` to the value "Hello, World!" in every HTTP request.
+
+#### 2. Conditional Header Modification:
+
+```plaintext
+http-request set-header X-Forwarded-Proto https if { ssl_fc }
+```
+
+This example sets the `X-Forwarded-Proto` header to "https" if the
+connection is using SSL (HTTPS). The condition `{ ssl_fc }` checks if
+the request came over SSL.
+
+#### 3. Using Variables:
+
+```plaintext
+http-request set-header X-User-Role %[hdr(User-Role)]
+```
+
+This sets the `X-User-Role` header to the value of the `User-Role` header in the incoming request.
+
+#### 4. Combining Conditions:
+
+```plaintext
+http-request set-header X-Device-Type mobile if { hdr_sub(User-Agent) -i Mobile }
+```
+
+This sets the `X-Device-Type` header to "mobile" if the User-Agent
+header indicates a mobile device. The condition checks if the User-Agent
+header contains the substring "Mobile."
+
+> Notes:
+> 
+> - You can use multiple `set-header` directives in a single
+>   configuration.
+> - Conditions can be based on various factors, including ACLs (Access
+>   Control Lists), request headers, and other variables.
+> - Always ensure that modifications align with your application's
+>   requirements and adhere to HTTP standards.
+> - Verify the HAProxy version's documentation, as syntax or features
+>   may vary between versions.
+
+## Backup backend
+
+`backup` designates a server as a backup server, meaning it will
+only be used if all the non-backup servers are unavailable.
+
+```plaintext
+backend your_backend
+    mode http
+    balance roundrobin
+
+    server server1 192.168.1.10:80 check
+    server server2 192.168.1.11:80 check
+    server server3 192.168.1.12:80 check backup
+```
+
+> **Note:** If you have several `backup`s and you want to use all of
+them, add `option allbackups`directive.
+
+In this example:
+
+- `server server1 192.168.1.10:80 check`: This is a regular server
+  definition without the `backup`.
+- `server server2 192.168.1.11:80 check`: Another regular server.
+- `server server3 192.168.1.12:80 check backup`: This server is
+  designated as a backup server using the `backup`.
+
+With this configuration:
+
+- If both `server1` and `server2` are available, requests will be
+  distributed between them using the specified balancing algorithm
+  (round-robin in this case).
+- If either `server1` or `server2` becomes unavailable, HAProxy will
+  start routing traffic to the `server3` backup server.
+- If both `server1` and `server2` are unavailable, all traffic will be
+  sent to `server3` until one of the primary servers becomes available
+  again.
+
+Using the `backup` is particularly useful when you have servers
+with different capacities, and you want to use the backup server only
+when necessary, minimizing its usage when the primary servers are
+operational. It helps ensure that resources are used efficiently while
+providing a failover mechanism when needed.
+
+## `nbsrv` method
+
+The `nbsrv()` function in HAProxy is used to obtain the number of active
+servers within a backend that are currently considered available or
+healthy. It returns the count of servers that are not marked as "down"
+or "maintenance."
+
+Here's the basic syntax of the `nbsrv()` function:
+
+```plaintext
+nbsrv(<backend_name>)
+```
+
+- `<backend_name>`: Specifies the name of the backend for which you want to get the number of active servers.
+
+The `nbsrv()` function is typically used within HAProxy ACLs (Access Control Lists) or in combination with other directives to make decisions based on the availability of servers. For example, it can be used to conditionally route traffic, depending on the number of healthy servers in a backend.
+
+Here's a simple example where the `nbsrv()` function is used to redirect traffic if there is only one active server in the backend:
+
+```plaintext
+frontend your_frontend
+    bind :80
+
+    acl single_server nbsrv(your_backend) eq 1
+    use_backend redirect_backend if single_server
+
+backend your_backend
+    mode http
+    balance roundrobin
+    server server1 192.168.1.10:80 check
+    server server2 192.168.1.11:80 check
+
+backend redirect_backend
+    mode http
+    server redirect_server 192.168.1.20:80
+```
+
+In this example:
+
+- The `acl single_server nbsrv(your_backend) eq 1` ACL checks if there
+  is only one active server in the `your_backend` backend.
+- The `use_backend redirect_backend if single_server` directive
+  redirects traffic to the `redirect_backend` if the condition of having
+  a single active server is met.
+
+## `srv_is_up()` method 
+
+`srv_is_up()` can be used within ACLs (Access Control Lists) to check
+whether a specific server in a backend is considered "up" or available.
+
+```plaintext
+frontend your_frontend
+    bind :80
+
+    acl server_up_1 if srv_is_up(your_backend/server1)
+    acl server_up_2 if srv_is_up(your_backend/server2)
+
+    use_backend backend_server1 if server_up_1
+    use_backend backend_server2 if server_up_2
+
+backend your_backend
+    mode http
+    balance roundrobin
+    server server1 192.168.1.10:80 check
+    server server2 192.168.1.11:80 check
+
+backend backend_server1
+    mode http
+    server server1 192.168.1.10:80 check
+
+backend backend_server2
+    mode http
+    server server2 192.168.1.11:80 check
+```
+
+In this example:
+
+- The ACLs `server_up_1` and `server_up_2` use `srv_is_up()` to check if
+  `server1` and `server2`, respectively, are considered "up" in the
+  `your_backend` backend.
+- The `use_backend` directives then conditionally route traffic based on
+  the availability of the servers.
+
+
+15
+
 ## Log formatting
 
 ```plaintext
+
 # Define a custom log format named "custom_log"
 log-format custom_log %[date] %[frontend_name] %[backend_name] %[server_name] \
     %[src] %[dst] %{+Q}r %ST %B %Ts %Tr %Tt %Hs %Hr %Ht %Tq %Tw %Tc %Tr %Tt %Tt
@@ -1215,4 +1723,41 @@ Explanation of the log format elements:
 - `%Tc`: Total time waiting for the connection to establish to the final server.
 - `%Tr`: Total time to receive the response from the final server.
 - `%Tt`: Total time of the session.
+
+
+## Tips
+
+* Install `vim-haproxy`
+* Check `haproxy.cfg` file validity with
+
+```bash
+haproxy -c -f /etc/haproxy/haproxy.cfg
+```
+* You can use `and`, `or` and `Negate` a condition. For more information
+  look [here](https://www.haproxy.com/documentation/haproxy-configuration-tutorials/core-concepts/acls/#logical-operators-in-conditions)
+
+* Use HAProxy as CDN (somehow)
+   * Create a `geolocaion.txt` like:
+   ```plaintext
+   192.168.1.0    north
+   192.168.2.0    east
+   192.168.3.0    wset
+   192.168.4.0    south
+   ```
+
+   * Add the following directive to HAProxy
+   ```plaintext
+   http-request set-header X-city   %[src, map_ip(/PATH/TO/geolocaion.txt)]
+   acl   is-west   req-hdr(X-city)  -i -m sub   we
+   acl   is-east   req-hdr(X-city)  -i -m sub   ea
+   acl   is-north  req-hdr(X-city)  -i -m sub   no
+   acl   is-south  req-hdr(X-city)  -i -m sub   so
+
+   redirect location https://west.example.com   if is-west
+   redirect location https://east.example.com   if is-east
+   redirect location https://north.example.com   if is-north
+   redirect location https://south.example.com   if is-south
+
+   use_backend mybackend  if is-west
+   ```
 
