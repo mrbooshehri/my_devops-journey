@@ -119,6 +119,23 @@ pg_dump -U <jira-username> -d <jira-db> -h <postgresql-host-address> -W  > jira-
 
 ## On new Jira machine
 
+> **Note:**
+> **DON'T FORGET TO CONFIGURE YOUR DATABASE FIRST**
+>
+> Example of `postgresql`:
+>
+> Create database user usin `psql`
+> ```bash
+> CREATE USER your_username WITH PASSWORD 'your_password';
+> ```
+>
+> Create database:
+> ```bash
+> CREATE DATABASE jiradb WITH ENCODING 'UNICODE' LC_COLLATE 'C' LC_CTYPE 'C' TEMPLATE template0;
+> GRANT ALL PRIVILEGES ON DATABASE <Database Name> TO <Role Name>
+> ```
+> [Offical Documentation](https://confluence.atlassian.com/adminjiraserver0906/connecting-jira-applications-to-postgresql-1217304530.html)
+
 1. Backup the `application-data` in the new machine
 ```bash
 cd /var/atlassian/
