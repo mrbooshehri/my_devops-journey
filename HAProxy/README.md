@@ -2,7 +2,6 @@
 Table of Contents
 =================
 
-* [Tabl of Contents](#tabl-of-contents)
 * [Proxy types](#proxy-types)
    * [Forward proxy](#forward-proxy)
    * [Reverse proxy](#reverse-proxy)
@@ -76,7 +75,37 @@ Table of Contents
          * [3. Using Variables:](#3-using-variables)
          * [4. Combining Conditions:](#4-combining-conditions)
    * [Backup backend](#backup-backend)
-   * [Log formatting](#log-formatting)
+   * [cookies](#cookies)
+   * [Stick table](#stick-table)
+         * [Scenario](#scenario)
+   * [Runnig HAProxy multi-thread](#runnig-haproxy-multi-thread)
+   * [Logging](#logging)
+      * [Explainging log directive](#explainging-log-directive)
+      * [Log formating](#log-formating)
+         * [Exapmle](#exapmle)
+      * [Send HAProxy logs to rsyslog](#send-haproxy-logs-to-rsyslog)
+         * [HAProxy Configuration:](#haproxy-configuration-1)
+         * [rsyslog Configuration:](#rsyslog-configuration)
+   * [TLS/SSL](#tlsssl)
+      * [Obtaining a certificate from Let's Encrypt using Certbot](#obtaining-a-certificate-from-lets-encrypt-using-certbot)
+         * [Prerequisites:](#prerequisites)
+         * [Obtaining a Let's Encrypt Certificate:](#obtaining-a-lets-encrypt-certificate)
+         * [Configuring Your Web Server:](#configuring-your-web-server)
+      * [SSL Types](#ssl-types)
+         * [1. <strong>SSL Termination:</strong>](#1-ssl-termination)
+         * [2. <strong>SSL Passthrough:</strong>](#2-ssl-passthrough)
+         * [3. <strong>SSL Re-encryption (or SSL Re-termination):</strong>](#3-ssl-re-encryption-or-ssl-re-termination)
+         * [Pros and Cons](#pros-and-cons)
+      * [Use certificate in HAProxy](#use-certificate-in-haproxy)
+         * [Example for TCP Mode (non-SSL):](#example-for-tcp-mode-non-ssl)
+         * [Example for HTTP Mode (SSL/TLS Termination):](#example-for-http-mode-ssltls-termination)
+         * [Important Note:](#important-note)
+         * [HAProxy configuration](#haproxy-configuration-2)
+         * [Certbot command](#certbot-command)
+      * [HAProxy SSL/TLS Security](#haproxy-ssltls-security)
+         * [Set SSL/TSL restriction](#set-ssltsl-restriction)
+         * [Set cypher](#set-cypher)
+   * [URL rewriting](#url-rewriting)
    * [Tips](#tips)
 
 <!-- Created by https://github.com/ekalinin/github-markdown-toc -->
@@ -1677,15 +1706,432 @@ In this example:
   the availability of the servers.
 
 
-15
+## `cookies`
 
-## Log formatting
+In HAProxy, a cookie option refers to a configuration directive that
+allows you to manage and manipulate HTTP cookies in the context of load
+balancing. The `cookie` option in HAProxy can be used in various ways to
+influence the behavior of load balancing based on the information
+present in HTTP cookies. Here are some common use cases:
+
+1. **Session Persistence (Stickiness):** HAProxy can be configured to
+   use cookies to ensure that a user's requests are consistently
+   directed to the same server. This is useful for applications that
+   require session persistence, such as those that store user session
+   information on a specific server.
+
+   Example:
+   ```plaintext
+   backend my_backend
+       balance roundrobin
+       cookie JSESSIONID prefix
+       server server1 192.168.1.10:80 cookie server1 check
+       server server2 192.168.1.11:80 cookie server2 check
+   ```
+
+   In this example, the `cookie JSESSIONID prefix` line instructs
+   HAProxy to use the "JSESSIONID" cookie for session persistence.
+
+2. **Inserting Cookies:** HAProxy can insert cookies into the HTTP
+   response to the client. This can be used for various purposes, such
+   as tracking, analytics, or custom application behavior.
+
+   Example:
+   ```plaintext
+   backend my_backend
+       balance roundrobin
+       cookie insert indirect
+       server server1 192.168.1.10:80 check
+       server server2 192.168.1.11:80 check
+   ```
+
+   Here, the `cookie insert indirect` line tells HAProxy to insert a
+   cookie into the response.
+
+3. **Cookie-Based Routing:** You can configure HAProxy to use the value
+   of a specific cookie for routing decisions, allowing you to direct
+   traffic based on specific criteria stored in cookies.
+
+   Example:
+   ```plaintext
+   backend my_backend
+       balance hdr(cookie) -i server1
+       server server1 192.168.1.10:80 check
+       server server2 192.168.1.11:80 check
+   ```
+
+   In this case, HAProxy uses the value of the "cookie" header to
+   determine the target server.
+
+### `cookie` modes
+
+In HAProxy, cookies can work in different modes depending on the desired
+behavior and use case. The `cookie` option can be configured with
+different modes to achieve specific functionalities. Here are some
+common modes for the `cookie` option in HAProxy:
+
+1. **Insert Mode (`insert`):** In this mode, HAProxy inserts a cookie
+   into the response sent to the client. This can be useful for tracking
+   or maintaining session information on the client side.
+
+   Example:
+   ```plaintext
+   cookie insert indirect
+   ```
+
+2. **Prefix Mode (`prefix`):** In this mode, HAProxy extracts the value
+   of a cookie from the request and uses it as a prefix for server
+   assignment. This is often used for session persistence, ensuring that
+   requests with the same prefix are directed to the same server.
+
+   Example:
+   ```plaintext
+   cookie JSESSIONID prefix
+   ```
+
+3. **Rewrite Mode (`rewrite`):** This mode allows HAProxy to rewrite the
+   value of a cookie in the request. It is useful for modifying cookie
+   values before making a load balancing decision.
+
+   Example:
+   ```plaintext
+   cookie SERVERID rewrite
+   ```
+
+4. **Dynamic Mode (`dynamic`):** In dynamic mode, HAProxy dynamically
+   generates a cookie value if it is not present in the client's
+   request. This can be used for scenarios where you want to assign a
+   cookie only if it's not already set by the client.
+
+   Example:
+   ```plaintext
+   cookie dynamic
+   ```
+
+5. **Indirect Mode (`indirect`):** In this mode, HAProxy inserts a
+   cookie into the response, and subsequent requests from the client
+   include the cookie. This is often used for session persistence.
+
+   Example:
+   ```plaintext
+   cookie insert indirect
+   ```
+
+6. **Learn Mode (`learn`):** Learn mode allows HAProxy to learn the
+   association between clients and servers based on the first request
+   from the client. It then uses this information for subsequent
+   requests.
+
+   Example:
+   ```plaintext
+   cookie learn
+   ```
+
+## Stick table
+
+A stick table in HAProxy is a mechanism for storing and tracking
+information about clients and their interactions with the server. It is
+used to maintain stateful information across multiple requests and is
+often employed for scenarios like session persistence or rate limiting.
+Stick tables allow HAProxy to make load balancing decisions and apply
+specific actions based on the stored information.
+
+Here are some key points about stick tables in HAProxy:
+
+1. **Stateful Information:** Stick tables enable HAProxy to maintain
+   stateful information about clients, servers, or both. This
+   information is retained and can be used for making load balancing
+   decisions.
+
+2. **Session Persistence:** One common use of stick tables is for
+   achieving session persistence (also known as session affinity or
+   sticky sessions). This ensures that requests from the same client are
+   consistently directed to the same server.
+
+   Example for session persistence:
+   ```plaintext
+   stick-table type ip size 100k expire 30m
+   stick on src
+   ```
+
+   > **Note:** You can use the following command instead of `stick on
+   > src`:
+   >
+   > ```plaintext
+   > stick match src
+   > stick store-request src
+   > ```
+
+   This example creates a stick table (which naming exactly equivalent
+   ot the backend name) for IP addresses and assigns the client's source
+   IP address to the corresponding server.
+
+3. **Rate Limiting:** Stick tables can be used to implement rate
+   limiting, allowing you to control the rate of requests from clients
+   based on certain criteria.
+
+   Example for rate limiting:
+   ```plaintext
+   stick-table type ip size 100k expire 1m store http_req_rate(10s)
+   acl is_abuser sc_http_req_rate gt 10
+   tcp-request content reject if is_abuser
+   ```
+
+   In this example, the stick table is used to store the request rate
+   for each IP address, and clients exceeding a specified rate are
+   rejected.
+
+4. **Dynamic Configuration:** Stick tables can be dynamically configured
+   and updated based on the characteristics of incoming traffic. This
+   allows for flexibility in adapting to changing conditions.
+
+   Example for dynamic configuration:
+   ```plaintext
+   stick-table type string len 32 size 100k expire 30s store conn_rate(3s)
+   tcp-request content track-sc0 src
+   tcp-request connection reject if { sc0_get_gpc0 gt 0 }
+   ```
+
+   Here, the stick table tracks the connection rate for each client and
+   rejects connections if the rate exceeds a certain threshold.
+
+> **Note:** `stick-table` works in `tcp` mode
+
+### `stick-table` paramethers
+
+| Option                     | Description                                                                                             | Example                                               |
+|----------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| `type`                     | Specifies the type of the stick table (e.g., `ip`, `integer`, `string`).                                | `stick-table type ip size 100k`                      |
+| `size`                     | Defines the maximum number of entries in the stick table.                                                | `stick-table type ip size 100k`                      |
+| `expire`                   | Sets the expiration time for entries in the stick table.                                                 | `stick-table type ip size 100k expire 30m`            |
+| `store`                    | Specifies which data to store in the stick table (e.g., `conn_rate`, `http_req_rate`).                    | `stick-table type ip size 100k store conn_rate(10s)`  |
+| `peers`                    | Enables synchronization of stick tables across multiple HAProxy instances (requires peer nodes).        | `stick-table type ip size 100k peers my_peers`        |
+| `nopurge`                  | Disables the automatic purging of old entries from the stick table.                                      | `stick-table type ip size 100k nopurge`              |
+| `key`                      | Defines a key used for lookups in the stick table (e.g., `src`, `hdr(X-Custom-Header)`).                  | `stick-table type string len 32 size 100k key src`   |
+| `source`                   | Specifies the source used to populate the stick table (e.g., `tcp-request`, `http-request`).            | `stick-table type ip size 100k source tcp-request`   |
+| `const`                    | Provides a fixed constant value for certain operations in the stick table.                              | `stick-table type ip size 100k const 42`             |
+| `incr` / `decr`            | Increments or decrements the value associated with an entry in the stick table.                           | `stick-table type ip size 100k incr conn_cur(3s)`    |
+| `aggregator`               | Defines an aggregation method for values stored in the stick table.                                      | `stick-table type ip size 100k aggregator sum`      |
+| `match`                    | Specifies a condition to be matched for updating the stick table.                                        | `stick-table type ip size 100k match src`            |
+| `on-pxname` / `on-pxname-i`| Associates stick table entries with a specific proxy name (case-sensitive or case-insensitive).         | `stick-table type ip size 100k on-pxname my_proxy`   |
+| `on-pxname` / `on-pxname-i`| Associates stick table entries with a specific proxy name (case-sensitive or case-insensitive).         | `stick-table type ip size 100k on-pxname my_proxy`   |
+
+
+### `stick-table` error handling with `redispatch`
+
+The `redispatch` option is not directly related to stick tables in
+HAProxy. Instead, it's a global option that affects how HAProxy handles
+server failures and the redistribution of traffic when a server becomes
+unavailable. The `redispatch` option primarily influences the behavior
+of the load balancer at a global level, and it doesn't specifically
+interact with stick tables.
+
+However, it can be uesed to implement session persistence or
+stickiness using stick tables, and you can maintain some form of
+connection affinity even during server failures.
+
+#### Scenario
+
+You have a stick table that tracks client-server associations (e.g.,
+based on source IP) and you experience a server failure, the absence of
+the `redispatch` option would mean that existing connections continue to
+be directed to the failed server until their completion or timeout, but
+new connections are sent to healthy servers.
+
+If you enable `redispatch`, it doesn't directly impact stick tables but
+rather influences how HAProxy redistributes traffic among healthy
+servers after a failure. In the context of stick tables, `redispatch`
+might be used to ensure that, after a server failure, the load balancer
+actively redistributes existing connections based on the stickiness
+information stored in the stick table.
+
+Here's an example of how you might use stick tables and `redispatch` together:
+
+```plaintext
+backend my_backend
+    balance roundrobin
+    stick-table type ip size 100k expire 30m
+    stick on src
+    option redispatch
+    server server1 192.168.1.10:80 check
+    server server2 192.168.1.11:80 check
+```
+
+In this example:
+
+- `stick-table type ip size 100k expire 30m`: Defines a stick table to
+  store client-server associations based on source IP.
+- `stick on src`: Specifies that stickiness is based on the source IP of
+  the client.
+- `option redispatch`: Enables the `redispatch` option to actively
+  redistribute connections after a server failure.
+
+The combination of stick tables and `redispatch` allows you to achieve
+both session persistence and a more balanced distribution of traffic in
+the event of a server failure.
+
+## Runnig HAProxy multi-thread 
+
+In HAProxy, `nbproc`, `nbthread`, and `cpu-map` are configuration
+options related to multiprocessing and multithreading. They are used to
+control how HAProxy utilizes multiple processor cores or threads to
+handle incoming traffic. These options help optimize performance by
+distributing the workload across multiple CPU resources.
+
+1. **`nbproc`:** This option is used to configure the number of
+   processes that HAProxy will run. Each process is independent and can
+   handle its own set of connections. Running multiple processes can be
+   beneficial for parallelizing the handling of connections and
+   increasing overall throughput.
+
+   Example:
+   ```plaintext
+   nbproc 4
+   ```
+
+   In this example, HAProxy is configured to run four independent
+   processes.
+
+2. **`nbthread`:** This option is used to configure the number of
+   threads per process. Each thread within a process can handle its own
+   connections. Running multiple threads within a process can be useful
+   for handling concurrency within each process.
+
+   Example:
+   ```plaintext
+   nbthread 2
+   ```
+
+   In this example, HAProxy is configured to run two threads within each
+   process.
+
+3. **`cpu-map`:** This option is used to map processes and threads to
+   specific CPU cores. It allows you to define the CPU affinity for each
+   process and thread, specifying which cores they should run on. This
+   can help optimize performance by minimizing cache misses and
+   improving overall CPU utilization.
+
+   Example:
+   ```plaintext
+   cpu-map auto:1-4 0-3
+   ```
+
+   In this example, the `cpu-map` option is used to map the processes
+   and threads to specific CPU cores. The `auto` keyword indicates
+   automatic CPU mapping, and `1-4` refers to the process IDs, while
+   `0-3` refers to the CPU core IDs.
+
+
+## Logging
+
+The `log` directive in HAProxy is used to control logging of information
+related to requests and responses. It allows you to specify the format
+and destination of log entries generated by HAProxy. Logging is crucial
+for monitoring, troubleshooting, and analyzing the behavior of the load
+balancer and the applications it serves.
+
+Here is a basic example of using the `log` directive in an HAProxy configuration:
+
+```plaintext
+defaults
+    log global
+    mode http
+    option httplog
+    option dontlognull
+
+frontend my_frontend
+    bind :80
+    default_backend my_backend
+
+backend my_backend
+    server server1 192.168.1.10:80 check
+    server server2 192.168.1.11:80 check
+```
+
+In this example:
+
+- `log global`: Specifies that log entries should be sent to the global
+  logging facility.
+- `mode http`: Indicates that the frontend operates in HTTP mode.
+- `option httplog`: Enables detailed HTTP request and response logging.
+- `option dontlognull`: Prevents logging of requests with no response.
+
+The `log` directive can be used in various sections of the configuration
+to control different aspects of logging. Commonly, it is found in the
+`defaults` section or within specific frontend and backend sections.
+
+### Explainging `log` directive
+
+```plaintext
+log /dev/log local1 notice
+```
+
+1. **`log`:** This is the keyword that indicates the beginning of the
+   logging configuration.
+
+2. **`/dev/log`:** This part specifies the destination where the log
+   messages will be sent. In this case, it is set to `/dev/log`, which
+   is a common UNIX system path representing the local syslog daemon.
+   Syslog is a standard logging protocol used by Unix-like systems to
+   collect and process log messages. `/dev/log` is typically a socket
+   file used for local logging.
+
+3. **`local1`:** This is the facility code used in syslog. Syslog
+   facilities are used to categorize messages. `local1` is one of the
+   local facilities (local0 through local7), which can be configured to
+   handle application-specific messages independently.
+
+4. **`notice`:** This is the severity level of the log messages. It
+   specifies the minimum severity level of messages to be logged. In
+   this case, it's set to `notice`, which includes messages of severity
+   notice and higher (e.g., warning, error, critical, alert, emergency).
+
+> **HAProxy log levels**
+>
+> | Log Level | Description                           |
+> |-----------|---------------------------------------|
+> | emerg     | System is unusable (highest severity)  |
+> | alert     | Action must be taken immediately       |
+> | crit      | Critical conditions                    |
+> | err       | Error conditions                       |
+> | warning   | Warning conditions                     |
+> | notice    | Normal but significant condition       |
+> | info      | Informational messages                 |
+> | debug     | Debug-level messages (lowest severity) |
+> 
+> **Usage:** 
+>
+> ```plaintext
+> log /dev/log local1 err
+> ```
+
+
+### Log formating
+
+You can customize the log format using the `log-format` option or by
+specifying a custom log format string. The log format string can include
+various placeholders, representing different pieces of information about
+the request, response, and connection.
+
+Here is an example of a custom log format string:
+
+```plaintext log-format "%ci:%cp [%t] %ft %b/%s %Tw/%Tc/%Tt %B %ts
+%ac/%fc/%bc/%sc/%rc %sq/%bq %hr %hs %{+Q}r"
+```
+
+This log format includes various placeholders such as client IP (`%ci`),
+client port (`%cp`), request time (`%t`), frontend (`%ft`), backend
+(`%b`), and others.
+
+#### Exapmle
 
 ```plaintext
 
-# Define a custom log format named "custom_log"
-log-format custom_log %[date] %[frontend_name] %[backend_name] %[server_name] \
-    %[src] %[dst] %{+Q}r %ST %B %Ts %Tr %Tt %Hs %Hr %Ht %Tq %Tw %Tc %Tr %Tt %Tt
+
+# Define a custom log format named "custom_log" 
+log-format custom_log %[date] %[frontend_name] %[backend_name]
+%[server_name] \ %[src] %[dst] %{+Q}r %ST %B %Ts %Tr %Tt %Hs %Hr %Ht %Tq
+%Tw %Tc %Tr %Tt %Tt
 
 # Use the defined custom log format in a frontend or backend section
 frontend example_frontend
@@ -1701,28 +2147,878 @@ backend example_backend
     log-format custom_log
 ```
 
-Explanation of the log format elements:
+> **Explanation of the log format elements:**
+> 
+> - `%[date]`: Current date in local time.
+> - `%[frontend_name]`: Name of the frontend.
+> - `%[backend_name]`: Name of the backend.
+> - `%[server_name]`: Name of the server.
+> - `%[src]`: Source IP address.
+> - `%[dst]`: Destination IP address.
+> - `%{+Q}r`: Request line (URL) in double-quotes.
+> - `%ST`: HTTP status code.
+> - `%B`: Bytes read from the client.
+> - `%Ts`: Start time of the session.
+> - `%Tr`: Response time.
+> - `%Tt`: Total time.
+> - `%Hs`: Number of requests in session.
+> - `%Hr`: Number of responses in session.
+> - `%Ht`: Total number of requests and responses in session.
+> - `%Tq`: Total time waiting for the client request.
+> - `%Tw`: Total time in queues.
+> - `%Tc`: Total time waiting for the connection to establish to the final server.
+> - `%Tr`: Total time to receive the response from the final server.
+> - `%Tt`: Total time of the session.
+>
+> For more information look [here](http://docs.haproxy.org/2.8/configuration.html#8)
 
-- `%[date]`: Current date in local time.
-- `%[frontend_name]`: Name of the frontend.
-- `%[backend_name]`: Name of the backend.
-- `%[server_name]`: Name of the server.
-- `%[src]`: Source IP address.
-- `%[dst]`: Destination IP address.
-- `%{+Q}r`: Request line (URL) in double-quotes.
-- `%ST`: HTTP status code.
-- `%B`: Bytes read from the client.
-- `%Ts`: Start time of the session.
-- `%Tr`: Response time.
-- `%Tt`: Total time.
-- `%Hs`: Number of requests in session.
-- `%Hr`: Number of responses in session.
-- `%Ht`: Total number of requests and responses in session.
-- `%Tq`: Total time waiting for the client request.
-- `%Tw`: Total time in queues.
-- `%Tc`: Total time waiting for the connection to establish to the final server.
-- `%Tr`: Total time to receive the response from the final server.
-- `%Tt`: Total time of the session.
+### Send HAProxy logs to `rsyslog`
+
+To send HAProxy logs to rsyslog, you need to configure the HAProxy
+logging settings and ensure that rsyslog is properly configured to
+receive and process these logs. Here are the general steps:
+
+#### HAProxy Configuration:
+
+In your HAProxy configuration file, you can use the `log` directive to
+specify the syslog server and the desired facility and log level.
+
+```plaintext
+log <syslog_server> local1 <log_level>
+```
+
+Example:
+
+```plaintext
+log 192.168.1.2 local1 info
+```
+
+This directs HAProxy to send logs to the rsyslog server at IP address
+192.168.1.2 using the `local1` facility with an `info` log level.
+
+#### rsyslog Configuration:
+
+On the rsyslog server, you need to configure rsyslog to receive logs
+from the specified facility and log level and store them in a file or
+process them further.
+
+1. Open the rsyslog configuration file, typically located at
+   `/etc/rsyslog.conf` or `/etc/rsyslog.d/`.
+
+2. Add a new configuration to specify how to handle logs from the
+   `local1` facility at the desired log level.
+
+   Example:
+
+   ```plaintext
+   if $syslogfacility-text == 'local1' and $syslogseverity == 'info' then /var/log/haproxy.log
+   ```
+
+   This example instructs rsyslog to write logs from the `local1`
+   facility with an `info` severity level to the file
+   `/var/log/haproxy.log`. Adjust the path and conditions as needed.
+
+3. Restart rsyslog to apply the changes.
+
+   ```bash
+   sudo systemctl restart rsyslog
+   ```
+
+> **Note:**
+>
+> In syslog, facilities are used to categorize messages and direct them
+> to the appropriate log files or destinations. Here's a list of the
+> standard facilities in syslog:
+> 
+> 1. **`auth` (Security/Authorization):** Messages related to security
+>    and authorization, such as authentication failures.
+> 2. **`authpriv` (Private Security/Authorization):** Private security
+>    and authorization messages.
+> 3. **`cron` (Cron/Time-related):** Messages related to cron jobs and
+>    time-related tasks.
+> 4. **`daemon` (System Daemons):** Messages from system daemons.
+> 5. **`ftp` (FTP Server):** Messages related to the FTP server.
+> 6. **`kern` (Kernel):** Kernel messages.
+> 7. **`lpr` (Line Printer):** Messages related to the line printer
+>    system.
+> 8. **`mail` (Mail System):** Messages related to the mail system.
+> 9. **`news` (USENET News):** Messages related to USENET news.
+> 10. **`syslog` (Syslog Daemon):** Internal syslog messages.
+> 11. **`user` (User-Level Messages):** Generic user-level messages.
+> 12. **`uucp` (UUCP):** Messages related to the UUCP subsystem.
+> 13. **`local0` through `local7` (Local Use):** These facilities are
+>     not predefined and can be used for local customization.
+> 
+> Each facility is associated with a specific numerical code, and
+> applications can choose the appropriate facility based on the type of
+> messages they generate.
+> 
+> In the context of HAProxy, the `log` directive often allows you to
+> specify a facility code (e.g., `local0`, `local1`, etc.) to categorize
+> and route log messages to the appropriate facility. For example:
+> 
+> ```plaintext
+> log /dev/log local3 info
+> ```
+> 
+> This directive specifies that log messages should be sent to the local
+> syslog daemon using the `local3` facility, and only messages with a
+> severity level of `info` and higher will be logged.
+
+## TLS/SSL
+
+### Obtaining a certificate from Let's Encrypt using Certbot
+
+#### Prerequisites:
+
+1. **Domain and DNS Configuration:**
+   - Make sure your domain is correctly set up, and its DNS records
+     point to the server where you plan to install the certificate.
+
+2. **Certbot Installation:**
+   - Ensure Certbot is installed on your Ubuntu server. You can install
+     it using the package manager:
+
+     ```bash
+     sudo apt-get update
+     sudo apt-get install certbot
+     ```
+
+#### Obtaining a Let's Encrypt Certificate:
+
+3. **Run Certbot:**
+   - Use Certbot to request a certificate. The command might look like this:
+
+     ```bash
+     sudo certbot certonly --webroot -w /path/to/your/website/root -d yourdomain.com -d www.yourdomain.com
+     # or
+     sudo certbot certonly --standalone --http-01-port 8080 --rsa-key-size 4096 -d -d yourdomain.com
+     ```
+
+     - Replace `/path/to/your/website/root` with the actual path to your
+       website's root directory.
+     - Replace `yourdomain.com` and `www.yourdomain.com` with your
+       actual domain names.
+
+4. **Follow the Instructions:**
+   - Certbot will prompt you to agree to the terms of service and ask
+     for your email address for renewal notifications. Follow the
+     on-screen instructions.
+
+5. **Automatic Renewal (Optional but Recommended):**
+   - Certificates obtained from Let's Encrypt are typically valid for 90
+     days. To automate the renewal process, you can set up a cron job to
+     periodically run Certbot. Certbot usually takes care of renewal
+     automatically, but it's a good idea to add a cron job to ensure it
+     happens without manual intervention.
+
+     ```bash
+     sudo crontab -e
+     ```
+
+     Add the following line to run Certbot twice a day:
+
+     ```bash
+     0 */12 * * * certbot renew
+     ```
+
+     Save and exit.
+
+#### Configuring Your Web Server:
+
+6. **Configure Your Web Server to Use the Certificate:**
+   - Once you have the certificate, update your web server configuration
+     to use the newly obtained certificates. The paths to the
+     certificates will be in the `/etc/letsencrypt/live/yourdomain.com/`
+     directory.
+
+   - For example, in an Apache server, you might modify the virtual host
+     configuration:
+
+     ```apache
+     SSLCertificateFile /etc/letsencrypt/live/yourdomain.com/fullchain.pem
+     SSLCertificateKeyFile /etc/letsencrypt/live/yourdomain.com/privkey.pem
+     ```
+
+   - For Nginx, you might modify the server block:
+
+     ```nginx
+     ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+     ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+     ```
+
+7. **Restart Your Web Server:**
+   - After making changes to your web server configuration, restart the server to apply the changes.
+
+     ```bash
+     sudo service apache2 restart   # For Apache
+     sudo service nginx restart    # For Nginx
+     ```
+
+### SSL Types
+
+#### 1. **SSL Termination:**
+
+   - In SSL termination, SSL/TLS encryption is terminated at a network
+     device, typically a load balancer, reverse proxy, or an application
+     delivery controller (ADC). The termination point is responsible for
+     decrypting the incoming SSL/TLS traffic and forwarding the
+     decrypted traffic to the backend servers in plain HTTP. This allows
+     the backend servers to handle the requests without the overhead of
+     SSL/TLS encryption.
+   - SSL termination is commonly used to offload the resource-intensive
+     process of SSL/TLS decryption from backend servers to specialized
+     devices, improving overall performance and simplifying certificate
+     management.
+   
+   > SSL termination in HAProxy involves terminating the SSL/TLS connection
+   > at the load balancer and forwarding the decrypted traffic to the
+   > backend servers. Below is a basic example of an HAProxy configuration
+   > for SSL termination:
+   > 
+   > ```plaintext
+   > frontend my_frontend
+   >     bind *:443 ssl crt /path/to/combined.pem
+   >     mode http
+   >     option httplog
+   >     default_backend my_backend
+   > 
+   > backend my_backend
+   >     mode http
+   >     server backend_server1 192.168.1.10:80 check
+   >     server backend_server2 192.168.1.11:80 check
+   > ```
+   > 
+   > Explanation:
+   > 
+   > - `bind *:443 ssl crt /path/to/combined.pem`: Binds the frontend to
+   >   port 443 with SSL enabled and specifies the path to the combined PEM
+   >   file containing certificates. Ensure that this file includes the
+   >   private key, server certificate, and any necessary intermediate or
+   >   chain certificates.
+   > - `mode http`: Indicates that the frontend and backend operate in HTTP
+   >   mode.
+   > - `option httplog`: Enables detailed HTTP request and response
+   >   logging.
+   > - `default_backend my_backend`: Directs traffic to the specified
+   >   backend if it doesn't match any other frontend rules.
+   > - `backend my_backend`: Represents the backend server pool.
+   >   - `mode http`: Indicates that the backend operates in HTTP mode.
+   >   - `server backend_server1 192.168.1.10:80 check`: Defines a backend
+   >     server with its IP address and port. Adjust the details based on
+   >     your actual backend servers.
+   > 
+   > After updating your HAProxy configuration, restart HAProxy to apply the changes:
+   > 
+   > ```bash
+   > sudo systemctl restart haproxy
+   > ```
+   > 
+   > Remember to replace `/path/to/combined.pem` with the actual path to
+   > your combined PEM file.
+   > 
+   > This example assumes that you are terminating SSL at the load balancer
+   > and forwarding traffic to backend servers over HTTP.
+   
+#### 2. **SSL Passthrough:**
+
+   - In SSL passthrough (or SSL offload), SSL/TLS encryption is
+     maintained end-to-end, and the SSL/TLS traffic is passed through
+     the load balancer or proxy without decryption. The SSL/TLS
+     termination occurs at the backend servers. This approach is
+     suitable when the load balancer or proxy is not responsible for
+     handling SSL/TLS encryption but needs to distribute the encrypted
+     traffic to different backend servers.
+   - SSL passthrough is beneficial when end-to-end encryption is a
+     strict requirement, and the load balancer or proxy is primarily
+     responsible for routing traffic based on IP addresses or other
+     non-HTTP parameters.
+
+   > SSL passthrough in HAProxy involves passing the SSL/TLS traffic
+   > directly to the backend servers without terminating the SSL/TLS
+   > connection at the load balancer. Here's a basic example of an
+   > HAProxy configuration for SSL passthrough:
+   > 
+   > ```plaintext
+   > frontend my_frontend
+   >     bind *:443
+   >     mode tcp
+   >     option tcplog
+   >     tcp-request inspect-delay 5s
+   >     tcp-request content accept if { req_ssl_hello_type 1 }
+   > 
+   >     use_backend my_backend
+   > 
+   > backend my_backend
+   >     mode tcp
+   >     server backend_server1 192.168.1.10:443 check
+   >     server backend_server2 192.168.1.11:443 check
+   > ```
+   > 
+   > Explanation:
+   > 
+   > - `bind *:443`: Binds the frontend to port 443 without specifying
+   >   SSL or certificates.
+   > - `mode tcp`: Indicates that the frontend and backend operate in
+   >   TCP mode.
+   > - `option tcplog`: Enables detailed TCP-level logging.
+   > - `tcp-request inspect-delay 5s`: Delays inspection of the TCP
+   >   payload for 5 seconds to allow enough time to inspect the SSL
+   >   handshake.
+   > - `tcp-request content accept if { req_ssl_hello_type 1 }`: Accepts
+   >   the connection only if the first message in the TCP payload is an
+   >   SSL ClientHello message, indicating an SSL handshake.
+   > - `use_backend my_backend`: Directs the traffic to the specified
+   >   backend.
+   > - `backend my_backend`: Represents the backend server pool.
+   >   - `mode tcp`: Indicates that the backend operates in TCP mode.
+   >   - `server backend_server1 192.168.1.10:443 check`: Defines a
+   >     backend server with its IP address and port. Adjust the details
+   >     based on your actual backend servers.
+   > 
+   > After updating your HAProxy configuration, restart HAProxy to apply
+   > the changes:
+   > 
+   > ```bash
+   > sudo systemctl restart haproxy
+   > ```
+   > 
+   > With this configuration, HAProxy is configured to perform SSL
+   > passthrough, meaning it forwards SSL/TLS traffic directly to the
+   > backend servers without decrypting it. Ensure that your backend
+   > servers are configured to handle SSL/TLS traffic appropriately. The
+   > servers in the backend pool should be set up to handle SSL/TLS
+   > termination themselves, as HAProxy does not perform SSL termination
+   > in this configuration.
+   
+#### 3. **SSL Re-encryption (or SSL Re-termination):**
+
+   - SSL re-encryption is a hybrid approach that combines elements of
+     SSL termination and SSL passthrough. In this scenario, SSL/TLS
+     traffic is initially terminated at the load balancer or proxy,
+     decrypted, and then re-encrypted before being sent to the backend
+     servers. The backend servers handle the re-encrypted traffic.
+   - SSL re-encryption provides a balance between offloading the SSL/TLS
+     decryption process and maintaining end-to-end encryption for
+     traffic between the load balancer and backend servers. It allows
+     the load balancer to inspect and potentially modify the decrypted
+     traffic before re-encrypting it for secure transmission to the
+     backend.
+
+   > If you want to perform SSL/TLS re-encryption in HAProxy, meaning
+   > that HAProxy terminates the incoming SSL/TLS connection, inspects
+   > the traffic, and then re-encrypts it before forwarding it to the
+   > backend servers, you can use a configuration similar to the SSL
+   > termination example, but with an additional `server` line in the
+   > backend section. Here's an example:
+   > 
+   > ```plaintext
+   > frontend my_frontend
+   >     bind *:443 ssl crt /path/to/combined.pem
+   >     mode http
+   >     option httplog
+   >     default_backend my_backend
+   > 
+   > backend my_backend
+   >     mode http
+   >     server backend_server1 192.168.1.10:443 ssl verify none check
+   >     server backend_server2 192.168.1.11:443 ssl verify none check
+   > ```
+   > 
+   > Explanation:
+   > - `bind *:443 ssl crt /path/to/combined.pem`: Binds the frontend to
+   >   port 443 with SSL enabled and specifies the path to the combined
+   >   PEM file containing certificates.
+   > - `mode http`: Indicates that the frontend and backend operate in
+   >   HTTP mode.
+   > - `option httplog`: Enables detailed HTTP request and response
+   >   logging.
+   > - `default_backend my_backend`: Directs traffic to the specified
+   >   backend.
+   > - `backend my_backend`: Represents the backend server pool.
+   >   - `mode http`: Indicates that the backend operates in HTTP mode.
+   >   - `server backend_server1 192.168.1.10:443 ssl verify none
+   >     check`: Defines a backend server with its IP address and port.
+   >     The `ssl verify none` option is used to disable SSL certificate
+   >     verification. Adjust the details based on your actual backend
+   >     servers.
+   >   - `server backend_server2 192.168.1.11:443 ssl verify none
+   >     check`: Another backend server definition. Adjust the details
+   >     based on your actual backend servers.
+   > 
+   > After updating your HAProxy configuration, restart HAProxy to apply
+   > the changes:
+   > 
+   > ```bash
+   > sudo systemctl restart haproxy
+   > ```
+   > 
+   > This configuration will perform SSL termination at HAProxy and then
+   > re-encrypt the traffic before forwarding it to the backend servers.
+   > The backend servers should be configured to handle plain HTTP
+   > traffic (not SSL/TLS). Adjust the configuration based on your
+   > specific requirements and backend server configurations.
+
+In summary:
+
+- **SSL Termination:** Decrypts SSL/TLS traffic at the load balancer,
+  forwarding plain HTTP to backend servers.
+- **SSL Passthrough:** Maintains end-to-end encryption, passing through
+  encrypted SSL/TLS traffic to backend servers.
+- **SSL Re-encryption:** Decrypts SSL/TLS traffic at the load balancer,
+  performs any necessary operations, and then re-encrypts the traffic
+  before sending it to backend servers.
+
+#### Pros and Cons
+
+| Aspect                    | SSL Termination                    | SSL Passthrough                   | SSL Re-encryption                  |
+|---------------------------|------------------------------------|------------------------------------|------------------------------------|
+| **Pros**                  |                                   |                                    |                                    |
+| Simplified Backend         | ✓ Offloads SSL/TLS processing from backend servers, reducing their resource requirements. | ✓ Maintains end-to-end encryption without decrypting traffic at the load balancer. | ✓ Balances between offloading SSL/TLS processing and maintaining end-to-end encryption. |
+| Performance Improvement    | ✓ Improves overall performance as backend servers handle plain HTTP traffic. | ✗ Performance overhead on the load balancer due to handling encrypted traffic. | ✓ Offloads SSL/TLS processing from backend servers, improving their performance. |
+| Certificate Management     | ✓ Centralized management of SSL/TLS certificates at the load balancer. | ✓ SSL/TLS certificates managed directly on backend servers. | ✓ Centralized certificate management at the load balancer. |
+| Inspection and Modification | ✓ Allows load balancer to inspect and modify plain HTTP traffic before forwarding to backend servers. | ✗ Limited ability to inspect or modify encrypted traffic; mainly forwards it. | ✓ Allows load balancer to inspect and modify decrypted traffic before re-encrypting. |
+| **Cons**                  |                                   |                                    |                                    |
+| End-to-End Encryption      | ✗ Breaks end-to-end encryption as SSL/TLS traffic is decrypted at the load balancer. | ✓ Maintains end-to-end encryption, but load balancer has limited visibility into traffic content. | ✗ Breaks end-to-end encryption, as SSL/TLS traffic is decrypted and re-encrypted. |
+| Complexity                | ✗ Introduces complexity at the load balancer, which needs to handle SSL/TLS decryption. | ✓ Simplifies load balancer, but backend servers must handle SSL/TLS encryption. | ✓ Balances complexity between load balancer and backend servers. |
+| Backend Server Visibility | ✓ Load balancer can see plain HTTP requests and responses. | ✗ Limited visibility into encrypted traffic at the load balancer. | ✓ Load balancer can see decrypted traffic before re-encryption. |
+| Security Implications     | ✓ May expose plaintext traffic within the internal network. | ✓ Maintains higher security by not decrypting traffic at the load balancer. | ✓ Decrypts and re-encrypts traffic, potentially exposing plaintext within the internal network. |
+
+
+### Use certificate in HAProxy
+
+To add certificates to HAProxy, you typically use the `bind` or `ssl`
+configuration directives within the `frontend` or `listen` section of
+your HAProxy configuration.
+
+#### Example for TCP Mode (non-SSL):
+
+If you are using TCP mode and want to configure a simple TCP frontend,
+you can use the `bind` directive to specify the IP address and port and
+include the concatenated PEM file for certificates:
+
+```plaintext
+frontend my_frontend
+    bind 0.0.0.0:443 ssl crt /path/to/combined.pem
+    mode tcp
+    default_backend my_backend
+
+backend my_backend
+    server backend_server 127.0.0.1:8080
+```
+
+In this example:
+
+- `bind 0.0.0.0:443 ssl crt /path/to/combined.pem`: Binds the frontend
+  to port 443 with SSL enabled, and specifies the path to the combined
+  PEM file containing certificates.
+
+#### Example for HTTP Mode (SSL/TLS Termination):
+
+If you are using HTTP mode and want to configure SSL/TLS termination,
+you can use the `bind` directive with the `ssl` option:
+
+```plaintext
+frontend my_frontend
+    bind 0.0.0.0:443 ssl crt /path/to/combined.pem
+    mode http
+    option httplog
+    default_backend my_backend
+
+backend my_backend
+    server backend_server 127.0.0.1:8080
+```
+
+In this example:
+
+- `bind 0.0.0.0:443 ssl crt /path/to/combined.pem`: Binds the frontend
+  to port 443 with SSL enabled, and specifies the path to the combined
+  PEM file containing certificates.
+- `mode http`: Indicates that the frontend operates in HTTP mode.
+
+#### Important Note:
+
+Make sure that the combined PEM file (`/path/to/combined.pem` in the
+examples) includes the private key, server certificate, and any
+necessary intermediate or chain certificates in the correct order. The
+order should typically be: private key, server certificate, intermediate
+certificates.
+
+> * If you have self-sign certificate files like, `cert.pem` and
+> `cert-key.pem`, first you have to concat them then use it in HAProxy.
+>
+>     ```bash
+>     cat cert-key.pem cert.prm > new-cert.pem
+>     ```
+>
+> * If you have `letsencrypt` certificate fiels, concate `fullchain.pem`
+>   and privkey.pem
+>   ```bash
+>   cat fullchain.pem privkey.pem > net-cert.pem
+>   ```
+
+Additionally, if you have separate key and certificate files, you can
+specify them separately using the `bind` directive:
+
+```plaintext
+bind 0.0.0.0:443 ssl key /path/to/private-key.pem crt /path/to/server-certificate.pem
+```
+
+Adjust the configuration based on your specific requirements and the
+structure of your certificates. Always back up your HAProxy
+configuration before making changes, and restart HAProxy to apply the
+changes:
+
+```bash
+sudo systemctl restart haproxy
+```
+
+Ensure that the permissions on the certificate files are set correctly
+to maintain security.
+
+
+### `http` to `https` force redirection
+
+To force redirect HTTP traffic to HTTPS in HAProxy, you can use the
+`redirect` directive in the `frontend` section of your configuration.
+
+```plaintext
+frontend http_frontend
+    bind *:80
+    mode http
+    redirect scheme https code 301 if !{ ssl_fc }
+
+frontend https_frontend
+    bind *:443 ssl crt /path/to/combined.pem
+    mode http
+    option httplog
+    default_backend my_backend
+
+backend my_backend
+    server backend_server 127.0.0.1:8080
+```
+
+Explanation:
+
+- `http_frontend`: Listens on port 80 for HTTP traffic.
+  - `redirect scheme https code 301 if !{ ssl_fc }`: Redirects requests
+    to the HTTPS scheme (https://) with a 301 status code if the
+    connection is not already using SSL/TLS (`!{ ssl_fc }`).
+
+- `https_frontend`: Listens on port 443 for HTTPS traffic.
+  - `ssl crt /path/to/combined.pem`: Specifies the path to the combined
+    PEM file containing certificates.
+
+- `backend my_backend`: Represents the backend server pool.
+
+
+This configuration ensures that all HTTP traffic is redirected to HTTPS,
+providing a secure connection for clients. The `redirect` directive, in
+combination with the condition `!{ ssl_fc }`, ensures that only
+non-SSL/TLS traffic is redirected. The `301` status code indicates a
+permanent redirect.
+
+### `letsencrypt` acme challenge on HAProxy host
+
+#### HAProxy configuration
+
+If you want to redirect traffic for Let's Encrypt ACME challenges
+(typically requested at the `/.well-known/acme-challenge/` path) to a
+specific backend server or port (e.g., port 8080), you can use an
+HAProxy rule in the `frontend` section of your configuration. Here's an
+example:
+
+```plaintext
+frontend my_frontend
+    bind *:80
+    mode http
+
+    acl is_acme_challenge path_beg -i /.well-known/acme-challenge/
+
+    use_backend acme_challenge_backend if is_acme_challenge
+    default_backend my_backend
+
+backend acme_challenge_backend
+    mode http
+    server acme_server 127.0.0.1:8080
+
+backend my_backend
+    mode http
+    server backend_server 127.0.0.1:8081  # Adjust the backend server and port as needed
+```
+
+Explanation:
+
+- `acl is_acme_challenge path_beg -i /.well-known/acme-challenge/`:
+  Defines an ACL (Access Control List) named `is_acme_challenge` that
+  checks if the requested path begins with
+  `/.well-known/acme-challenge/`. The `-i` flag makes the match
+  case-insensitive.
+
+- `use_backend acme_challenge_backend if is_acme_challenge`: Redirects
+  traffic to the `acme_challenge_backend` if the request matches the
+  ACME challenge path.
+
+- `backend acme_challenge_backend`: Specifies the backend to which ACME
+  challenge requests will be redirected.
+  - `server acme_server 127.0.0.1:8080`: Defines the server for the ACME
+    challenge backend, pointing to `127.0.0.1:8080`.
+
+- `default_backend my_backend`: For all other requests, use the default
+  backend (`my_backend` in this example).
+
+Make sure to adjust the backend server (`acme_server` and
+`backend_server`) and port numbers based on your actual setup.
+
+After making changes, restart HAProxy to apply the new configuration:
+
+```bash
+sudo systemctl restart haproxy
+```
+
+#### Certbot command
+
+To use Certbot for the ACME challenge on port 8080, you can specify the
+`--preferred-challenges` option along with the `http-01` challenge type,
+and additionally, you can use the `--http-01-port` option to set the
+port to 8080. Here's an example:
+
+```bash
+sudo certbot certonly \
+  --standalone \
+  --preferred-challenges http-01 \
+  --http-01-port 8080 \
+  -d example.com
+```
+
+Explanation:
+
+- `--standalone`: Uses the standalone authenticator. This is suitable
+  when Certbot needs to temporarily stand alone and bind to the ports to
+  respond to the ACME challenge.
+- `--preferred-challenges http-01`: Specifies that the HTTP-01 challenge
+  type is preferred.
+- `--http-01-port 8080`: Sets the port to 8080 for the HTTP-01
+  challenge. This aligns with your request to use port 8080.
+- `-d example.com`: Specifies the domain for which you want to obtain
+  the SSL certificate. Replace "example.com" with your actual domain.
+
+This command assumes that port 8080 is available on your server, and
+Certbot can bind to it temporarily during the challenge process.
+
+Note: Ensure that the specified domain (`example.com` in this case) is
+correctly configured in your HAProxy setup, and the ACME challenge
+requests on port 8080 are correctly directed to the appropriate backend
+server (as configured in HAProxy).
+
+- [Certbot Documentation](https://certbot.eff.org/docs/)
+
+### HAProxy SSL/TLS Security
+
+Ignoring old SSL/TLS versions, such as SSLv3 and TLS 1.0, is generally
+recommended for security reasons. These older versions have known
+vulnerabilities and weaknesses that could be exploited by attackers,
+putting the confidentiality and integrity of your communication at risk.
+Here are some reasons why it is advisable to disable old SSL/TLS
+versions:
+
+1. **Security Vulnerabilities:**
+   - **SSLv3 (SSL 3.0):** SSLv3 has known vulnerabilities, including the
+     POODLE attack, which allows an attacker to decrypt the contents of
+     secure connections.
+   - **TLS 1.0:** TLS 1.0 is also susceptible to various attacks, such
+     as BEAST (Browser Exploit Against SSL/TLS) and POODLE.
+
+2. **Compliance Requirements:**
+   - Many security standards and compliance frameworks, such as PCI DSS
+     (Payment Card Industry Data Security Standard), require the
+     deprecation of older SSL/TLS versions due to security concerns.
+
+3. **Enhanced Security Features:**
+   - Newer versions of TLS (TLS 1.2 and TLS 1.3) include improved
+     security features and cryptographic algorithms. Enabling only the
+     latest versions ensures that your systems benefit from these
+     advancements.
+
+4. **Client and Server Compatibility:**
+   - While it's crucial to disable insecure versions, it's equally
+     important to consider the compatibility of your clients and
+     servers. Ensure that your systems support the TLS versions you
+     enable, and communicate any changes to users or clients.
+
+5. **Industry Best Practices:**
+   - Following industry best practices and recommendations from security
+     experts and organizations, such as the Internet Engineering Task
+     Force (IETF), helps ensure a more secure and robust communication
+     environment.
+
+When configuring HAProxy or any other SSL/TLS termination point, it's
+common to disable SSLv3 and TLS 1.0 and enable only the more secure TLS
+versions (TLS 1.1, TLS 1.2, and TLS 1.3). This can be achieved using
+configuration options such as `no-sslv3`, `no-tlsv10`, and
+`ssl-default-bind-options` in HAProxy.
+
+#### Set SSL/TSL restriction
+
+In HAProxy, you can control the allowed SSL/TLS versions using the
+`ssl-default-bind-ciphers` and `ssl-default-bind-options` directives in
+the `frontend` or `listen` section of your configuration. To restrict
+the SSL/TLS versions to versions later than 1.2, you can use the
+`no-sslv3` and `no-tlsv10` options.
+
+Here's an example of how you can enforce TLS versions 1.2 and above in
+HAProxy:
+
+```plaintext
+frontend my_frontend
+    bind *:443 ssl crt /path/to/combined.pem
+    mode http
+    option httplog
+    ssl-default-bind-ciphers <your-cipher-list>
+    ssl-default-bind-options no-sslv3 no-tlsv10
+    default_backend my_backend
+```
+
+Replace `<your-cipher-list>` with the appropriate cipher suite(s) you
+want to use. Additionally, you can adjust the ciphers according to your
+security requirements.
+
+The `no-sslv3` and `no-tlsv10` options explicitly disable SSL version
+3.0 and TLS version 1.0, respectively. This ensures that only TLS 1.1,
+TLS 1.2, TLS 1.3, or later versions are allowed.
+
+Always make sure that your backend servers support the TLS versions you
+configure in HAProxy. If the backend servers do not support TLS 1.2 or
+later, you may encounter connectivity issues.
+
+After making changes to your HAProxy configuration, remember to restart
+or reload HAProxy for the changes to take effect:
+
+```bash
+sudo systemctl restart haproxy
+```
+
+#### Set cypher
+
+In HAProxy, you can specify the cipher suites that should be used for
+SSL/TLS communication using the `ssl-default-bind-ciphers` directive in
+the `frontend` or `listen` section of your configuration. The
+`ssl-default-bind-ciphers` directive allows you to define the allowed
+cipher suites or their order of preference.
+
+Here's an example of how you can configure cipher suites in HAProxy:
+
+```plaintext
+frontend my_frontend
+    bind *:443 ssl crt /path/to/combined.pem
+    mode http
+    option httplog
+    ssl-default-bind-ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256
+    default_backend my_backend
+```
+
+In this example:
+
+- `bind *:443 ssl crt /path/to/combined.pem`: Binds the frontend to port
+  443 with SSL enabled and specifies the path to the combined PEM file
+  containing certificates.
+- `mode http`: Indicates that the frontend operates in HTTP mode.
+- `option httplog`: Enables detailed HTTP request and response logging.
+- `ssl-default-bind-ciphers`: Specifies the allowed cipher suites for
+  SSL/TLS connections. You can customize the cipher suites based on your
+  security and compatibility requirements.
+
+In the `ssl-default-bind-ciphers` directive, you can specify one or more
+cipher suites separated by colons. The example above includes three
+common cipher suites, but you can customize the list according to your
+needs.
+
+It's important to strike a balance between security and compatibility
+when configuring cipher suites. Ensure that the chosen cipher suites are
+supported by both the clients and servers in your environment.
+
+After making changes to your HAProxy configuration, restart or reload
+HAProxy for the changes to take effect:
+
+```bash
+sudo systemctl restart haproxy
+```
+
+## URL rewriting
+
+In HAProxy, URL rewriting can be achieved using the `http-request`
+directive, which allows you to modify the HTTP request headers based on
+various conditions. URL rewriting is useful for changing, adding, or
+removing parts of the URL before forwarding the request to the backend
+server. Here are some examples of URL rewriting using `http-request`:
+
+1. **Change the Path of the URL:**
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Replace "/old-path/" with "/new-path/" in the URL
+       http-request set-path /new-path%[path,regsub(^/old-path/,)]
+       
+       default_backend my_backend
+   ```
+
+   In this example, the `set-path` action is used to replace
+   "/old-path/" with "/new-path/" in the URL.
+
+2. **Add a Query Parameter:**
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Add "?parameter=value" to the end of the URL
+       http-request set-query %[query,regsub(,^$,?parameter=value,)]
+       
+       default_backend my_backend
+   ```
+
+   This example uses `set-query` to add "?parameter=value" to the end of
+   the URL if there's no existing query string.
+
+3. **Remove Query Parameters:**
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Remove the "unwanted_parameter" from the query string
+       http-request set-query %[query,regsub(&unwanted_parameter=[^&]*,)]
+       
+       default_backend my_backend
+   ```
+
+   Here, `set-query` is used with `regsub` to remove the "unwanted_parameter" from the query string.
+
+4. **Conditional Rewriting:**
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # If the URL starts with "/prefix/", replace it with "/new-prefix/"
+       acl is_prefixed path_beg /prefix/
+       http-request set-path /new-prefix%[path,regsub(^/prefix/,)] if is_prefixed
+       
+       default_backend my_backend
+   ```
+
+   This example uses an ACL (`is_prefixed`) to conditionally replace "/prefix/" with "/new-prefix/" in the URL.
+
 
 
 ## Tips
@@ -1760,4 +3056,12 @@ haproxy -c -f /etc/haproxy/haproxy.cfg
 
    use_backend mybackend  if is-west
    ```
+* To explor haproxy logs you can use `halog` which is already exist
+  beside the `haproxy` package you've installed.
+
+  ```bash
+  halog --help
+  halog -srv < /var/log/haproxy.log
+  ```
+
 
