@@ -6,7 +6,7 @@ Table of Contents
    * [Forward proxy](#forward-proxy)
    * [Reverse proxy](#reverse-proxy)
    * [Receiving proxy vs Loadbalancer](#receiving-proxy-vs-loadbalancer)
-      * [Reverse proxy:](#reverse-proxy-1)
+      * [Reverse proxy](#reverse-proxy-1)
       * [Loadbalancer](#loadbalancer)
    * [Layer 4 Loadbalancer](#layer-4-loadbalancer)
    * [Layer 7 Loadbalancer](#layer-7-loadbalancer)
@@ -14,66 +14,66 @@ Table of Contents
    * [HAProxy features](#haproxy-features)
    * [Things HAProxy is not](#things-haproxy-is-not)
    * [Install HAProxy](#install-haproxy)
-      * [1. <strong>Linux (Debian/Ubuntu):</strong>](#1-linux-debianubuntu)
-      * [2. <strong>Linux (Red Hat/CentOS):</strong>](#2-linux-red-hatcentos)
-      * [3. <strong>Compile from Source:</strong>](#3-compile-from-source)
-      * [4. <strong>Docker:</strong>](#4-docker)
-      * [5. <strong>Configuration:</strong>](#5-configuration)
+      * [1. <strong>Linux (Debian/Ubuntu)</strong>](#1-linux-debianubuntu)
+      * [2. <strong>Linux (Red Hat/CentOS)</strong>](#2-linux-red-hatcentos)
+      * [3. <strong>Compile from Source</strong>](#3-compile-from-source)
+      * [4. <strong>Docker</strong>](#4-docker)
+      * [5. <strong>Configuration</strong>](#5-configuration)
    * [HAProxy configuration](#haproxy-configuration)
    * [HAProxy modes](#haproxy-modes)
    * [HAProxy Error responses](#haproxy-error-responses)
-      * [Basic Syntax:](#basic-syntax)
-      * [Example:](#example)
-      * [Additional Notes:](#additional-notes)
-      * [Example Configuration Snippet:](#example-configuration-snippet)
+      * [Basic Syntax](#basic-syntax)
+      * [Example](#example)
+      * [Additional Notes](#additional-notes)
+      * [Example Configuration Snippet](#example-configuration-snippet)
    * [HAProxy timeouts](#haproxy-timeouts)
    * [HAProxy Access Control List (ACL) and fetching samples <a href="http://docs.haproxy.org/2.8/configuration.html#7" rel="nofollow">[Official Documentation]</a>](#haproxy-access-control-list-acl-and-fetching-samples-official-documentation)
-      * [Basic ACL Syntax:](#basic-acl-syntax)
-      * [Example:](#example-1)
-      * [Using ACLs in Configuration:](#using-acls-in-configuration)
-      * [Types of ACL Conditions:](#types-of-acl-conditions)
-      * [Combining ACLs:](#combining-acls)
+      * [Basic ACL Syntax](#basic-acl-syntax)
+      * [Example](#example-1)
+      * [Using ACLs in Configuration](#using-acls-in-configuration)
+      * [Types of ACL Conditions](#types-of-acl-conditions)
+      * [Combining ACLs](#combining-acls)
       * [HAProxy Matching Methods](#haproxy-matching-methods)
-      * [Path-related criteria in HAProxy ACLs:](#path-related-criteria-in-haproxy-acls)
-      * [Fetching Samples:](#fetching-samples)
-      * [Combined Example:](#combined-example)
+      * [Path-related criteria in HAProxy ACLs](#path-related-criteria-in-haproxy-acls)
+      * [Fetching Samples](#fetching-samples)
+      * [Combined Example](#combined-example)
    * [Directives in HAProxy](#directives-in-haproxy)
-      * [Example Configuration Snippet:](#example-configuration-snippet-1)
+      * [Example Configuration Snippet](#example-configuration-snippet-1)
    * [HAProxy stickiness](#haproxy-stickiness)
-      * [Basic Stickiness Configuration:](#basic-stickiness-configuration)
-      * [Additional Stickiness Options:](#additional-stickiness-options)
-      * [Example with Cookie Stickiness:](#example-with-cookie-stickiness)
+      * [Basic Stickiness Configuration](#basic-stickiness-configuration)
+      * [Additional Stickiness Options](#additional-stickiness-options)
+      * [Example with Cookie Stickiness](#example-with-cookie-stickiness)
    * [Health checks in HAProxy](#health-checks-in-haproxy)
-      * [1. <strong>Backend Server Health Checks:</strong>](#1-backend-server-health-checks)
-      * [2. <strong>option httpchk Directive:</strong>](#2-option-httpchk-directive)
-      * [3. <strong>option tcp-check Directive:</strong>](#3-option-tcp-check-directive)
-      * [4. <strong>http-check expect Directive:</strong>](#4-http-check-expect-directive)
-      * [5. <strong>server ... check Directive:</strong>](#5-server--check-directive)
-      * [6. <strong>Health Check Intervals:</strong>](#6-health-check-intervals)
-      * [7. <strong>rise and fall Parameters:</strong>](#7-rise-and-fall-parameters)
-      * [8. <strong>Custom Health Check Scripts:</strong>](#8-custom-health-check-scripts)
+      * [1. <strong>Backend Server Health Checks</strong>](#1-backend-server-health-checks)
+      * [2. <strong>option httpchk Directive</strong>](#2-option-httpchk-directive)
+      * [3. <strong>option tcp-check Directive</strong>](#3-option-tcp-check-directive)
+      * [4. <strong>http-check expect Directive</strong>](#4-http-check-expect-directive)
+      * [5. <strong>server ... check Directive</strong>](#5-server--check-directive)
+      * [6. <strong>Health Check Intervals</strong>](#6-health-check-intervals)
+      * [7. <strong>rise and fall Parameters</strong>](#7-rise-and-fall-parameters)
+      * [8. <strong>Custom Health Check Scripts</strong>](#8-custom-health-check-scripts)
    * [HAProxy Load Balancing Algorithms](#haproxy-load-balancing-algorithms)
-      * [Basic Usage:](#basic-usage)
-      * [Use Cases:](#use-cases)
-      * [Without whole Keyword:](#without-whole-keyword)
+      * [Basic Usage](#basic-usage)
+      * [Use Cases](#use-cases)
+      * [Without whole Keyword](#without-whole-keyword)
    * [HAProxy disabled otption](#haproxy-disabled-otption)
-      * [Common Use Cases:](#common-use-cases)
-      * [Enabling a Disabled Server:](#enabling-a-disabled-server)
+      * [Common Use Cases](#common-use-cases)
+      * [Enabling a Disabled Server](#enabling-a-disabled-server)
    * [Redirections](#redirections)
-      * [1. HTTP Redirection using http-request redirect:](#1-http-redirection-using-http-request-redirect)
-      * [2. SSL/TLS Redirection:](#2-ssltls-redirection)
-      * [3. Path-Based Redirection:](#3-path-based-redirection)
-      * [4. Custom Redirection Logic:](#4-custom-redirection-logic)
-      * [5. Using errorfile for Redirection:](#5-using-errorfile-for-redirection)
-      * [6. Dynamically Computed Redirects:](#6-dynamically-computed-redirects)
+      * [1. HTTP Redirection using http-request redirect](#1-http-redirection-using-http-request-redirect)
+      * [2. SSL/TLS Redirection](#2-ssltls-redirection)
+      * [3. Path-Based Redirection](#3-path-based-redirection)
+      * [4. Custom Redirection Logic](#4-custom-redirection-logic)
+      * [5. Using errorfile for Redirection](#5-using-errorfile-for-redirection)
+      * [6. Dynamically Computed Redirects](#6-dynamically-computed-redirects)
    * [http-request](#http-request)
    * [set-header](#set-header)
-      * [Syntax:](#syntax)
-      * [Examples:](#examples)
-         * [1. Basic Header Modification:](#1-basic-header-modification)
-         * [2. Conditional Header Modification:](#2-conditional-header-modification)
-         * [3. Using Variables:](#3-using-variables)
-         * [4. Combining Conditions:](#4-combining-conditions)
+      * [Syntax](#syntax)
+      * [Examples](#examples)
+         * [1. Basic Header Modification](#1-basic-header-modification)
+         * [2. Conditional Header Modification](#2-conditional-header-modification)
+         * [3. Using Variables](#3-using-variables)
+         * [4. Combining Conditions](#4-combining-conditions)
    * [Backup backend](#backup-backend)
    * [cookies](#cookies)
    * [Stick table](#stick-table)
@@ -84,22 +84,22 @@ Table of Contents
       * [Log formating](#log-formating)
          * [Exapmle](#exapmle)
       * [Send HAProxy logs to rsyslog](#send-haproxy-logs-to-rsyslog)
-         * [HAProxy Configuration:](#haproxy-configuration-1)
-         * [rsyslog Configuration:](#rsyslog-configuration)
+         * [HAProxy Configuration](#haproxy-configuration-1)
+         * [rsyslog Configuration](#rsyslog-configuration)
    * [TLS/SSL](#tlsssl)
       * [Obtaining a certificate from Let's Encrypt using Certbot](#obtaining-a-certificate-from-lets-encrypt-using-certbot)
-         * [Prerequisites:](#prerequisites)
-         * [Obtaining a Let's Encrypt Certificate:](#obtaining-a-lets-encrypt-certificate)
-         * [Configuring Your Web Server:](#configuring-your-web-server)
+         * [Prerequisites](#prerequisites)
+         * [Obtaining a Let's Encrypt Certificate](#obtaining-a-lets-encrypt-certificate)
+         * [Configuring Your Web Server](#configuring-your-web-server)
       * [SSL Types](#ssl-types)
-         * [1. <strong>SSL Termination:</strong>](#1-ssl-termination)
-         * [2. <strong>SSL Passthrough:</strong>](#2-ssl-passthrough)
-         * [3. <strong>SSL Re-encryption (or SSL Re-termination):</strong>](#3-ssl-re-encryption-or-ssl-re-termination)
+         * [1. <strong>SSL Termination</strong>](#1-ssl-termination)
+         * [2. <strong>SSL Passthrough</strong>](#2-ssl-passthrough)
+         * [3. <strong>SSL Re-encryption (or SSL Re-termination)</strong>](#3-ssl-re-encryption-or-ssl-re-termination)
          * [Pros and Cons](#pros-and-cons)
       * [Use certificate in HAProxy](#use-certificate-in-haproxy)
-         * [Example for TCP Mode (non-SSL):](#example-for-tcp-mode-non-ssl)
-         * [Example for HTTP Mode (SSL/TLS Termination):](#example-for-http-mode-ssltls-termination)
-         * [Important Note:](#important-note)
+         * [Example for TCP Mode (non-SSL)](#example-for-tcp-mode-non-ssl)
+         * [Example for HTTP Mode (SSL/TLS Termination)](#example-for-http-mode-ssltls-termination)
+         * [Important Note](#important-note)
          * [HAProxy configuration](#haproxy-configuration-2)
          * [Certbot command](#certbot-command)
       * [HAProxy SSL/TLS Security](#haproxy-ssltls-security)
@@ -107,8 +107,6 @@ Table of Contents
          * [Set cypher](#set-cypher)
    * [URL rewriting](#url-rewriting)
    * [Tips](#tips)
-
-<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 
 # Proxy types
 ## Forward proxy
@@ -1897,7 +1895,9 @@ Here are some key points about stick tables in HAProxy:
 
 > **Note:** `stick-table` works in `tcp` mode
 
+
 ### `stick-table` paramethers
+
 
 | Option                     | Description                                                                                             | Example                                               |
 |----------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
@@ -1917,7 +1917,9 @@ Here are some key points about stick tables in HAProxy:
 | `on-pxname` / `on-pxname-i`| Associates stick table entries with a specific proxy name (case-sensitive or case-insensitive).         | `stick-table type ip size 100k on-pxname my_proxy`   |
 
 
+
 ### `stick-table` error handling with `redispatch`
+
 
 The `redispatch` option is not directly related to stick tables in
 HAProxy. Instead, it's a global option that affects how HAProxy handles
@@ -1930,7 +1932,7 @@ However, it can be uesed to implement session persistence or
 stickiness using stick tables, and you can maintain some form of
 connection affinity even during server failures.
 
-#### Scenario
+**Scenario**
 
 You have a stick table that tracks client-server associations (e.g.,
 based on source IP) and you experience a server failure, the absence of
@@ -2020,7 +2022,6 @@ distributing the workload across multiple CPU resources.
    and threads to specific CPU cores. The `auto` keyword indicates
    automatic CPU mapping, and `1-4` refers to the process IDs, while
    `0-3` refers to the CPU core IDs.
-
 
 ## Logging
 
@@ -2128,10 +2129,13 @@ client port (`%cp`), request time (`%t`), frontend (`%ft`), backend
 ```plaintext
 
 
+
 # Define a custom log format named "custom_log" 
 log-format custom_log %[date] %[frontend_name] %[backend_name]
 %[server_name] \ %[src] %[dst] %{+Q}r %ST %B %Ts %Tr %Tt %Hs %Hr %Ht %Tq
 %Tw %Tc %Tr %Tt %Tt
+
+
 
 # Use the defined custom log format in a frontend or backend section
 frontend example_frontend
@@ -3020,6 +3024,1473 @@ server. Here are some examples of URL rewriting using `http-request`:
    This example uses an ACL (`is_prefixed`) to conditionally replace "/prefix/" with "/new-prefix/" in the URL.
 
 
+## Manipulate headers
+
+In HAProxy, the `http-request` directive provides various actions that
+allow you to modify HTTP headers in the request. Three commonly used
+actions for header manipulation are `set-header`, `add-header`, and
+`del-header`. Here's an explanation of each:
+
+1. **set-header:**
+   - The `set-header` action is used to set the value of an HTTP header
+     or replace the existing value with a new one.
+   - Syntax: `http-request set-header <header-name> <new-value>`
+   - Example:
+
+     ```plaintext
+     frontend my_frontend
+         bind *:80
+         mode http
+         option httplog
+
+         # Set the "User-Agent" header to a specific value
+         http-request set-header User-Agent "MyCustomUserAgent"
+
+         default_backend my_backend
+     ```
+
+2. **add-header:**
+   - The `add-header` action is used to add a new HTTP header with a
+     specified value. If the header already exists, the new value is
+     appended.
+   - Syntax: `http-request add-header <header-name> <value>`
+   - Example:
+
+     ```plaintext
+     frontend my_frontend
+         bind *:80
+         mode http
+         option httplog
+
+         # Add a custom header "X-Custom-Header" with value "MyValue"
+         http-request add-header X-Custom-Header MyValue
+
+         default_backend my_backend
+     ```
+
+3. **del-header:**
+   - The `del-header` action is used to delete/remove a specific HTTP header.
+   - Syntax: `http-request del-header <header-name>`
+   - Example:
+
+     ```plaintext
+     frontend my_frontend
+         bind *:80
+         mode http
+         option httplog
+
+         # Remove the "X-Unwanted-Header" if present
+         http-request del-header X-Unwanted-Header
+
+         default_backend my_backend
+     ```
+
+These actions can be used in combination with ACLs (Access Control
+Lists) to conditionally apply header modifications based on certain
+criteria. For example, you might want to set or remove headers only for
+requests matching specific paths or having certain characteristics.
+
+## Securing headers
+
+Securing headers in HAProxy is an important aspect of enhancing web
+application security. Properly configured headers can help protect
+against various attacks and ensure a more robust security posture. Here
+are some tips for securing headers in HAProxy:
+
+1. **Remove Sensitive Headers:**
+   - Ensure that sensitive headers, such as `Server` and `X-Powered-By`,
+     are not disclosed to clients. Attackers can use this information to
+     identify server software and potential vulnerabilities.
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Remove server version information
+       http-response del-header Server
+       http-response del-header X-Powered-By
+
+       default_backend my_backend
+   ```
+
+2. **Implement Strict Transport Security (HSTS):**
+   - Enforce the use of HTTPS by implementing HTTP Strict Transport
+     Security (HSTS) headers. This ensures that clients communicate with
+     your server over secure channels only.
+
+   ```plaintext
+   frontend my_frontend
+       bind *:443 ssl crt /path/to/combined.pem
+       mode http
+       option httplog
+
+       # Enable HSTS with a max-age of 1 year
+       http-response set-header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+       default_backend my_backend
+   ```
+
+3. **X-Content-Type-Options: nosniff:**
+   - Prevent browsers from interpreting files as a different MIME type.
+     This helps mitigate certain types of attacks, such as MIME
+     sniffing.
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Set X-Content-Type-Options header to nosniff
+       http-response set-header X-Content-Type-Options nosniff
+
+       default_backend my_backend
+   ```
+
+4. **Content Security Policy (CSP):**
+   - Implement Content Security Policy headers to control the sources
+     from which certain types of content can be loaded on your website,
+     helping to prevent cross-site scripting (XSS) attacks.
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Set Content Security Policy header
+       http-response set-header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+
+       default_backend my_backend
+   ```
+
+5. **X-Frame-Options: DENY:**
+   - Prevent your web pages from being embedded into iframes. This helps
+     protect against clickjacking attacks.
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Set X-Frame-Options header to DENY
+       http-response set-header X-Frame-Options DENY
+
+       default_backend my_backend
+   ```
+
+6. **Referrer Policy:**
+   - Control how much referrer information is included with requests.
+     This helps protect user privacy.
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Set Referrer-Policy header
+       http-response set-header Referrer-Policy "strict-origin-when-cross-origin"
+
+       default_backend my_backend
+   ```
+
+> **Note:** To Check headers security use this [tool](https://securityheaders.com/)
+
+## Compression
+
+In HAProxy, compression refers to the ability to compress HTTP responses
+before sending them to clients. Compressing responses can significantly
+reduce the amount of data transmitted over the network, leading to
+faster page loads and improved performance. HAProxy provides the ability
+to enable compression for HTTP responses using the `http-response`
+directive.
+
+Here's how you can enable compression in HAProxy:
+
+1. **Configure HAProxy for Compression:**
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Enable compression for responses
+       http-response compress
+
+       default_backend my_backend
+   ```
+
+   In this example:
+
+   - `http-response compress`: This directive enables compression for
+     HTTP responses. HAProxy will automatically compress responses based
+     on the client's `Accept-Encoding` header, supporting common
+     compression algorithms like gzip and deflate.
+
+2. **Customize Compression Settings:**
+
+   You can customize the compression settings based on your
+   requirements. For example:
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Enable compression for responses with a minimum size of 1024 bytes
+       http-response compress if { mime_type text/html } !{ hdr_sub(Content-Encoding) gzip }
+       http-response set-header Content-Encoding gzip
+       http-response set-header Vary Accept-Encoding
+
+       default_backend my_backend
+   ```
+
+   In this example:
+
+   - `http-response compress if { mime_type text/html } !{ hdr_sub(Content-Encoding) gzip }`: This line specifies that compression should be applied only to responses with a MIME type of `text/html` and only if the `Content-Encoding` header does not already contain `gzip`.
+
+   - `http-response set-header Content-Encoding gzip`: This line sets the `Content-Encoding` header to indicate that the response is compressed using gzip.
+
+   - `http-response set-header Vary Accept-Encoding`: This line adds the `Vary: Accept-Encoding` header, informing caches that the response varies based on the `Accept-Encoding` header.
+
+
+
+
+### 1. **Compression Algorithms:**
+   - **Gzip:** Gzip (GNU zip) is one of the most commonly used
+     compression algorithms for HTTP content. It works by replacing
+     repetitive sequences of characters with shorter representations,
+     reducing the overall size of the data. Gzip compression is widely
+     supported by browsers and web servers.
+
+   - **Deflate:** Deflate is another compression algorithm commonly used
+     for HTTP. It is similar to Gzip but uses a different compression
+     format. While Deflate is supported by most browsers, Gzip is
+     generally preferred due to its better compression efficiency.
+
+### 2. **Compression Types:**
+
+   - **Static Content Compression:** Static content, such as HTML, CSS,
+     and JavaScript files, can be pre-compressed and served in a
+     compressed form. This reduces the load on the server during runtime
+     but requires additional storage for storing pre-compressed
+     versions.
+
+   - **Dynamic Content Compression:** Dynamic content, generated
+     on-the-fly by applications, can be compressed in real-time before
+     being sent to clients. This requires server resources for
+     compression but allows for compression of content that may change
+     dynamically.
+
+### 3. **Compression Offload:**
+
+   - **Compression Offload (Hardware Offload):** Compression offload
+     refers to the process of offloading the compression workload from
+     the server's CPU to specialized hardware. Some hardware devices,
+     like load balancers or dedicated compression appliances, may have
+     built-in support for compression. Offloading compression to
+     dedicated hardware can improve server performance by freeing up CPU
+     resources for other tasks.
+
+4. **HAProxy Compression Configuration:**
+   - In HAProxy, compression can be configured using the `http-response`
+     directive to enable compression for HTTP responses.
+   - The `http-response compress` directive automatically compresses
+     responses based on the client's `Accept-Encoding` header.
+   - The `compression` setting allows you to customize compression
+     settings, including the compression algorithm and minimum response
+     size for compression to be applied.
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Enable compression for responses with a minimum size of 1024 bytes
+       http-response compress if { mime_type text/html } !{ hdr_sub(Content-Encoding) gzip }
+       http-response set-header Content-Encoding gzip
+       http-response set-header Vary Accept-Encoding
+
+       default_backend my_backend
+   ```
+
+   - The `compression algo gzip` setting can be used to explicitly
+     specify the compression algorithm (e.g., gzip) to be used.
+
+```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Enable compression using gzip algorithm
+       http-response compress algo gzip
+       http-response set-header Vary Accept-Encoding
+
+       default_backend my_backend
+   ```
+
+### Compression tips
+
+1. **Enable Compression for Appropriate Content Types:**
+   - Enable compression for content types that benefit the most from
+     compression, such as text-based files like HTML, CSS, and
+     JavaScript. Avoid compressing already compressed content types,
+     such as images and binary files.
+
+   ```plaintext
+   http-response compress if { mime_type text/html text/plain text/css application/javascript }
+   ```
+
+2. **Adjust Compression Threshold:**
+   - Set an appropriate minimum response size for compression. Responses
+     below this size may not benefit significantly from compression and
+     could result in increased CPU usage without much gain.
+
+   ```plaintext
+   http-response compress if { size > 1024 }
+   ```
+
+3. **Specify Compression Algorithms:**
+   - Specify the compression algorithm based on browser compatibility
+     and efficiency. Gzip is widely supported and efficient, but you can
+     also consider alternatives like Brotli for modern browsers.
+
+   ```plaintext
+   http-response compress algo gzip
+   ```
+
+4. **Use Compression Offload:**
+   - If your environment allows, consider offloading compression to
+     specialized hardware or dedicated compression appliances. This can
+     help reduce the impact on the server's CPU.
+
+5. **Monitor Server Performance:**
+   - Regularly monitor server performance, especially CPU usage, when
+     compression is enabled. If compression is causing a significant
+     increase in CPU usage, consider adjusting compression settings or
+     upgrading hardware.
+
+6. **Implement Caching:**
+   - Implement caching mechanisms to store pre-compressed versions of
+     static content. This reduces the need for on-the-fly compression
+     for frequently requested resources.
+
+7. **Set Proper Cache-Control Headers:**
+   - Configure appropriate `Cache-Control` headers to control how
+     browsers and intermediaries cache compressed content. This can
+     impact the efficiency of compression, especially for dynamic
+     content.
+
+8. **Optimize Images Separately:**
+   - Compressing images is often more efficiently done using dedicated
+     image optimization tools. Consider optimizing and compressing
+     images separately before serving them through your web server.
+
+9. **Consider Content Delivery Networks (CDNs):**
+   - Content Delivery Networks can perform automatic compression and
+     serve content from geographically distributed servers. CDNs often
+     include features to optimize and compress content for improved
+     delivery.
+
+10. **Test Across Browsers and Devices:**
+    - Test your website's performance and behavior across different
+      browsers and devices to ensure that compression is handled
+      correctly by a diverse set of clients.
+
+Remember to continuously monitor and optimize compression settings based
+on the evolving needs of your web application. Balancing the benefits of
+reduced bandwidth usage with the potential impact on server performance
+is crucial for achieving optimal results.
+
+## Basic Authentication
+
+In HAProxy, you can implement basic authentication with a userlist to
+secure access to your services. Basic authentication involves sending a
+username and password encoded in the HTTP request headers. Here's how
+you can set it up:
+
+1. **Create a Userlist:**
+   - Define a userlist in your HAProxy configuration. This includes
+     specifying usernames and their associated passwords.
+
+   ```plaintext
+   userlist basic_auth_users
+       user alice password securepassword
+       user bob password anotherpassword
+   ```
+
+   In this example, we've created a userlist named `basic_auth_users`
+   with two users: "alice" and "bob," each with their respective
+   passwords.
+    
+   > In HAProxy's userlist section, you can specify different types of
+   > password encryption or hashing methods for enhanced security. The
+   > `password` directive in the userlist section supports various types
+   > to store passwords securely. Here are some common password types in
+   > HAProxy:
+   > 
+   > 1. **Clear Text Password:**
+   >    - The password is stored in clear text. While this is the
+   >      simplest method, it is not recommended for production use due
+   >      to security concerns.
+   > 
+   >    ```plaintext
+   >    userlist basic_auth_users
+   >        user alice password securepassword
+   >    ```
+   > 
+   > 2. **SHA-1 Hashed Password:**
+   >    - Passwords are hashed using the SHA-1 algorithm. This provides
+   >      a basic level of security compared to storing clear text
+   >      passwords.
+   > 
+   >    ```plaintext
+   >    userlist basic_auth_users
+   >        user alice password {SHA}5en6G6MezRroT3XKqkdPOmY/BfQ=
+   >    ```
+   > 
+   >    The `{SHA}` prefix indicates the SHA-1 hashing method.
+   > 
+   > 3. **SHA-256 and SHA-512 Hashed Passwords:**
+   >    - Passwords can also be hashed using stronger algorithms like
+   >      SHA-256 and SHA-512. These offer higher security compared to
+   >      SHA-1.
+   > 
+   >    ```plaintext
+   >    userlist basic_auth_users
+   >        user alice password {SHA256}$5$salt$Bc9l0pJ1MMbRZ/D6Ar/9qFQDxKrLcYK/lNDsRrz8LF.
+   >        user bob password {SHA512}$6$salt$P6pS2.xM7ze1IRw3JJXUBfHZesW9.hb4Y1SUOOw1UV64rFQ9F9P2MuQKvdZzAV/0zmr7uHFRWVXXEaLwrNO10/
+   >    ```
+   > 
+   >    The `{SHA256}` and `{SHA512}` prefixes indicate the SHA-256 and
+   >    SHA-512 hashing methods, respectively.
+   > 
+   > 4. **PBKDF2 (Password-Based Key Derivation Function 2):**
+   >    - PBKDF2 is a key derivation function designed to be slow and
+   >      computationally intensive, making it resistant to brute-force
+   >      attacks. It uses a specified number of iterations to derive a
+   >      cryptographic key from the password.
+   > 
+   >    ```plaintext
+   >    userlist basic_auth_users
+   >        user alice password {PBKDF2}10000$C8XMmckjzMv$7f5a166e6708bf6d63cb4bb9569363623780d7e47f57318a82984961e764a73d
+   >    ```
+   > 
+   >    The `{PBKDF2}` prefix indicates the PBKDF2 hashing method. The
+   >    parameters after `{PBKDF2}` include the number of iterations,
+   >    salt, and the derived key.
+   > 
+   > Choose a password hashing method based on the security requirements
+   > of your application. It is generally recommended to use stronger
+   > hashing algorithms like SHA-256, SHA-512, or PBKDF2 for improved
+   > security. Additionally, always use HTTPS to encrypt the
+   > transmission of authentication credentials over the network.
+    
+2. **Apply Authentication to a Frontend or a Backend:**
+   - Apply the basic authentication to a frontend or a backend
+     section in your HAProxy configuration.
+
+   ```plaintext
+   frontend my_frontend
+       bind *:80
+       mode http
+       option httplog
+
+       # Apply basic authentication
+       acl auth_users http_auth(basic_auth_users)
+       http-request auth realm MyRealm if !auth_users
+
+       # Your regular frontend configuration goes here
+
+       default_backend my_backend
+   ```
+
+   In this example:
+
+   - `acl auth_users http_auth(basic_auth_users)`: This ACL checks
+     if the incoming request includes valid credentials from the
+     `basic_auth_users` userlist.
+
+   - `http-request auth realm MyRealm if !auth_users`: This line
+     triggers basic authentication with the realm "MyRealm" if the
+     user is not authenticated. The realm is the message displayed
+     to the user in the authentication dialog.
+
+3. **Complete Configuration:**
+   - Complete the configuration with your regular frontend and
+     backend settings.
+
+   ```plaintext
+   backend my_backend
+       mode http
+       server server1 192.168.1.10:80 check
+       server server2 192.168.1.11:80 check
+   ```
+
+   In this section, you configure your backend servers as usual.
+
+4. **Restart HAProxy:**
+   - After making changes to your HAProxy configuration, restart or reload HAProxy for the changes to take effect.
+
+   ```bash
+   sudo systemctl restart haproxy
+   ```
+
+Now, when clients access your HAProxy frontend, they will be
+prompted for basic authentication credentials. The configured
+usernames and passwords in the `basic_auth_users` userlist will be
+validated for access.
+
+Please note that basic authentication sends credentials in base64
+encoding, which can be intercepted if not used over HTTPS. If
+security is a concern, consider using more advanced authentication
+methods or combining basic authentication with secure connections
+(HTTPS). Additionally, use strong and secure passwords for your
+users.
+
+## HAProxy command line (Make change on the fly)
+
+The `stats socket` in HAProxy is used to enable the UNIX socket for
+runtime statistics and management. This allows you to interact with the
+HAProxy runtime API to obtain real-time information, make configuration
+changes, and manage the HAProxy instance. Here's an example of how you
+can configure the `stats socket`:
+
+```plaintext
+global
+    stats socket /var/run/haproxy.sock mode 660 level admin
+
+defaults
+    mode http
+    stats enable
+    stats uri /haproxy_stats
+
+listen my_frontend
+    bind *:80
+    mode http
+    option httplog
+    stats enable
+    stats uri /haproxy_stats
+    stats auth admin:admin_password
+
+    server backend_server1 192.168.1.10:80 check
+    server backend_server2 192.168.1.11:80 check
+```
+
+In this example:
+
+- `stats socket /var/run/haproxy.sock mode 600 level admin`: This line
+  enables the UNIX socket for runtime statistics and management. The
+  socket file is located at `/var/run/haproxy.sock` with read-write
+  permissions (`mode 600`) and requires admin-level access.
+
+- `stats enable` and `stats uri /haproxy_stats`: These lines enable
+  statistics reporting and specify the URI path for accessing the
+  statistics page. In this example, the statistics page is available at
+  `http://your_domain/haproxy_stats`.
+
+- `stats auth admin:admin_password`: This line sets a username and
+  password for accessing the statistics page. In this example, the
+  username is "admin" and the password is "admin_password."
+
+After configuring the `stats socket`, you can use tools like `socat` or
+`nc` to interact with the UNIX socket for runtime management. For
+example:
+
+```bash
+echo "show info" | socat stdio /var/run/haproxy.sock
+```
+
+`stats socket` directive supports different access levels, and `admin`
+is one of them. However, note that support for access levels might vary
+depending on your HAProxy version.
+
+In HAProxy, the available access levels for the `stats socket` are:
+
+1. **admin:** Provides full access to the runtime API, allowing
+   configuration changes and access to all runtime information.
+
+2. **operator:** Similar to `admin` but with read-only access to certain
+   sections of the runtime API. It allows monitoring and limited
+   configuration changes.
+
+3. **user:** Limited access level for basic monitoring and information
+   retrieval. Users with this level have restricted access compared to
+   `operator` and `admin`.
+
+Here is an example of how you can configure different access levels:
+
+```plaintext
+global
+    stats socket /var/run/haproxy.sock mode 660 level admin
+    stats socket /var/run/haproxy.sock mode 660 level operator
+    stats socket /var/run/haproxy.sock mode 660 level user
+```
+
+In this example:
+
+- The first line configures the UNIX socket with `admin` level access.
+- The second line configures the UNIX socket with `operator` level
+  access.
+- The third line configures the UNIX socket with `user` level access.
+
+
+### Useful commands
+
+HAProxy provides a variety of commands that you can send to its UNIX
+socket for runtime management. Here are some additional useful commands
+you can use:
+
+1. **Disable Server:**
+   ```bash
+   echo "disable server <backend>/<server>" | socat stdio /var/run/haproxy.sock
+   ```
+   This command disables a specific server within a backend. Replace
+   `<backend>` with the backend name and `<server>` with the server
+   name.
+
+2. **Enable Server:**
+   ```bash
+   echo "enable server <backend>/<server>" | socat stdio /var/run/haproxy.sock
+   ```
+   This command enables a previously disabled server within a backend.
+   Replace `<backend>` with the backend name and `<server>` with the
+   server name.
+
+3. **Set Weight for Server:**
+   ```bash
+   echo "set weight <backend>/<server> <weight>" | socat stdio /var/run/haproxy.sock
+   ```
+   This command sets the weight for a server within a backend. Replace
+   `<backend>` with the backend name, `<server>` with the server name,
+   and `<weight>` with the desired weight.
+
+4. **Show Backend Information:**
+   ```bash
+   echo "show backend <backend>" | socat stdio /var/run/haproxy.sock
+   ```
+   This command displays detailed information about a specific backend.
+   Replace `<backend>` with the backend name.
+
+5. **Show Server State:**
+   ```bash
+   echo "show servers state" | socat stdio /var/run/haproxy.sock
+   ```
+   This command displays the runtime state of all servers.
+
+6. **Clear Counters:**
+   ```bash
+   echo "clear counters" | socat stdio /var/run/haproxy.sock
+   ```
+   This command resets all statistics counters.
+
+7. **Shutdown HAProxy:**
+   ```bash
+   echo "shutdown sessions" | socat stdio /var/run/haproxy.sock
+   ```
+   This command gracefully shuts down HAProxy, allowing existing
+   sessions to finish before stopping.
+
+8. **Show Map Table:**
+   ```bash
+   echo "show map <map_name>" | socat stdio /var/run/haproxy.sock
+   ```
+   This command displays the contents of a map table. Replace
+   `<map_name>` with the name of the map.
+
+9. **Show Runtime API Information:**
+   ```bash
+   echo "show api" | socat stdio /var/run/haproxy.sock
+   ```
+   This command displays information about the HAProxy Runtime API.
+
+10. **Reload Configuration:**
+    ```bash
+    echo "reload" | socat stdio /var/run/haproxy.sock
+    ```
+    This command triggers a configuration reload. It re-reads the
+    configuration file and applies changes without stopping the HAProxy
+    process.
+
+
+> **Note:** You can use `hatop` instead
+> ```bash
+> hatop -s /run/haproxy/admin.sock
+> ```
+
+## High Availability
+
+High Availability (HA) for HAProxy can be achieved by using Keepalived
+in conjunction with multiple HAProxy instances. Keepalived is a powerful
+tool for creating high-availability clusters and provides a framework
+for floating IP addresses between nodes to ensure continuous service
+availability. 
+
+Making HAProxy high available with Keepalived using unicast
+communication involves configuring Keepalived on multiple servers to
+manage a virtual IP address and ensure failover capabilities. The
+unicast configuration specifies the source IP address (`unicast_src_ip`)
+and the list of peers (`unicast_peer`) for communication between
+Keepalived instances. Here's a step-by-step explanation:
+
+### 1. Install HAProxy and Keepalived:
+
+Ensure that both HAProxy and Keepalived are installed on each server in
+your high-availability setup. You can use your system's package manager
+to install them. For example, on a Debian-based system:
+
+```bash
+sudo apt-get update
+sudo apt-get install haproxy keepalived
+```
+
+### 2. Configure HAProxy:
+
+Create a basic HAProxy configuration (`haproxy.cfg`). For example:
+
+```plaintext
+frontend my_frontend
+    bind *:80
+    mode http
+    default_backend my_backend
+
+backend my_backend
+    mode http
+    server server1 192.168.1.10:80 check
+    server server2 192.168.1.11:80 check
+    # Add more servers as needed
+```
+
+### 3. Configure Keepalived:
+
+Create a Keepalived configuration file (`keepalived.conf`) on each
+server:
+
+```plaintext
+vrrp_script chk_haproxy {
+    script "pidof haproxy"
+    interval 2
+}
+
+vrrp_instance VI_1 {
+    interface eth0  # Adjust the network interface
+    state BACKUP
+    priority 100
+    virtual_router_id 51
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass my_secret_password  # Set a strong password
+    }
+    virtual_ipaddress {
+        192.168.1.100/24  # Floating IP
+    }
+    unicast_src_ip 192.168.1.10  # Source IP for unicast
+    unicast_peer {
+        192.168.1.11
+        192.168.1.12  # IP addresses of other Keepalived nodes
+    }
+    track_script {
+        chk_haproxy
+    }
+}
+```
+
+### 4. Start and Enable Services:
+
+Start and enable both HAProxy and Keepalived services on each server:
+
+```bash
+sudo systemctl start haproxy
+sudo systemctl enable haproxy
+
+sudo systemctl start keepalived
+sudo systemctl enable keepalived
+```
+
+### 5. Testing:
+
+- Access the floating IP address (`192.168.1.100` in the example) to
+  ensure that HAProxy is serving requests.
+- Test failover by stopping HAProxy on the primary node. The secondary
+  node should take over, and the floating IP should move to the
+  secondary node.
+
+### Important Notes:
+
+- **Network Configuration:**
+  - Ensure that the network interface specified in Keepalived
+    configuration (`eth0` in the example) is appropriate for your
+    environment.
+- **Security:**
+  - Use strong authentication passwords and consider encrypting
+    communication between HAProxy nodes.
+- **Monitoring:**
+  - Implement monitoring solutions to alert administrators in case of
+    failures or unusual behavior.
+- **Keepalived Logs:**
+  - Monitor Keepalived logs for any issues or warnings during startup
+    and operation.
+    
+### Sync `haproxy.cfg` amoung all nodes
+
+You can achive this goal with the following script
+
+```bash
+#!/bin/bash
+
+# Define variables for the local server
+LOCAL_SERVER_CONFIG_PATH="/etc/haproxy/haproxy.cfg"
+
+# Define variables for the remote server
+REMOTE_SERVER="root@192.168.1.2"
+REMOTE_SERVER_CONFIG_PATH="/etc/haproxy/haproxy.cfg"
+REMOTE_BACKUP_DIR="/path/to/remote/backup/directory"
+
+# Create the remote backup directory if it doesn't exist
+ssh "$REMOTE_SERVER" "[ ! -d \"$REMOTE_BACKUP_DIR\" ] && mkdir -p \"$REMOTE_BACKUP_DIR\""
+
+# Create a timestamp for backup
+TIMESTAMP=$(date +"%Y%m%d%-H%M%S")
+REMOTE_BACKUP_FILE="$REMOTE_BACKUP_DIR/haproxy.cfg_backup_$TIMESTAMP"
+
+
+# Reload HAProxy on the local server
+echo "Reloading HAProxy on the local server..."
+if service haproxy reload; then
+    echo "HAProxy reloaded successfully on the local server."
+
+    # Backup HAProxy config on the remote server
+    echo "Creating a backup of HAProxy config on the remote server..."
+    ssh "$REMOTE_SERVER" "cp $REMOTE_SERVER_CONFIG_PATH $REMOTE_BACKUP_FILE"
+
+    # Copy HAProxy config to the remote server using rsync
+    echo "Copying HAProxy config to the remote server..."
+    rsync -avz --delete "$LOCAL_SERVER_CONFIG_PATH" "$REMOTE_SERVER:$REMOTE_SERVER_CONFIG_PATH"
+
+    # Reload HAProxy on the remote server
+    echo "Reloading HAProxy on the remote server..."
+    ssh "$REMOTE_SERVER" "service haproxy reload"
+
+    echo "HAProxy configuration and service reload completed successfully."
+    echo "Remote backup saved at: $REMOTE_BACKUP_FILE"
+else
+    echo "Failed to reload HAProxy on the local server. Aborting..."
+fi
+```
+
+> **Note:** Don't forget to sync your `cert`s
+
+### Syncing `memory` of HAProxy nodes
+
+#### What is `peers`
+
+In HAProxy, the "peers" section in the configuration file is used for
+inter-process communication between multiple HAProxy instances. This
+feature allows multiple HAProxy processes to exchange information and
+synchronize state, which is particularly useful in scenarios where you
+have a high-availability setup or load balancing across multiple nodes.
+
+Here's a brief explanation of the "peers" section:
+
+1. **Peer Configuration Block:** In the HAProxy configuration file, you
+   define a "peers" block to configure the parameters related to
+   inter-process communication. The basic syntax looks like this:
+
+   ```plaintext
+   peers <peer_name>
+   ```
+
+   `<peer_name>` is a user-defined name for the group of peers. It's
+   essentially a label that identifies the group.
+
+2. **Peer Configuration Directives:** Within the "peers" block, you can
+   include directives to specify the configuration details for peer
+   communication. Common directives include:
+
+   - `peer`: Defines the IP address and port of another HAProxy instance
+     in the same "peers" group.
+   - `listen`: Configures a listening address and port for incoming peer
+     connections.
+   - `bind`: Specifies the local IP address and port to bind for peer
+     communication.
+   - `check`: Enables health checks between peers to verify their
+     availability.
+
+   Here's an example:
+
+   ```plaintext
+   peers my_peers
+   peer haproxy1 192.168.1.101:1024
+   peer haproxy2 192.168.1.102:1024
+   listen peers_listener
+     bind 192.168.1.100:1024
+     mode  tcp
+     server haproxy1 192.168.1.101:1024 check
+     server haproxy2 192.168.1.102:1024 check
+   ```
+
+   In this example, two HAProxy instances (haproxy1 and haproxy2) are
+   part of the "my_peers" group, and they communicate over TCP on port
+   1024. The "peers_listener" section configures a listener on the local
+   instance to accept connections from the specified peers.
+
+3. **Use Cases:**
+   - **High Availability:** In a high-availability setup, multiple
+     HAProxy instances share information about their health and can take
+     over traffic in case one of them fails.
+   - **Session Persistence:** HAProxy instances can share information
+     about active sessions, ensuring that requests from the same client
+     are consistently directed to the same server.
+
+
+#### Syncing `stick-table`
+
+To sync stick tables using peers in HAProxy, you'll need to configure
+the "peers" section in your HAProxy configuration file.
+
+1. Define the "peers" section with the necessary configuration. This
+   includes specifying peers and setting up a listening address and port
+   for peer communication. Additionally, you need to define the stick
+   table and enable synchronization.
+
+```plaintext
+peers my_peers
+  peer haproxy1 192.168.1.101:1024
+  peer haproxy2 192.168.1.102:1024
+
+listen peers_listener
+  bind 192.168.1.100:1024
+  mode  tcp
+  server haproxy1 192.168.1.101:1024 check
+  server haproxy2 192.168.1.102:1024 check
+
+# Define the stick table
+stick-table type ip size 100k peers my_peers
+
+# Enable synchronization of the stick table
+stick-table type ip size 100k peers my_peers store gpc0,gpc0_rate(60s)
+```
+
+In this example:
+
+- `peers my_peers`: Defines the group of peers.
+- `listen peers_listener`: Configures a listener for peer communication.
+- `stick-table type ip size 100k peers my_peers`: Specifies the stick
+  table type, size, and associates it with the "my_peers" group.
+- `stick-table type ip size 100k peers my_peers store
+  gpc0,gpc0_rate(60s)`: Enables synchronization and specifies the data
+  elements to be stored and synchronized across peers.
+
+2. Make sure to replace IP addresses (e.g., 192.168.1.100,
+   192.168.1.101, 192.168.1.102) and port numbers with your actual
+   configuration.
+
+3. Reload or restart your HAProxy instances for the changes to take
+   effect.
+
+## Tackling with DDoS attacks
+
+Creating a complex ACL (Access Control List) in HAProxy for a specific
+application can involve various conditions and criteria based on your
+application's requirements and potential threats. Below is an example of
+a more comprehensive HAProxy ACL setup that takes into account different
+aspects of a web application, such as IP blocking, user-agent filtering,
+and URI-based restrictions:
+
+```haproxy
+frontend your_frontend
+    bind *:80
+    mode http
+    option http-server-close
+    option forwardfor
+
+    # ACL to block requests from specific IP addresses or IP ranges
+    acl block_ip src 192.168.1.1
+    acl block_ip_range src -f /etc/haproxy/blocked_ip_ranges.lst
+    tcp-request connection reject if block_ip block_ip_range
+
+    # ACL to block requests with specific User-Agents
+    acl bad_ua hdr_sub(User-Agent) -i bot badbot
+    tcp-request connection reject if bad_ua
+
+    # ACL to block requests to specific URIs
+    acl block_uri path_beg /admin /restricted
+    tcp-request connection reject if block_uri
+
+    # ACL to limit requests per IP
+    acl rate_limited src_http_req_rate(Abuse) ge 100
+    tcp-request connection reject if rate_limited
+
+    # Your regular backend configuration goes here
+    default_backend your_backend
+
+backend your_backend
+    mode http
+    option http-server-close
+    option forwardfor
+
+    # Your backend server configurations go here
+    server backend_server1 192.168.1.1:80 maxconn 32
+    server backend_server2 192.168.1.2:80 maxconn 32
+```
+
+In this example:
+
+- `acl block_ip`: Blocks requests from a specific IP address (e.g.,
+  192.168.1.1). - `acl block_ip_range`: Blocks requests from IP ranges
+  listed in a file (e.g., /etc/haproxy/blocked_ip_ranges.lst).
+- `acl bad_ua`: Blocks requests with specified User-Agents containing
+  keywords like "bot" or "badbot."
+- `acl block_uri`: Blocks requests to specific URIs (e.g., /admin,
+  /restricted).
+- `acl rate_limited`: Blocks requests from IPs that exceed a certain
+  request rate (e.g., 100 requests per second).
+
+## Stats page
+
+In HAProxy, the "stats page" refers to a web-based user interface that
+provides real-time monitoring and statistics about the state and
+performance of the HAProxy instance. This web page is accessible through
+a web browser and allows administrators to view various metrics, track
+server health, and gather insights into the traffic being handled by
+HAProxy.
+
+The HAProxy stats page provides information such as:
+
+1. **Overview:** A summary of the current status of HAProxy, including
+   uptime, the number of sessions, and the current number of active and
+   backup servers.
+2. **Listeners:** Details about the configured listeners, their status,
+   and the number of connections.
+3. **Backends:** Information about the backend servers, including their
+   status, the number of active and backup servers, and the current
+   session and request rates.
+4. **Frontends:** Details about the configured frontends, including
+   their status, the number of connections, and request rates.
+5. **Server Details:** Specific information about each server, such as
+   its current state, the number of sessions, and response time.
+6. **Runtime API:** Allows users to interact with the HAProxy runtime
+   API to perform various operations, such as enabling or disabling
+   servers, checking statistics, and more.
+
+To enable the stats page in HAProxy, you need to include a section in
+your configuration file with the necessary settings. Here's a basic
+example:
+
+```plaintext
+listen stats
+  bind :9000 # Use the desired IP and port
+  mode http
+  stats enable
+  stats uri /haproxy_stats # URL path for accessing the stats page
+  stats realm Haproxy\ Statistics
+  stats auth admin:your_password # Replace with your desired username and password
+  stats hide-version
+  stats admin if TRUE
+```
+
+In this example:
+
+- `listen stats`: Defines a new listener for the stats page.
+- `bind :9000`: Specifies the IP address and port for accessing the
+  stats page.
+- `stats enable`: Enables statistics reporting.
+- `stats uri /haproxy_stats`: Sets the URL path for accessing the stats
+  page.
+- `stats realm Haproxy\ Statistics`: Specifies the authentication realm.
+- `stats auth admin:your_password`: Sets the username and password for
+  accessing the stats page. Replace "admin" and "your_password" with
+  your desired credentials.
+
+After configuring the stats page, you can access it through a web browser by navigating to the specified URL (e.g., http://your_haproxy_server:9000/haproxy_stats) and logging in with the provided credentials. The stats page is a powerful tool for monitoring and troubleshooting HAProxy configurations in real-time.
+
+
+
+
+```plaintext
+frontend ss_frontend
+  bind *:80  # Adjust the listening IP and port as needed
+  mode http
+  option httplog
+  acl is_stats_request path_beg /ss  # ACL to identify stats requests
+
+  use_backend stats_backend if is_stats_request
+
+backend stats_backend
+  mode http
+  stats enable
+  stats uri /ss  # Set the URL path for accessing the stats page
+  stats realm Haproxy\ Statistics
+  stats auth admin:your_password  # Replace with your desired username and password
+  stats hide-version
+  stats admin if TRUE
+```
+
+Explanation:
+
+- `frontend ss_frontend`: Defines a frontend for handling incoming
+  requests.
+  - `bind *:80`: Binds the frontend to listen on all available network
+    interfaces on port 80.
+  - `mode http`: Sets the mode to handle HTTP traffic.
+  - `option httplog`: Enables HTTP request logging.
+  - `acl is_stats_request path_beg /ss`: Defines an ACL to identify
+    requests starting with "/ss."
+  - `use_backend stats_backend if is_stats_request`: Routes requests
+    starting with "/ss" to the stats backend; otherwise, it routes them
+    to the default backend.
+
+- `backend stats_backend`: Defines a backend for handling stats
+  requests.
+  - `mode http`: Sets the mode to handle HTTP traffic.
+  - `stats enable`: Enables statistics reporting.
+  - `stats uri /ss`: Sets the URL path for accessing the stats page.
+  - `stats realm Haproxy\ Statistics`: Specifies the authentication
+    realm.
+  - `stats auth admin:your_password`: Sets the username and password for
+    accessing the stats page.
+
+
+## Handle SNI with HAProxy
+
+### Server Name Indiction (SNI) 
+
+Server Name Indication (SNI) is an extension to the Transport Layer Security
+(TLS) protocol, which is used to secure communication over a computer
+network. SNI allows a client (such as a web browser) to indicate the
+specific hostname it is attempting to connect to during the initial
+stages of the TLS handshake process.
+
+Before the introduction of SNI, the TLS handshake did not include
+information about the target hostname. This posed a challenge in
+situations where a single IP address hosted multiple websites, each with
+its own SSL/TLS certificate. Without SNI, the server couldn't determine
+which certificate to use based solely on the IP address, potentially
+leading to misconfigurations or the inability to host multiple
+SSL/TLS-enabled websites on a single IP address.
+
+SNI addresses this limitation by including the hostname information in
+the initial TLS handshake, allowing the server to identify the intended
+target and present the appropriate SSL/TLS certificate for that specific
+domain. This is particularly useful in shared hosting environments and
+situations where multiple secure websites share the same IP address.
+Most modern web browsers and servers support SNI, but there could be
+compatibility issues with older systems that don't support this
+extension.
+
+![sni](assests/sni.jpg)
+
+#### Usecases
+
+Server Name Indication (SNI) is primarily used in scenarios where
+multiple websites or services are hosted on the same IP address, and
+each requires its own SSL/TLS certificate. The main use cases for SNI
+include:
+
+1. **Shared Hosting Environments:**
+   - In shared hosting environments, multiple websites may share the
+     same IP address. SNI allows the web server to differentiate between
+     these sites during the TLS handshake, enabling it to present the
+     correct SSL/TLS certificate for the requested domain.
+
+2. **Virtual Hosting:**
+   - When a single server hosts multiple virtual hosts, each with its
+     own domain and SSL/TLS certificate, SNI helps the server identify
+     the intended domain during the TLS handshake. This is essential for
+     securing communication for each virtual host independently.
+
+3. **Cloud Hosting and Content Delivery Networks (CDNs):**
+   - Cloud hosting providers and CDNs often allocate multiple customers
+     or websites to a single IP address. SNI is crucial in such
+     scenarios to ensure that the correct SSL/TLS certificate is
+     presented for the requested domain, allowing secure communication
+     for each hosted service.
+
+4. **Wildcard and Multi-Domain SSL Certificates:**
+   - While wildcard SSL certificates can secure multiple subdomains
+     under a single domain, SNI is useful when different domains or
+     non-wildcard certificates are hosted on the same IP address. It
+     allows for flexibility in certificate management.
+
+5. **Efficient Resource Utilization:**
+   - SNI enables more efficient use of IP addresses, as it eliminates
+     the need for a unique IP address for each SSL/TLS-enabled domain.
+     This can be particularly important when IPv4 addresses are scarce.
+
+6. **Support for Multiple SSL/TLS Certificates:**
+   - SNI allows a single server to support multiple SSL/TLS
+     certificates, facilitating the secure hosting of diverse websites
+     with their own unique certificates on the same IP address.
+
+### HAProxy Configuration
+
+1. Add Certs path to your front, like below:
+```plaintext
+frontend my_frontend
+		bind *:443 ssl crt /etc/haproxy/certs/ # Path to your SSL certificates
+		mode http
+		option httplog 
+...
+```
+
+2. Name each cert name to its crosponding domain
+
+```bash
+mv /PATH/TO/CERTS/my_cert.pem	/PATH/TO/CERTS/my_domain.com.pem
+```
+
+3. Restart `haproxy` service
+
+```bash
+sudo service haproxy restart
+```
+
+
+## Handling client's IP address
+
+### For `mode http`
+
+In HAProxy, the `forwardfor` option is used to insert the original client's IP
+address into the HTTP headers of the backend servers. This can be particularly
+useful in scenarios where the backend servers need to know the real client's IP
+address, especially when HAProxy is acting as a reverse proxy.
+
+When the `forwardfor` option is enabled, HAProxy adds an "X-Forwarded-For"
+(XFF) header to the HTTP request sent to the backend servers. This header
+contains a comma-separated list of IP addresses representing the client and any
+intermediate proxies that forwarded the request.
+
+Here is an example of how to use `forwardfor` in an HAProxy configuration:
+
+```plaintext
+frontend my_frontend
+    bind *:80
+    mode http
+    option forwardfor if-none  # Enable the forwardfor option
+
+    default_backend my_backend
+
+backend my_backend
+    mode http
+    server server1 192.168.1.10:80 check
+    server server2 192.168.1.11:80 check
+```
+
+In this example:
+
+- `option forwardfor`: Enables the insertion of the X-Forwarded-For header. 
+- `default_backend my_backend`: Routes incoming requests to the specified
+backend.
+- `if-none`: Prevent HAProxy to override X-Forwarded-For header.
+
+With this configuration, when a client makes an HTTP request through HAProxy,
+the "X-Forwarded-For" header will be added to the request sent to the backend
+servers, containing the original client's IP address.
+
+Keep in mind that the `X-Forwarded-For` header can be manipulated by clients,
+so it should not be blindly trusted for security-related decisions.
+Additionally, the backend servers must be configured to interpret the
+`X-Forwarded-For` header if they need to use the original client's IP address.
+
+It's worth noting that for HTTPS traffic, you may also need to consider the
+`option http-server-close` or `option httpclose` directives to close the
+connection after each request, allowing HAProxy to insert the X-Forwarded-For
+header in subsequent requests.
+
+### For `mode tcp`
+
+You can use the `send-proxy` option in HAProxy's TCP mode to pass connection
+information, including the client's IP address, to the backend server. This can
+be particularly useful when working with protocols that don't have built-in
+support for conveying the client's IP address, such as when HAProxy is used as
+a TCP or SSL/TLS proxy.
+
+Here's an example of how to use the `send-proxy` option in HAProxy's TCP mode:
+
+```plaintext
+frontend my_frontend
+    bind *:80
+    mode tcp
+    option tcplog
+    tcp-request inspect-delay 5s
+    tcp-request content accept if { req_ssl_hello_type 1 }
+    use_backend my_backend if { req_ssl_hello_type 1 }
+
+backend my_backend
+    mode tcp
+    option tcplog
+    server server1 192.168.1.10:80 check send-proxy
+    server server2 192.168.1.11:80 check send-proxy
+```
+
+Explanation:
+
+- `option tcplog`: Enables logging of TCP connections.
+- `tcp-request content accept if { req_ssl_hello_type 1 }`: This line checks
+whether the connection is using SSL/TLS based on the SSL hello message. Adjust
+this condition based on your specific use case. - `use_backend my_backend if {
+req_ssl_hello_type 1 }`: Redirects traffic to the specified backend if the
+condition is met.
+- `server server1 192.168.1.10:80 check send-proxy`: Configures the backend
+server to accept the PROXY protocol. The `send-proxy` keyword instructs HAProxy
+to send the PROXY protocol header to the backend server, containing information
+about the original client's IP address.
+
+Make sure that your backend servers are configured to accept the PROXY
+protocol. The `send-proxy` option may be supported natively by some
+applications or may require additional configuration on the server side.
+
+The PROXY protocol header includes information such as the source and
+destination IP addresses and ports, allowing the backend server to obtain the
+original client's IP address even in a TCP proxy scenario.
+
+
+## Handling Cross-Origin
+
+### What is Cross-Origin
+
+Cross-origin refers to making requests or loading resources from a different
+domain, protocol, or port than the one from which the current web page
+originated. In the context of HTTP (Hypertext Transfer Protocol), the
+same-origin policy is a security measure implemented by web browsers to
+restrict web pages from making requests to a different domain than the one that
+served the original web page.
+
+The same-origin policy helps prevent various security vulnerabilities, such as
+cross-site request forgery (CSRF) and cross-site scripting (XSS). However,
+there are situations where you might need to make cross-origin requests or
+share resources between different origins. In such cases, you need to deal with
+Cross-Origin Resource Sharing (CORS).
+
+CORS is a mechanism that allows web servers to specify which origins are
+permitted to access their resources. It involves both the browser and the
+server cooperating to determine if a web application running at one origin
+should be allowed to access resources from a different origin.
+
+
+### HAProxy Config
+
+Handling Cross-Origin Resource Sharing (CORS) in HAProxy involves configuring
+the appropriate HTTP headers to allow or restrict cross-origin requests. CORS
+is a security feature implemented by web browsers that restricts web pages from
+making requests to a different domain than the one that served the original web
+page.
+
+Here's an example of how you can configure HAProxy to handle CORS:
+
+```plaintext
+frontend my_frontend
+    bind *:80
+    mode http
+
+    # Define ACLs for CORS-related conditions
+    acl is_cors_preflight method OPTIONS
+    acl is_cors_request method GET HEAD POST
+
+    # Set CORS headers for preflight requests
+    http-response set-header Access-Control-Allow-Origin %[req.hdr(Origin)]
+    http-response set-header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    http-response set-header Access-Control-Allow-Headers "Content-Type"
+
+    # Handle preflight requests
+    use_backend cors_preflight_backend if is_cors_preflight
+
+    # Default backend for regular CORS requests
+    default_backend my_backend
+
+backend cors_preflight_backend
+    mode http
+    http-response set-header Access-Control-Allow-Origin %[req.hdr(Origin)]
+    http-response set-header Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    http-response set-header Access-Control-Allow-Headers "Content-Type"
+    http-response set-header Access-Control-Max-Age "3600"
+    http-response set-status 204
+    option httplog
+
+backend my_backend
+    mode http
+    option httplog
+    # Your regular backend configuration
+    server server1 192.168.1.10:80 check
+    server server2 192.168.1.11:80 check
+```
+
+Explanation:
+
+- The ACLs `is_cors_preflight` and `is_cors_request` are used to identify CORS
+preflight requests (OPTIONS method) and regular CORS requests (GET, HEAD, POST
+methods).
+- The `http-response set-header` lines set the necessary CORS headers for both
+preflight and regular requests. The `Access-Control-Allow-Origin` header is set
+based on the `Origin` header from the request.
+- The `use_backend cors_preflight_backend if is_cors_preflight` line directs
+preflight requests to a separate backend (`cors_preflight_backend`) that
+responds with the appropriate headers and a 204 status code.
+- The `default_backend my_backend` line routes regular CORS requests to your
+main backend (`my_backend`).
+
+## Using HAProxy as a Databse Loadbalancer
+
+Using HAProxy as a database load balancer is a common use case to distribute
+database queries across multiple database servers, improving performance,
+scalability, and providing high availability. Below are the general steps to
+set up HAProxy for database load balancing:
+
+**Configure HAProxy:**
+
+Create a configuration file for HAProxy (e.g., `haproxy.cfg`) and define the
+backend database servers. Adjust the configuration based on your database type
+(e.g., MySQL, PostgreSQL). Here's a basic example for MySQL:
+
+```plaintext
+global
+    log /dev/log local0
+    log /dev/log local1 notice
+    chroot /var/lib/haproxy
+    stats socket /run/haproxy/admin.sock mode 660 level admin
+    stats timeout 30s
+    user haproxy
+    group haproxy
+    daemon
+
+defaults
+    log global
+    mode tcp
+    option tcplog
+    timeout connect 5000
+    timeout client 50000
+    timeout server 50000
+
+listen mysql-cluster
+    bind *:3306
+    mode tcp
+    balance roundrobin
+    option tcp-check
+    server db1 192.168.1.10:3306 check inter 5s fall 2 rise 2
+    server db2 192.168.1.11:3306 check inter 5s fall 2 rise 2
+    # Add more servers as needed
+```
+
+**Important Considerations:**
+
+- **Connection Pooling:** Depending on your database, consider enabling
+connection pooling to efficiently manage and reuse database connections.
+- **SSL/TLS:** If your database connections need to be encrypted, configure
+HAProxy to handle SSL/TLS termination.
+- **High Availability:** Consider adding features like health checks, automatic
+server recovery, and backups for high availability.
+
+> **Note:** Fore better database loadbalancing you can use better practices
+> like `proxySQL` or `MaxScle`
 
 ## Tips
 
@@ -3062,6 +4533,8 @@ haproxy -c -f /etc/haproxy/haproxy.cfg
   ```bash
   halog --help
   halog -srv < /var/log/haproxy.log
+
+* To debug HAProxy you can use the following command:
+  ```bash
+   haproxy -d -f /etc/haproxy/haproxy.cfg
   ```
-
-
