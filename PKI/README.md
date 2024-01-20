@@ -1,3 +1,33 @@
+
+Table of Contents
+=================
+
+* [Public Key Infrastructure](#public-key-infrastructure)
+   * [What is PKI?](#what-is-pki)
+   * [PKI Components](#pki-components)
+   * [PKI Terminology](#pki-terminology)
+   * [What is PKI's use-case](#what-is-pkis-use-case)
+   * [How Does PKI Work?](#how-does-pki-work)
+      * [Symmetric Encryption](#symmetric-encryption)
+      * [Asymmetric Encryption](#asymmetric-encryption)
+      * [Chronological flow of issuing a cert](#chronological-flow-of-issuing-a-cert)
+      * [Schematic Demonstration](#schematic-demonstration)
+   * [The Emergence of PKI to Govern Encryption Keys](#the-emergence-of-pki-to-govern-encryption-keys)
+   * [The Role of Digital Certificates in PKI](#the-role-of-digital-certificates-in-pki)
+   * [Introducing Certification Authorities](#introducing-certification-authorities)
+   * [How the Certificate Creation Process Works](#how-the-certificate-creation-process-works)
+   * [How CA Hierarchies and Root CAs Create Layers of Trust](#how-ca-hierarchies-and-root-cas-create-layers-of-trust)
+   * [Root CA Security is of Utmost Importance [Infromation]](#root-ca-security-is-of-utmost-importance-infromation)
+   * [Determining the Optimal Level of Tiers in Your PKI’s CA Hierarchy](#determining-the-optimal-level-of-tiers-in-your-pkis-ca-hierarchy)
+   * [Managing Revocation Through Certificate Revocation Lists](#managing-revocation-through-certificate-revocation-lists)
+   * [Trusted Root Certificates](#trusted-root-certificates)
+   * [What are Common Challenges that PKI Solves?](#what-are-common-challenges-that-pki-solves)
+   * [Generate self-signed certificate](#generate-self-signed-certificate)
+   * [Get a valid cert from letsencrypt](#get-a-valid-cert-from-letsencrypt)
+      * [Prerequisites:](#prerequisites)
+      * [Steps:](#steps)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
 # Public Key Infrastructure
 
 ## What is PKI?
@@ -220,57 +250,66 @@ This chronological flow ensures that digital certificates are issued securely an
 ### Schematic Demonstration 
 
 ```
-  +--------------------------+           +----------------------+
-  | Certificate Request      |           |                      |
-  | Generation               +----------->| Certificate          |
-  |                          |           | Enrollment           |
-  +--------------------------+           |                      |
-                                       +----------------------+
-                                                |
-                                                |
-                                                v
+  +--------------------------+         +----------------------+
+  | Certificate Request      |         |  Certificate         |
+  | Generation               +-------->|  Enrollment          |
+  |                          |         |                      |
+  +--------------------------+         +----------------------+
+                                                  |
+                                                  |
+                                                  v
                                        +----------------------+
                                        | Identity             |
                                        | Verification         |
                                        |                      |
                                        +----------------------+
-                                                |
-                                                |
-                                                v
+                                                  |
+                                                  |
+                                                  v
                                        +----------------------+
                                        | CSR Validation       |
                                        |                      |
                                        +----------------------+
-                                                |
-                                                |
-                                                v
+                                                  |
+                                                  |
+                                                  v
                                        +----------------------+
                                        | Certificate Issuance |
                                        |                      |
                                        +----------------------+
-                                                |
-                                                |
-                                                v
+                                                  |
+                                                  |
+                                                  v
                                        +----------------------+
                                        | Certificate          |
                                        | Distribution         |
                                        |                      |
                                        +----------------------+
-                                                |
-                                                |
-                                                v
+                                                  |
+                                                  |
+                                                  v
                                        +----------------------+
                                        | Certificate          |
                                        | Installation         |
                                        |                      |
                                        +----------------------+
-                                                |
-                                                |
-                                                v
+                                                  |
+                                                  |
+                                                  v
                                        +----------------------+
                                        | Certificate          |
                                        | Revocation           |
                                        | Management           |
+                                       |                      |
+                                       +----------------------+
+                                                  |
+                                                  |
+                                                  v
+                                       +----------------------+
+                                       | Certificate          |
+                                       | Authority (CA)       |
+                                       | (Root Level)         |
+                                       |                      |
                                        +----------------------+
 ```
 
