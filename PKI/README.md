@@ -29,6 +29,57 @@ An entity must be uniquely identifiable within each CA domain on the basis of
 information about that entity. A third-party validation authority (VA) can
 provide this entity information on behalf of the CA.
 
+
+## PKI Components
+
+1. **Public Key and Private Key:**
+   - **Public Key:** This is a cryptographic key that is shared openly and can be freely distributed. It is used for encryption and verifying digital signatures. When someone wants to send you an encrypted message or verify a signature you created, they use your public key.
+   - **Private Key:** This is the secret counterpart to the public key. It must be kept confidential and known only to the owner. The private key is used for decrypting messages that were encrypted with the corresponding public key and for creating digital signatures.
+
+2. **Digital Certificates:**
+   - A digital certificate is an electronic document that binds a public key to an individual, device, or service. It contains information about the key, the identity of its owner, and the digital signature of the Certificate Authority (CA) that issued the certificate.
+   - Digital certificates serve as a means of verifying the authenticity of the public key and the identity of the certificate holder.
+
+3. **Certificate Authority (CA):**
+   - The CA is a trusted entity responsible for issuing digital certificates. It verifies the identity of certificate applicants before issuing certificates to them.
+   - CAs establish and vouch for the authenticity of public keys, creating a web of trust. Well-known CAs are included in web browsers and other software, making it easier for users to trust the certificates they issue.
+
+4. **Registration Authority (RA):**
+   - The RA is an entity that works with the CA. It is responsible for authenticating users and accepting their requests for digital certificates.
+   - While the CA issues certificates, the RA performs the initial identity verification and validation, ensuring that the requester is who they claim to be.
+
+5. **Certificate Revocation List (CRL):**
+   - A CRL is a list of certificates that have been revoked by the CA before their scheduled expiration date. Certificates may be revoked if the private key is compromised or if the certificate holder's information changes.
+   - Applications can check the CRL to determine if a particular certificate is still valid. This is crucial for maintaining the security of the PKI.
+
+## PKI Terminology
+
+| Term                       | Definition                                                                                                                                                                                                                                      |
+|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Public Key Infrastructure (PKI)** | The framework and set of standards for managing digital keys and certificates, providing a secure method for exchanging digital information.                                                                                                   |
+| **Public Key**             | A cryptographic key shared openly for encryption and verifying digital signatures.                                                                                                                                                               |
+| **Private Key**            | A secret key known only to the owner, used for decryption and creating digital signatures.                                                                                                                                                       |
+| **Digital Certificate**   | An electronic document binding a public key to an entity, issued by a Certificate Authority (CA).                                                                                                                                              |
+| **Certificate Authority (CA)**   | A trusted entity responsible for issuing and managing digital certificates.                                                                                                                                                                     |
+| **Registration Authority (RA)**   | An entity working with the CA to authenticate users and accept requests for digital certificates.                                                                                                                                              |
+| **Certificate Revocation List (CRL)** | A list maintained by the CA, containing serial numbers of revoked certificates.                                                                                                                                                                |
+| **Certificate Signing Request (CSR)** | A request to a CA for a digital certificate, including the public key and requester's information.                                                                                                                                               |
+| **Subject**                | The entity (individual, device, or service) for which a digital certificate is issued.                                                                                                                                                           |
+| **Issuer**                 | The entity (CA) issuing the digital certificate.                                                                                                                                                                                                |
+| **Validity Period**        | The time during which a digital certificate is considered valid.                                                                                                                                                                                |
+| **Key Pair**               | A combination of a public key and its corresponding private key.                                                                                                                                                                               |
+| **Revocation**             | The process of invalidating a digital certificate before its expiration date.                                                                                                                                                                    |
+| **Trust Model**            | The approach used to establish trust in a PKI, often hierarchical with trusted root CAs.                                                                                                                                                         |
+| **End Entity**             | The final user or device in a PKI system.                                                                                                                                                                                                       |
+| **Intermediate Certificate Authority** | A CA subordinate to a root CA, issuing certificates on behalf of the root CA.                                                                                                                                                                    |
+| **Root Certificate**       | The top-level self-signed certificate in a PKI hierarchy used to sign other certificates.                                                                                                                                                        |
+| **Cross-Certification**    | A process where two CAs establish trust by issuing certificates for each other.                                                                                                                                                                  |
+| **Key Escrow**             | Storing a copy of a user's private key in case it needs to be recovered.                                                                                                                                                                         |
+| **Digital Signature**      | A cryptographic technique verifying the authenticity and integrity of digital messages or documents.                                                                                                                                           |
+
+Understanding these terms is crucial for navigating and implementing PKI successfully.
+
+
 ## What is PKI's use-case
 
 Today, organizations rely on PKI to manage security through encryption.
@@ -135,6 +186,99 @@ Asymmetric encryption powers things like:
 * Bitcoin/Blockchain 
 * Signal private messenger 
 * Digital signatures
+
+### Chronological flow of issuing a cert
+
+1. **Certificate Request Generation:**
+   - An entity, often referred to as the "subject" (individual, device, or service), generates a key pair consisting of a public key and a private key. The subject creates a Certificate Signing Request (CSR), which includes the public key and information about the entity.
+
+2. **Certificate Enrollment:**
+   - The subject submits the CSR to the Certificate Authority (CA) or a Registration Authority (RA). The CA may have specific requirements for identity verification before issuing a certificate.
+
+3. **Identity Verification:**
+   - The CA or RA performs identity verification to ensure that the entity requesting the certificate is who they claim to be. This process may involve verifying documentation or using other authentication methods.
+
+4. **CSR Validation:**
+   - The CA validates the information in the CSR, ensuring that it matches the entity's identity and that the public key is valid.
+
+5. **Certificate Issuance:**
+   - Upon successful validation, the CA issues a digital certificate. The certificate includes the public key, information about the subject, the digital signature of the CA, and a validity period.
+
+6. **Certificate Distribution:**
+   - The CA sends the issued digital certificate to the subject. Depending on the use case, the certificate may be distributed through various means, such as email, secure download, or a dedicated secure channel.
+
+7. **Certificate Installation:**
+   - The subject installs the digital certificate on the intended device or system. This involves associating the private key with the corresponding public key in the certificate.
+
+8. **Certificate Revocation Management:**
+   - The CA maintains a Certificate Revocation List (CRL) that includes information about revoked certificates. In case a private key is compromised or the certificate needs to be revoked for other reasons, the CA updates the CRL.
+
+It's important to note that in some cases, especially in large-scale PKI deployments, there might be intermediate steps, such as cross-certification or additional levels of hierarchy involving subordinate CAs.
+
+This chronological flow ensures that digital certificates are issued securely and that the identity of the certificate holder is verified before the certificate is trusted in a public key infrastructure.
+
+### Schematic Demonstration 
+
+```
+  +--------------------------+           +----------------------+
+  | Certificate Request      |           |                      |
+  | Generation               +----------->| Certificate          |
+  |                          |           | Enrollment           |
+  +--------------------------+           |                      |
+                                       +----------------------+
+                                                |
+                                                |
+                                                v
+                                       +----------------------+
+                                       | Identity             |
+                                       | Verification         |
+                                       |                      |
+                                       +----------------------+
+                                                |
+                                                |
+                                                v
+                                       +----------------------+
+                                       | CSR Validation       |
+                                       |                      |
+                                       +----------------------+
+                                                |
+                                                |
+                                                v
+                                       +----------------------+
+                                       | Certificate Issuance |
+                                       |                      |
+                                       +----------------------+
+                                                |
+                                                |
+                                                v
+                                       +----------------------+
+                                       | Certificate          |
+                                       | Distribution         |
+                                       |                      |
+                                       +----------------------+
+                                                |
+                                                |
+                                                v
+                                       +----------------------+
+                                       | Certificate          |
+                                       | Installation         |
+                                       |                      |
+                                       +----------------------+
+                                                |
+                                                |
+                                                v
+                                       +----------------------+
+                                       | Certificate          |
+                                       | Revocation           |
+                                       | Management           |
+                                       +----------------------+
+```
+
+This representation uses boxes to depict each step and arrows to
+indicate the chronological flow from one step to the next. Note that
+this is a simplified representation, and the actual implementation might
+involve additional details and steps.
+
 
 ## The Emergence of PKI to Govern Encryption Keys
 
@@ -332,6 +476,126 @@ cases include:
 * Password-free Wifi access based on device ownership 
 * Email and data encryption
 
+## Generate self-signed certificate
+
+To generate a self-signed certificate with a Certificate Authority (CA),
+you can use various tools depending on your system and requirements.
+Below, I'll provide a general guide using OpenSSL, a widely used
+open-source tool for working with SSL/TLS protocols and certificates.
+This example assumes you have OpenSSL installed on your system.
+
+1. **Create a Private Key for the CA:**
+   ```bash
+   openssl genpkey -algorithm RSA -out ca-key.pem
+   ```
+
+2. **Create a Self-Signed Certificate for the CA:**
+   ```bash
+   openssl req -new -x509 -key ca-key.pem -out ca-cert.pem
+   ```
+
+   Follow the prompts to provide information about the CA, such as country, state, organization, etc.
+
+3. **Create a Private Key for the Server:**
+   ```bash
+   openssl genpkey -algorithm RSA -out server-key.pem
+   ```
+
+4. **Create a Certificate Signing Request (CSR) for the Server:**
+   ```bash
+   openssl req -new -key server-key.pem -out server-csr.pem
+   ```
+
+   Again, follow the prompts to provide information about the server.
+
+5. **Sign the Server CSR with the CA:**
+   ```bash
+   openssl x509 -req -in server-csr.pem -CA ca-cert.pem -CAkey ca-key.pem -out server-cert.pem -CAcreateserial
+   ```
+
+   This command signs the server CSR with the CA, producing the server certificate (`server-cert.pem`).
+
+Now, you have a self-signed CA certificate (`ca-cert.pem`) and a signed server certificate (`server-cert.pem`). Keep the private keys (`ca-key.pem` and `server-key.pem`) secure.
+
+## Get a valid cert from `letsencrypt`
+
+Obtaining a certificate with Let's Encrypt is a straightforward process,
+and they provide an easy-to-use tool called Certbot for this purpose.
+Here are the general steps to get a certificate with Let's Encrypt using
+Certbot:
+
+### Prerequisites:
+1. Ensure you have a domain name pointing to your server's IP address.
+2. Make sure your server is reachable on ports 80 and 443.
+
+### Steps:
+
+1. **Install Certbot:**
+   On many systems, Certbot can be installed using package managers. The following commands are examples for various systems:
+
+   - **Ubuntu/Debian:**
+     ```bash
+     sudo apt-get update
+     sudo apt-get install certbot
+     ```
+
+   - **CentOS/RHEL:**
+     ```bash
+     sudo yum install certbot
+     ```
+
+   - **Others:**
+     Refer to the [Certbot installation guide](https://certbot.eff.org/instructions) for your specific system.
+
+2. **Run Certbot:**
+   Execute the following command and follow the prompts:
+
+   ```bash
+   sudo certbot certonly --standalone -d yourdomain.com
+   ```
+
+   Replace `yourdomain.com` with your actual domain. Certbot will
+   temporarily stop your web server, authenticate with Let's Encrypt,
+   and obtain the certificate.
+
+3. **Configure Your Web Server:**
+   After obtaining the certificate, Certbot will display the path to the certificate files. Update your web server configuration to use these files. For example, for Nginx:
+
+   ```nginx
+   server {
+       listen 443 ssl;
+       server_name yourdomain.com;
+
+       ssl_certificate /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+       ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+
+       # Other SSL configuration...
+   }
+   ```
+
+4. **Automatic Renewal (Optional):**
+   Certificates from Let's Encrypt are valid for 90 days. It's recommended to set up automatic renewal to avoid expiration issues. Certbot can handle this for you.
+
+   Run the following command to test the renewal process:
+
+   ```bash
+   sudo certbot renew --dry-run
+   ```
+
+   If it runs successfully, you can add a cron job to automatically renew the certificates:
+
+   ```bash
+   sudo crontab -e
+   ```
+
+   Add the following line to run the renewal check twice a day:
+
+   ```cron
+   0 0,12 * * * certbot renew
+   ```
+
+   This checks for renewals twice a day but only renews if a certificate is within 30 days of expiration.
+
 
 Related:
 ```
@@ -339,5 +603,6 @@ Related:
 * https://en.wikipedia.org/wiki/Public_key_infrastructure
 * https://cpl.thalesgroup.com/faq/public-key-infrastructure-pki/what-public-key-infrastructure-pki
 ```
+
 
 
