@@ -901,3 +901,29 @@ In ansible ```project.yaml``` you can define a ```remote_user``` like:
 ## Example project 5
 
 Install Apache
+
+
+# `ansible-vault`
+
+| Command                   | Description                                                                                           | Options                                                                                                    |
+|---------------------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| ansible-vault create      | Creates a new encrypted file.                                                                        | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault edit        | Opens an encrypted file in an editor for editing.                                                     | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault decrypt     | Decrypts an encrypted file.                                                                          | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault encrypt     | Encrypts a file.                                                                                     | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault rekey       | Changes the encryption password for a file.                                                          | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault view        | Displays the contents of an encrypted file without editing.                                           | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault encrypt_string | Encrypts a string and outputs it in a format that can be used in Ansible files.                     | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault decrypt_string | Decrypts a string that was previously encrypted with `encrypt_string`.                                | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault view_string | Displays the contents of an encrypted string without editing.                                         | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault encrypt_file | Encrypts a file in place.                                                                             | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault decrypt_file | Decrypts an encrypted file in place.                                                                  | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault rekey_file   | Changes the encryption password for a file in place.                                                  | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault view_file    | Displays the contents of an encrypted file without editing.                                           | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault encrypt_config | Encrypts a configuration file.                                                                       | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault decrypt_config | Decrypts an encrypted configuration file.                                                            | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault rekey_config | Changes the encryption password for a configuration file.                                             | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault view_config  | Displays the contents of an encrypted configuration file without editing.                             | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault encrypt_var  | Encrypts a variable and outputs it in a format that can be used in Ansible files.                     | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault decrypt_var  | Decrypts a variable that was previously encrypted with `encrypt_var`.                                  | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
+| ansible-vault view_var     | Displays the contents of an encrypted variable without editing.                                       | - --vault-id VAULT_ID <br> - --vault-password-file PATH <br> - --vault-password-prompt <br> - --vault-password-stdin |
