@@ -111,13 +111,11 @@ If you're running out of inodes, it might be due to a large number of small file
 
 ```bash
 du -a /path/to/directory | sort -n -r | head -n  20
-
-find / -xdev -printf '%h\n' 2> /dev/null | sort | uniq -c | sort -k  1 -n
 ```
 
 This command lists the sizes of files and directories under `/path/to/directory`, sorted in descending order, and shows the top  20 largest.
 
-The following command locate the directory with the most files
+The following command lists files sorted by the number of inodes they use. It might take some time to complete, especially on large filesystems.
 
 ```bash
 find / -xdev -printf '%h\n'  2> /dev/null | sort | uniq -c | sort -k  1 -n
