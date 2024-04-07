@@ -176,10 +176,39 @@ kubeadm join 192.168.74.137:6443 --token ocbdbr.ghcbi8pw2xgbxqai \
          --discovery-token-ca-cert-hash sha256:11666d5f78f76f3c5b697839460a92eac1f7fd012bcd667d2e879aa5ac6eaa44
 ```
 
+## Renew cluster certificates
+
+1. Check certs status
+```bash
+kubeadm certs check-expiration
+```
+
+2. Backup the existing certs [optional]
+```bash
+tar cvf pki_`date +%Y-%m-%d`.tar pki 
+```
+3. Renew certs:
+```bash
+kubeadm certs renew all
+```
+4. Backup old kuber config
+```bash
+~/.kube/config ~/.kube/config_`date +%Y-%m-%d`
+```
+5. Copy new config from `/etc/kubernetes/`
+```bash
+cp /etc/kubernetes/admin.conf ~/.kube/config
+```
+6. Check cluster status
+```bsah
+kubectl get ns
+```
+
 Related: 
 ```
 * https://thinkvirtualblog.wordpress.com/2021/04/25/install-kubernetes-on-vmware-workstation/
 * https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/
 * https://askubuntu.com/questions/1273024/docker-io-depends-containerd-1-2-6-0ubuntu1
 * https://old.reddit.com/r/kubernetes/comments/utiymt/kubeadm_init_running_into_issue_error_cri/
+* https://www.codurance.com/publications/kubeadm-cluster-certs
 ```
