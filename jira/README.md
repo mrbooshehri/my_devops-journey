@@ -5,8 +5,9 @@
 ### Mysql 5.7
 
 ```mysql
+CREATE DATABASE jiradb CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER,INDEX on jiradb.* TO 'jirauser'@'%' IDENTIFIED BY '<PASSWORD>';
-flush privileges;
+FLUSH PRIVILEGES;
 ```
 
 ### Mysql 8
@@ -21,9 +22,11 @@ GRANT ALL PRIVILEGES ON jiradb.* TO 'jirauser'@'%';
 FLUSH PRIVILEGES;
 ```
 
-Add the following lines in ```/etc/mt.conf```
+Add the following lines in ```/etc/mysql/my.cnf```
 ```mysql
 [mysqld]
+bind-address = 0.0.0.0
+max_connections = 100
 default-storage-engine=INNODB
 character_set_server=utf8mb4
 innodb_default_row_format=DYNAMIC
