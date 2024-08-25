@@ -1,4 +1,202 @@
-To install Prometheus on Ubuntu, you can follow these steps:
+# Learning Prometheus hands-on
+
+Learning Prometheus through a hands-on scenario like setting up a Docker
+Compose environment with services generating logs, which are then
+monitored by Prometheus and visualized with Grafana, is an excellent
+approach. This will give you practical experience with these tools and
+how they work together. Let's break down the steps and create a Docker
+Compose file for this scenario.
+
+
+## Step-by-Step Thought Process
+
+1. **Docker Compose Setup**: We'll start by defining a Docker Compose file that includes three main services: a log generator service, Prometheus, and Grafana.
+
+2. **Log Generator Service**: For simplicity, we can create a custom Docker image that runs a simple application generating logs at regular intervals. These logs will simulate the kind of data Prometheus might monitor in a real-world scenario.
+
+3. **Prometheus Configuration**: We'll configure Prometheus to scrape logs from our log generator service. This involves setting up a `prometheus.yml` configuration file that defines the target for log scraping.
+
+4. **Grafana Setup**: Finally, we'll set up Grafana to connect to our Prometheus instance so we can visualize the log data through dashboards.
+
+5. **Networking**: Ensure all services are on the same network so they can communicate with each other.
+
+6. **Volumes**: Use Docker volumes for Prometheus and Grafana to persist data across container restarts.
+
+## Key Points to Consider
+
+- **Log Format**: Decide on a simple log format that Prometheus can easily parse.
+- **Prometheus Configuration**: Properly configure Prometheus to scrape logs from our service.
+- **Grafana Dashboards**: Learn how to create dashboards in Grafana to visualize the log data.
+
+### Docker Compose Implementation
+
+Let's start by creating a simple log generator service. We'll use Python for this example due to its simplicity and wide adoption.
+
+1. **Create a Python Script (`log_generator.py`)**:
+```python
+import time
+import logging
+
+logging.basicConfig(filename='app.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+
+while True:
+    logging.info('This is a test log message')
+    time.sleep(1)
+```
+
+2. **Dockerfile for Log Generator**:
+```dockerfile
+FROM python:3.8-slim
+
+WORKDIR /app
+
+COPY log_generator.py .
+
+CMD ["python", "./log_generator.py"]
+```
+
+3. **Docker Compose File (`docker-compose.yml`)**:
+```yaml
+version: '3.8'
+
+services:
+  log-generator:
+    build: .
+    volumes:
+      - ./log_generator.py:/app/log_generator.py
+    networks:
+      - monitoring-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring-network
+
+networks:
+  monitoring-network:
+```
+
+4. **Prometheus Configuration File (`prometheus.yml`)**:
+```yaml
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds.
+
+scrape_configs:
+  - job_name: 'log-generator'
+    static_configs:
+      - targets: ['log-generator:80']
+```
+
+# Prometheus Configuration File (`prometheus.yml`)
+
+```yaml
+global:
+  scrape_interval:     15s # How often Prometheus scrapes targets.
+  evaluation_interval: 15s # How often Prometheus evaluates rules.
+
+scrape_configs:
+  - job_name: 'log-generator' # Name of the job.
+    static_configs:
+      - targets: ['log-generator:80'] # Target to scrape. Assuming our log generator exposes logs on port 80.
+    metrics_path: '/metrics' # Path where Prometheus expects to find metrics.
+    scheme: 'http' # Protocol used to scrape the target.
+    relabel_configs: # Optional: Modify labels before scraping.
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: log-generator:80 # Ensures Prometheus knows where to scrape.
+
+rule_files: # Optional: Path to rule files for alerting or recording rules.
+  - "rules.yml"
+
+alerting: # Optional: Configuration for alerting.
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093'] # Assuming Alertmanager is also part of your monitoring stack.
+
+```
+
+## Explanation
+
+- **`global`**: This section defines global settings for Prometheus. 
+  - `scrape_interval`: Determines how frequently Prometheus scrapes metrics from targets. In this example, it's set to every 15 seconds.
+  - `evaluation_interval`: Specifies how often Prometheus evaluates rules (for alerting or recording). Also set to 15 seconds in this case.
+
+- **`scrape_configs`**: Defines how Prometheus discovers and scrapes targets.
+  - `job_name`: A name identifying the job. Useful for distinguishing between different scraping configurations.
+  - `static_configs`: Specifies static targets to scrape. Here, we target our log generator service. Note that in a real-world scenario, your log generator might expose metrics on a different port or path, so adjust accordingly.
+  - `metrics_path`: The path Prometheus will scrape for metrics. This is often `/metrics` but can vary based on the service being monitored.
+  - `scheme`: Specifies whether to scrape over HTTP or HTTPS. Since our log generator likely doesn't use SSL/TLS, we use `http`.
+  - `relabel_configs`: Allows for dynamic modification of labels before scraping. This example shows how to ensure Prometheus correctly identifies and scrapes our log generator service. Adjustments might be necessary based on your specific setup.
+
+- **`rule_files`**: Optional. Specifies the location of rule files for alerting or recording rules. This is useful for defining alerts based on the metrics collected.
+
+- **`alerting`**: Optional. Configures how Prometheus sends alerts. This example shows a basic setup pointing to an Alertmanager instance, assuming you have one running as part of your monitoring stack.
+
+Here's a table of all available options in `prometheus.yaml`
+
+| Section          | Option                     | Description                                                                                                                                                                                                 |
+|------------------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `global`         | `scrape_interval`          | How often Prometheus scrapes targets.                                                                                                                                                                       |
+|                  | `evaluation_interval`      | How often Prometheus evaluates rules.                                                                                                                                                                        |
+|                  | `external_labels`          | Labels to add to any time series or alerts when communicating with external systems.                                                                                                                           |
+|                  | `scrape_configs`           | List of configurations that define where and how Prometheus should scrape metrics.                                                                                                                             |
+| `scrape_config`  | `job_name`                 | Name identifying the job.                                                                                                                                                                                   |
+|                  | `metrics_path`             | Path to scrape for metrics.                                                                                                                                                                                  |
+|                  | `scheme`                   | Protocol scheme to use for scraping (e.g., `http` or `https`).                                                                                                                                                |
+|                  | `static_configs`           | Static target configurations.                                                                                                                                                                                |
+|                  | `relabel_configs`          | Allows dynamic modification of labels before scraping.                                                                                                                                                         |
+|                  | `metric_relabel_configs`   | Allows dynamic modification of metric names and labels before ingestion.                                                                                                                                       |
+|                  | `params`                   | Defines query parameters to send with the scrape request.                                                                                                                                                       |
+|                  | `basic_auth`, `bearer_token`, `bearer_token_file` | Authentication methods for scraping targets.                                                                                                                                                   |
+|                  | `tls_config`               | TLS configuration for scraping over HTTPS.                                                                                                                                                                     |
+|                  | `proxy_url`                | URL of an HTTP proxy to use for scraping.                                                                                                                                                                      |
+|                  | `honor_labels`             | Controls how Prometheus merges labels from scrapes.                                                                                                                                                             |
+|                  | `sample_limit`             | Maximum number of samples to retrieve for each scrape.                                                                                                                                                         |
+|                  | `timeout`                  | Scrape timeout.                                                                                                                                                                                              |
+| `alerting`       | `alertmanagers`            | Configuration for alertmanager instances.                                                                                                                                                                     |
+|                  | `static_configs`           | Static configurations of alertmanager addresses.                                                                                                                                                               |
+| `rule_files`     |                          | List of rule files for alerting and recording rules.                                                                                                                                                             |
+| `query`          | `max_concurrent_selects`   | Maximum number of concurrent select queries.                                                                                                                                                                  |
+|                  | `max_concurrent_range_selects` | Maximum number of concurrent range select queries.                                                                                                                                                          |
+|                  | `max_samples`              | Maximum number of samples a single query can return.                                                                                                                                                            |
+| `storage_tsdb`   | `path`                     | Data directory for time series storage.                                                                                                                                                                       |
+|                  | `wal_compression`          | Enables compression of the write-ahead log.                                                                                                                                                                     |
+|                  | `block_size`               | Maximum size of a TSDB block.                                                                                                                                                                                 |
+| `remote_write`   |                          | List of remote write configurations.                                                                                                                                                                           |
+|                  | `url`                      | URL of the remote endpoint.                                                                                                                                                                                  |
+|                  | `remote_timeout`           | Timeout for requests to the remote write endpoint.                                                                                                                                                             |
+| `remote_read`    |                          | List of remote read configurations.                                                                                                                                                                            |
+|                  | `url`                      | URL of the remote endpoint.                                                                                                                                                                                  |
+|                  | `read_recent`              | Whether reads should fetch data from the most recent block.                                                                                                                                                      |
+| `web`            | `listen_address`           | Address to listen on for the web interface and API.                                                                                                                                                             |
+|                  | `external_url`             | The URL under which Prometheus is externally reachable.                                                                                                                                                         |
+|                  | `route_prefix`             | Prefix for the internal server routes.                                                                                                                                                                         |
+| `lifecycle`      | `addr`                     | Address to listen on for gRPC.                                                                                                                                                                                |
+|                  | `per_serve_probe`          | Whether to perform a health check probe for each scrape.                                                                                                                                                        |
+
+This table provides a high-level overview of the configuration options
+available in Prometheus. For detailed descriptions and additional
+options, refer to the [official Prometheus documentation](https://prometheus.io/docs/introduction/overview/).
+
+
+
+# To install Prometheus on Ubuntu, you can follow these steps:
 
 1. Download the latest version of Prometheus from the official website using the following command:
 
