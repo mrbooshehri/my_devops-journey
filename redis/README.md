@@ -852,3 +852,248 @@ ls -l /var/lib/redis/dump.rdb
 
 8. **noeviction**: Returns an error when the memory limit is reached and
 	 no keys are removed.
+
+
+# Scaling
+
+## Linear Scaling in Redis Enterprise
+
+- **Introduction to Linear Scaling**: Linear scaling is a method of
+  scaling databases that allows for both horizontal and vertical
+  scaling. This approach ensures that as the data volume grows, the
+  database can handle the increased load by either adding more nodes
+  (horizontal scaling) or increasing the capacity of existing nodes
+  (vertical scaling).
+
+- **Benefits of Linear Scaling**:
+  - **Performance**: Linear scaling ensures that the database can handle
+    increased load without a significant drop in performance. This is
+    crucial for applications that require high availability and low
+    latency.
+  - **Cost-Effectiveness**: By allowing for both horizontal and vertical
+    scaling, linear scaling can help reduce costs. It enables businesses
+    to start with a smaller setup and scale up as needed, rather than
+    investing in a large infrastructure upfront.
+  - **Flexibility**: Linear scaling provides the flexibility to adapt to
+    changing data volume and application requirements. It allows
+    businesses to scale their databases according to their needs,
+    ensuring that they have the resources to support their growth.
+
+- **How Linear Scaling Works in Redis Enterprise**:
+  - **Horizontal Scaling**: Redis Enterprise supports horizontal scaling
+    through sharding. This involves distributing the data across
+    multiple nodes, allowing for parallel processing and increased
+    throughput.
+  - **Vertical Scaling**: Vertical scaling is achieved by increasing the
+    capacity of existing nodes. This can include adding more memory,
+    CPU, or storage to existing nodes to handle larger data volumes.
+  - **Automatic Scaling**: Redis Enterprise provides automatic scaling
+    capabilities, which can adjust the database's configuration based on
+    the current load. This ensures that the database can handle
+    fluctuating data volumes without manual intervention.
+
+- **Use Cases for Linear Scaling**:
+  - **High-Volume Data Processing**: For applications that process large
+    volumes of data, linear scaling ensures that the database can handle
+    the increased load without compromising performance.
+  - **Real-Time Analytics**: Real-time analytics applications can
+    benefit from linear scaling, as it allows for the processing of
+    large datasets in real-time.
+  - **High-Availability Systems**: Systems that require high
+    availability can benefit from linear scaling, as it ensures that the
+    database can handle failures and continue to operate without
+    downtime.
+
+
+# Sharding
+
+Redis sharding is a technique used to distribute data across multiple
+Redis instances to improve performance, scalability, and reliability.
+Sharding is particularly useful in scenarios where a single Redis
+instance cannot handle the load or when the dataset is too large to fit
+into a single Redis instance. Here's a step-by-step explanation of how
+Redis sharding works and its benefits:
+
+## How Redis Sharding Works
+
+1. **Partitioning Data**: The first step in Redis sharding is to
+   partition the data. This involves dividing the dataset into smaller,
+   manageable chunks that can be stored on different Redis instances.
+   The partitioning can be done based on various strategies, such as key
+   range, hash, or consistent hashing.
+
+2. **Distributing Data**: Once the data is partitioned, it is
+   distributed across multiple Redis instances. Each instance is
+   responsible for a subset of the data. This distribution ensures that
+   the load is balanced across the instances, improving performance and
+   scalability.
+
+3. **Client Requests**: When a client makes a request to read or write
+   data, the request is routed to the appropriate Redis instance based
+   on the partitioning strategy. For example, if the data is partitioned
+   by key range, the client would hash the key to determine which
+   instance to query.
+
+4. **Handling Failures**: Sharding introduces the challenge of handling
+   failures. If one Redis instance fails, the system needs to ensure
+   that the data is still accessible. This can be achieved through
+   replication, where each partition is replicated across multiple
+   instances, or through data migration, where data is moved to other
+   instances to maintain balance.
+
+## Benefits of Redis Sharding
+
+- **Scalability**: Sharding allows for horizontal scaling, meaning you
+  can add more Redis instances to handle increased load without needing
+  to upgrade a single, larger instance.
+
+- **Performance**: By distributing the load across multiple instances,
+  sharding can significantly improve performance, especially for
+  read-heavy workloads.
+
+- **Reliability**: Sharding can improve the reliability of the system by
+  ensuring that the failure of a single instance does not lead to data
+  loss or downtime.
+
+- **Cost-Effectiveness**: For large datasets, sharding can be more
+  cost-effective than scaling up a single, larger Redis instance, as it
+  allows for more efficient use of resources.
+
+## Implementation Considerations
+
+- **Consistency**: Ensuring data consistency across shards is crucial.
+  Techniques like eventual consistency or strong consistency models can
+  be used, depending on the application's requirements.
+
+- **Client Support**: The client application or library must support
+  sharding, either by implementing the logic to route requests to the
+  correct Redis instance or by using a sharding library that abstracts
+  this complexity.
+
+- **Monitoring and Management**: Sharding introduces complexity in terms
+  of monitoring and managing the system. Tools and practices for
+  monitoring the health and performance of each Redis instance, as well
+  as the overall system, are essential.
+
+
+# Sentinel
+
+Redis Sentinel is a high availability (HA) solution for Redis. It
+provides a system to help manage Redis instances, monitor their health,
+and perform automatic failover in case of a master node failure.
+Sentinel is designed to be easy to configure and to work with minimal
+intervention, making it a popular choice for ensuring the reliability of
+Redis deployments. Here's a detailed explanation of how Redis Sentinel
+works and its key features:
+
+## How Redis Sentinel Works
+
+1. **Monitoring**: Sentinel continuously monitors the state of Redis
+   instances. It checks the health of the master and slave instances,
+   verifying that they are running and that the master is reachable by
+   the slaves.
+
+2. **Notification**: If a master node fails, Sentinel can notify other
+   systems or applications about the failure. This can be useful for
+   triggering alerts or automated failover processes.
+
+3. **Automatic Failover**: In the event of a master node failure,
+   Sentinel can automatically promote a slave to become the new master.
+   This process involves electing a new master from the available
+   slaves, ensuring that the system can continue to operate without
+   manual intervention.
+
+4. **Configuration Propagation**: When a slave is promoted to a master,
+   Sentinel can also propagate the configuration changes to the other
+   slaves, ensuring that they are aware of the new master and can
+   continue to operate correctly.
+
+## Key Features of Redis Sentinel
+
+- **High Availability**: Sentinel provides a high availability solution
+  for Redis, ensuring that the system can continue to operate even if
+  the master node fails.
+
+- **Automatic Failover**: Sentinel can automatically handle the failover
+  process, minimizing downtime and ensuring that the system remains
+  available.
+
+- **Monitoring and Alerting**: Sentinel monitors the health of Redis
+  instances and can alert administrators or trigger automated processes
+  in case of failures.
+
+- **Configuration Management**: Sentinel can manage the configuration of
+  Redis instances, including the promotion of slaves to masters and the
+  propagation of configuration changes.
+
+## Implementation Considerations
+
+- **Quorum**: Sentinel uses a quorum-based system to decide on the
+  failover. A quorum is the minimum number of Sentinel instances that
+  need to agree on the failover for it to proceed. This ensures that the
+  failover process is reliable and that it doesn't happen in the event
+  of network partitions or other issues.
+
+- **Security**: Sentinel communicates with Redis instances using the
+  same protocols and authentication mechanisms as Redis itself. It's
+  important to secure Sentinel communications to prevent unauthorized
+  access.
+
+- **Scalability**: While Sentinel is designed to be easy to set up and
+  manage, it's important to consider the scalability of your Sentinel
+  deployment as your Redis infrastructure grows. Adding more Sentinel
+  instances can help improve the reliability and performance of the
+  system.
+
+# Sharding vs Sentinel
+
+
+## Redis Sharding
+
+Redis sharding is a technique used to distribute data across multiple
+Redis instances. This is done to improve performance, scalability, and
+reliability by spreading the load across multiple nodes. Sharding can be
+implemented in various ways, such as by key range, hash, or consistent
+hashing. The primary goal of sharding is to allow a single application
+to scale horizontally by adding more Redis instances as the data grows.
+
+## Redis Sentinel
+
+Redis Sentinel is a high availability (HA) solution for Redis. It
+provides a system to monitor Redis instances, detect failures, and
+perform automatic failover in case of a master node failure. Sentinel
+ensures that the system can continue to operate even if the master node
+fails, by promoting a slave to become the new master.
+
+## Relationship Between Sharding and Sentinel
+
+- **Complementary Solutions**: Sharding and Sentinel can be used
+  together in a Redis deployment. Sharding can be used to distribute
+  data across multiple Redis instances, while Sentinel can be used to
+  ensure high availability and automatic failover for these instances.
+  This combination allows for both scalability (through sharding) and
+  reliability (through Sentinel).
+
+- **Use Cases**: In a scenario where you have a large dataset that needs
+  to be distributed across multiple Redis instances (sharding), and you
+  want to ensure high availability and automatic failover for these
+  instances (Sentinel), you would use both solutions together. This
+  setup allows your application to scale horizontally and remain highly
+  available.
+
+- **Configuration and Management**: When using both sharding and
+  Sentinel, it's important to carefully manage the configuration and
+  ensure that the Sentinel instances are aware of all the Redis
+  instances (both masters and slaves) in the sharded setup. This ensures
+  that Sentinel can correctly monitor the health of all instances and
+  perform failover if necessary.
+
+In summary, while Redis sharding and Redis Sentinel serve different
+purposes—sharding for scalability and Sentinel for high
+availability—they can be effectively used together in a Redis deployment
+to achieve both scalability and reliability. The key is to carefully
+plan and configure the system to ensure that both solutions work
+together seamlessly.
+
+# Distributed Caching in ASP.NET Core with Redis
+https://sahansera.dev/distributed-caching-aspnet-core-redis/
