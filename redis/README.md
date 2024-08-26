@@ -852,3 +852,58 @@ ls -l /var/lib/redis/dump.rdb
 
 8. **noeviction**: Returns an error when the memory limit is reached and
 	 no keys are removed.
+
+
+# Scaling
+
+## Linear Scaling in Redis Enterprise
+
+- **Introduction to Linear Scaling**: Linear scaling is a method of
+  scaling databases that allows for both horizontal and vertical
+  scaling. This approach ensures that as the data volume grows, the
+  database can handle the increased load by either adding more nodes
+  (horizontal scaling) or increasing the capacity of existing nodes
+  (vertical scaling).
+
+- **Benefits of Linear Scaling**:
+  - **Performance**: Linear scaling ensures that the database can handle
+    increased load without a significant drop in performance. This is
+    crucial for applications that require high availability and low
+    latency.
+  - **Cost-Effectiveness**: By allowing for both horizontal and vertical
+    scaling, linear scaling can help reduce costs. It enables businesses
+    to start with a smaller setup and scale up as needed, rather than
+    investing in a large infrastructure upfront.
+  - **Flexibility**: Linear scaling provides the flexibility to adapt to
+    changing data volume and application requirements. It allows
+    businesses to scale their databases according to their needs,
+    ensuring that they have the resources to support their growth.
+
+- **How Linear Scaling Works in Redis Enterprise**:
+  - **Horizontal Scaling**: Redis Enterprise supports horizontal scaling
+    through sharding. This involves distributing the data across
+    multiple nodes, allowing for parallel processing and increased
+    throughput.
+  - **Vertical Scaling**: Vertical scaling is achieved by increasing the
+    capacity of existing nodes. This can include adding more memory,
+    CPU, or storage to existing nodes to handle larger data volumes.
+  - **Automatic Scaling**: Redis Enterprise provides automatic scaling
+    capabilities, which can adjust the database's configuration based on
+    the current load. This ensures that the database can handle
+    fluctuating data volumes without manual intervention.
+
+- **Use Cases for Linear Scaling**:
+  - **High-Volume Data Processing**: For applications that process large
+    volumes of data, linear scaling ensures that the database can handle
+    the increased load without compromising performance.
+  - **Real-Time Analytics**: Real-time analytics applications can
+    benefit from linear scaling, as it allows for the processing of
+    large datasets in real-time.
+  - **High-Availability Systems**: Systems that require high
+    availability can benefit from linear scaling, as it ensures that the
+    database can handle failures and continue to operate without
+    downtime.
+
+
+# Distributed Caching in ASP.NET Core with Redis
+https://sahansera.dev/distributed-caching-aspnet-core-redis/
