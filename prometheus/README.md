@@ -580,6 +580,8 @@ with the tool.
 ## Chapter 2
 
 
+
+
 # Learning Prometheus hands-on
 
 Learning Prometheus through a hands-on scenario like setting up a Docker
