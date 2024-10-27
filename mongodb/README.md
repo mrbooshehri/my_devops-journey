@@ -899,12 +899,12 @@ for analytics and reporting:
 
 By default, MongoDB replica set secondaries don’t accept read operations unless specified. To enable reading from a secondary:
 
-	 - **Use the `readPreference` Option**: Set `readPreference` to
-		 `secondary` or `secondaryPreferred` in your client connection.
-			- `secondary`: Directs all read operations to secondaries only.
-			- `secondaryPreferred`: Allows reads from the secondary when
-				available but falls back to the primary if no secondary is
-				available.
+- **Use the `readPreference` Option**: Set `readPreference` to
+  `secondary` or `secondaryPreferred` in your client connection.
+ 	- `secondary`: Directs all read operations to secondaries only.
+ 	- `secondaryPreferred`: Allows reads from the secondary when
+ 		available but falls back to the primary if no secondary is
+ 		available.
 
 **Example** (in MongoDB shell):
 
@@ -943,14 +943,14 @@ replication data and can be used for read operations.
 
 3. **Use Aggregation Pipelines and Analytics Queries on the Secondary**
 
-	 - **Run Aggregations**: MongoDB’s aggregation framework is highly
-		 efficient for analytics tasks, such as grouping, filtering, and
-		 calculating metrics across large datasets. The secondary node can
-		 handle these queries without impacting the primary.
-	 - **Scheduled Reporting Jobs**: Schedule your analytics queries
-		 (e.g., for daily or hourly reports) to run on this secondary,
-		 ensuring that these tasks do not interfere with real-time,
-		 transactional workloads on the primary.
+- **Run Aggregations**: MongoDB’s aggregation framework is highly
+  efficient for analytics tasks, such as grouping, filtering, and
+  calculating metrics across large datasets. The secondary node can
+  handle these queries without impacting the primary.
+- **Scheduled Reporting Jobs**: Schedule your analytics queries
+  (e.g., for daily or hourly reports) to run on this secondary,
+  ensuring that these tasks do not interfere with real-time,
+  transactional workloads on the primary.
 
 Example of running an aggregation query on the secondary:
 
@@ -974,19 +974,20 @@ asynchronously, there may be a **delay** between when data is written to
 the primary and when it is available on the secondary. If near-real-time
 data is necessary:
 
-	 - Monitor **replication lag** to ensure that the delay remains within
-		 acceptable limits for your analytics tasks.
-	 - For data with strict consistency requirements, configure **read
-		 concern** levels, though it may still be challenging to have
-		 real-time data with secondary reads.
+- Monitor **replication lag** to ensure that the delay remains within
+  acceptable limits for your analytics tasks.
+- For data with strict consistency requirements, configure **read
+  concern** levels, though it may still be challenging to have
+  real-time data with secondary reads.
 
 5. **Set Up Backup and Disaster Recovery from the Analytics Node**
 
 You can also use this analytics-dedicated secondary node for **backup** purposes:
-	 - Schedule backups during off-peak hours to avoid interference with
-		 reporting jobs.
-	 - Use **MongoDB’s built-in backup tools** or third-party solutions to
-		 create regular backups from the secondary node.
+
+- Schedule backups during off-peak hours to avoid interference with
+  reporting jobs.
+- Use **MongoDB’s built-in backup tools** or third-party solutions to
+  create regular backups from the secondary node.
 
 ### High Availability & Fault Tolerance
 
@@ -1009,31 +1010,34 @@ replica sets.
 **Replica Sets**: The Core of High Availability
 A replica set is a cluster of MongoDB servers that store the same data
 and consist of:
-	 - **Primary Node**: The primary handles all write operations and
-		 replicates data to secondary nodes.
-	 - **Secondary Nodes**: These nodes replicate data from the primary to
-		 maintain an up-to-date copy. They can also be used to handle read
-		 operations, particularly in high-read environments.
-	 - **Arbiters (optional)**: Arbiters are voting members that don’t
-		 store data but participate in elections to help decide which
-		 secondary should become the primary during failover. Arbiters are
-		 often used in odd-numbered replica sets to avoid split-brain
-		 scenarios.
+
+- **Primary Node**: The primary handles all write operations and
+  replicates data to secondary nodes.
+- **Secondary Nodes**: These nodes replicate data from the primary to
+  maintain an up-to-date copy. They can also be used to handle read
+  operations, particularly in high-read environments.
+- **Arbiters (optional)**: Arbiters are voting members that don’t
+  store data but participate in elections to help decide which
+  secondary should become the primary during failover. Arbiters are
+  often used in odd-numbered replica sets to avoid split-brain
+  scenarios.
 
 	**Automatic Failover Process**
-		 - MongoDB monitors the health and availability of each node within the replica set. If the primary node fails or becomes unavailable, the remaining members initiate an **automatic election** to elect a new primary.
-		 - During an election, secondary nodes communicate to identify the eligible member with the latest data to promote as the new primary.
-		 - Once elected, the new primary node takes over handling all write operations, while other nodes update their replication state to reflect the change.
-		 - This failover process is usually completed within seconds, minimizing downtime.
+	
+- MongoDB monitors the health and availability of each node within the replica set. If the primary node fails or becomes unavailable, the remaining members initiate an **automatic election** to elect a new primary.
+- During an election, secondary nodes communicate to identify the eligible member with the latest data to promote as the new primary.
+- Once elected, the new primary node takes over handling all write operations, while other nodes update their replication state to reflect the change.
+- This failover process is usually completed within seconds, minimizing downtime.
 
-	**Read Preferences and Load Distribution**
-		 - MongoDB allows **read preferences** that distribute read operations across secondary nodes, improving availability by reducing the load on the primary.
-		 - You can set `readPreference` options like `secondary`, `secondaryPreferred`, or `nearest`, ensuring that applications can continue to access data even if the primary node is temporarily unavailable.
+**Read Preferences and Load Distribution**
 
-	**Advantages of High Availability in MongoDB**
-		 - **Automatic Failover** ensures that applications experience minimal interruption during node failures.
-		 - **Distributed Reads** allow read-heavy applications to offload work to secondary nodes, enhancing availability.
-		 - **Data Redundancy** ensures multiple copies of the data are maintained, reducing the risk of data loss.
+- MongoDB allows **read preferences** that distribute read operations across secondary nodes, improving availability by reducing the load on the primary.
+- You can set `readPreference` options like `secondary`, `secondaryPreferred`, or `nearest`, ensuring that applications can continue to access data even if the primary node is temporarily unavailable.
+
+**Advantages of High Availability in MongoDB**
+- **Automatic Failover** ensures that applications experience minimal interruption during node failures.
+- **Distributed Reads** allow read-heavy applications to offload work to secondary nodes, enhancing availability.
+- **Data Redundancy** ensures multiple copies of the data are maintained, reducing the risk of data loss.
 
 2. **Fault Tolerance in MongoDB**
 
@@ -1041,89 +1045,98 @@ Fault Tolerance is about ensuring MongoDB continues operating smoothly
 even when components fail, avoiding data loss and minimizing service
 disruption.
 
-	**Fault Tolerance in Replica Sets**
-	Replica sets achieve fault tolerance by replicating data across multiple nodes. In MongoDB:
-		 - **Data Replication**: Each write operation on the primary is
-			 automatically replicated to the secondaries. Even if a node
-			 fails, other nodes maintain data consistency.
-		 - **Write Concerns**: MongoDB’s write concerns allow control over
-			 how many nodes must confirm a write before it’s considered
-			 successful. For example:
-				- **`"majority"`** ensures that the write is confirmed by the
-					majority of replica set members, reducing the chance of data
-					loss.
-				- **`w: 2` or higher** specifies the exact number of nodes that
-					must acknowledge a write, offering flexibility in balancing
-					fault tolerance and performance.
+**Fault Tolerance in Replica Sets** Replica sets achieve fault tolerance
+by replicating data across multiple nodes. In MongoDB:
 
-	**Fault Tolerance in Sharded Clusters**
-	In a **sharded cluster**, data is horizontally distributed across
-	multiple shards (each a replica set). Sharded clusters enhance fault
-	tolerance through:
-		 - **Data Distribution**: Data is spread across multiple shards, and
-			 each shard has its own replica set for redundancy.
-		 - **Config Servers**: Config servers store metadata about data
-			 distribution across shards. MongoDB uses multiple config servers
-			 in a replica set to avoid single points of failure.
-		 - **Mongos Routing Layer**: The `mongos` query router directs
-			 client requests to the correct shard(s). Multiple `mongos`
-			 instances can be deployed to distribute client connections,
-			 providing redundancy in case one `mongos` node fails.
+- **Data Replication**: Each write operation on the primary is
+  automatically replicated to the secondaries. Even if a node
+  fails, other nodes maintain data consistency.
+- **Write Concerns**: MongoDB’s write concerns allow control over
+  how many nodes must confirm a write before it’s considered
+  successful. For example:
+ 	- **`"majority"`** ensures that the write is confirmed by the
+ 		majority of replica set members, reducing the chance of data
+ 		loss.
+ 	- **`w: 2` or higher** specifies the exact number of nodes that
+ 		must acknowledge a write, offering flexibility in balancing
+ 		fault tolerance and performance.
 
-	**Example Scenario of Fault Tolerance in a Sharded Cluster** Consider
-	a sharded cluster with three shards, each a replica set. If a primary
-	node in one shard fails:
-		 - The replica set initiates an election, promoting a secondary node
-			 to primary.
-		 - Client requests routed through `mongos` continue to reach the new
-			 primary without interruption.
-		 - If a shard becomes completely unavailable, the other shards
-			 continue operating, so parts of the application that don’t rely
-			 on that specific shard can remain functional.
+**Fault Tolerance in Sharded Clusters** In a **sharded cluster**, data
+is horizontally distributed across multiple shards (each a replica set).
+Sharded clusters enhance fault tolerance through:
 
-	**Preventing Data Loss with Backup and Recovery Strategies** Fault
-	tolerance also involves preventing permanent data loss through:
-		 - **Point-in-Time Backups**: Use backup solutions to capture
-			 consistent snapshots of the database at regular intervals.
-		 - **Continuous Data Archiving**: Some implementations allow for
-			 continuous backup of oplogs (operation logs), enabling recovery
-			 to a specific point in time.
-		 - **Disaster Recovery Planning**: Implement geographic distribution
-			 of replica set nodes across multiple data centers to handle data
-			 center failures.
+- **Data Distribution**: Data is spread across multiple shards, and
+  each shard has its own replica set for redundancy.
+- **Config Servers**: Config servers store metadata about data
+  distribution across shards. MongoDB uses multiple config servers
+  in a replica set to avoid single points of failure.
+- **Mongos Routing Layer**: The `mongos` query router directs
+  client requests to the correct shard(s). Multiple `mongos`
+  instances can be deployed to distribute client connections,
+  providing redundancy in case one `mongos` node fails.
+
+**Example Scenario of Fault Tolerance in a Sharded Cluster** Consider
+a sharded cluster with three shards, each a replica set. If a primary
+node in one shard fails:
+
+- The replica set initiates an election, promoting a secondary node
+  to primary.
+- Client requests routed through `mongos` continue to reach the new
+  primary without interruption.
+- If a shard becomes completely unavailable, the other shards
+  continue operating, so parts of the application that don’t rely
+  on that specific shard can remain functional.
+
+**Preventing Data Loss with Backup and Recovery Strategies** Fault
+tolerance also involves preventing permanent data loss through:
+
+- **Point-in-Time Backups**: Use backup solutions to capture
+  consistent snapshots of the database at regular intervals.
+- **Continuous Data Archiving**: Some implementations allow for
+  continuous backup of oplogs (operation logs), enabling recovery
+  to a specific point in time.
+- **Disaster Recovery Planning**: Implement geographic distribution
+  of replica set nodes across multiple data centers to handle data
+  center failures.
 
 **Best Practices for High Availability and Fault Tolerance in MongoDB**
 
 1. **Design Replica Sets with Odd Numbers of Members**:
-	 - To avoid split-brain scenarios and ensure a reliable majority vote
-		 during elections, configure replica sets with an odd number of
-		 members (e.g., 3, 5, or 7 nodes).
+
+- To avoid split-brain scenarios and ensure a reliable majority vote
+  during elections, configure replica sets with an odd number of
+  members (e.g., 3, 5, or 7 nodes).
 
 2. **Geographic Distribution of Replica Nodes**:
-	 - Place replica nodes across multiple data centers or availability
-		 zones to mitigate the impact of localized failures, like network or
-		 power outages.
+
+- Place replica nodes across multiple data centers or availability
+  zones to mitigate the impact of localized failures, like network or
+  power outages.
 
 3. **Use Appropriate Write Concerns and Read Preferences**:
-	 - Set the correct write concern (`w: majority` for critical writes)
-		 to prevent data loss and ensure durability.
-	 - Use read preferences to offload read operations to secondaries,
-		 reducing the primary load.
+
+- Set the correct write concern (`w: majority` for critical writes)
+  to prevent data loss and ensure durability.
+- Use read preferences to offload read operations to secondaries,
+  reducing the primary load.
 
 4. **Monitoring and Alerts**:
-	 - Use MongoDB’s monitoring tools or third-party solutions to track
-		 node health, replication lag, and performance metrics.
-	 - Set up alerts for significant events, such as node failures, high
-		 replication lag, or slow elections, to respond quickly.
+
+- Use MongoDB’s monitoring tools or third-party solutions to track
+  node health, replication lag, and performance metrics.
+- Set up alerts for significant events, such as node failures, high
+  replication lag, or slow elections, to respond quickly.
 
 5. **Regular Backup and Testing**:
-	 - Implement regular backup schedules and perform recovery tests to
-		 ensure data integrity and swift disaster recovery.
+
+- Implement regular backup schedules and perform recovery tests to
+  ensure data integrity and swift disaster recovery.
 
 6. **Balance Between HA and Cost**:
-	 - HA and FT come with additional infrastructure costs. While more
-		 nodes enhance redundancy and failover, balancing the architecture
-		 with the application’s uptime requirements and budget is essential.
+
+- HA and FT come with additional infrastructure costs. While more
+  nodes enhance redundancy and failover, balancing the architecture
+  with the application’s uptime requirements and budget is essential.
 
 **Example of High Availability & Fault Tolerance Setup**
 
@@ -1173,33 +1186,36 @@ enhance the ability of MongoDB to handle larger datasets and more
 simultaneous requests by increasing hardware resources, which allows
 for:
 
-	 - **Faster Query Processing**: More RAM means more of the working
-		 dataset can fit in memory, reducing disk I/O and speeding up query
-		 responses.
-	 - **Larger Storage Capacity**: With more storage, you can store
-		 larger databases on a single server without needing to partition
-		 the data.
+- **Faster Query Processing**: More RAM means more of the working
+  dataset can fit in memory, reducing disk I/O and speeding up query
+  responses.
+- **Larger Storage Capacity**: With more storage, you can store
+  larger databases on a single server without needing to partition
+  the data.
 
-	**Advantages of Vertical Scaling**
-		 - **Simplicity**: Adding resources to a single server is
-			 straightforward and doesn’t require complex architecture changes.
-		 - **Enhanced Performance**: For read-heavy applications, adding RAM
-			 and CPU can lead to significant performance improvements since
-			 MongoDB can handle larger working sets in memory.
+**Advantages of Vertical Scaling**
 
-	**Limitations of Vertical Scaling**
-		 - **Hardware Limits**: There’s a limit to how much you can scale
-			 up; at some point, adding more resources has diminishing returns.
-		 - **Single Point of Failure**: If the vertically scaled server
-			 fails, your entire MongoDB service is impacted.
-		 - **Cost**: High-performance hardware is often expensive, and
-			 scaling up indefinitely is not always financially feasible.
+- **Simplicity**: Adding resources to a single server is
+ straightforward and doesn’t require complex architecture changes.
+- **Enhanced Performance**: For read-heavy applications, adding RAM
+ and CPU can lead to significant performance improvements since
+ MongoDB can handle larger working sets in memory.
 
-	**Use Cases for Vertical Scaling**
-		 - Smaller applications or startups that can rely on a single server
-			 in the short term.
-		 - Development and testing environments that don’t need complex
-			 distributed setups.
+**Limitations of Vertical Scaling**
+
+- **Hardware Limits**: There’s a limit to how much you can scale
+  up; at some point, adding more resources has diminishing returns.
+- **Single Point of Failure**: If the vertically scaled server
+  fails, your entire MongoDB service is impacted.
+- **Cost**: High-performance hardware is often expensive, and
+	scaling up indefinitely is not always financially feasible.
+
+**Use Cases for Vertical Scaling**
+
+- Smaller applications or startups that can rely on a single server
+  in the short term.
+- Development and testing environments that don’t need complex
+  distributed setups.
 
 
 2. **Horizontal Scaling (Scaling Out)**
@@ -1220,49 +1236,54 @@ request volumes.
 	reside.
 
 	**Components of a Sharded Cluster**
-		 - **Shards**: Each shard contains a portion of the data and can be
-			 a replica set for high availability.
-		 - **Config Servers**: Store metadata about data distribution, such
-			 as the range of shard keys and the location of data chunks.
-		 - **mongos Router**: Acts as an entry point for applications,
-			 routing client requests to the appropriate shards.
 
-	**Shard Key Selection**
-	Choosing an effective shard key is crucial for an efficient sharded
-	cluster. The shard key should:
-		 - **Distribute Data Evenly**: Ensure that data is evenly
-			 distributed across shards to avoid hotspots.
-		 - **Support Query Patterns**: Choose a shard key that aligns with
-			 your application’s common queries to prevent excessive
-			 cross-shard operations.
+- **Shards**: Each shard contains a portion of the data and can be
+  a replica set for high availability.
+- **Config Servers**: Store metadata about data distribution, such
+  as the range of shard keys and the location of data chunks.
+- **mongos Router**: Acts as an entry point for applications,
+  routing client requests to the appropriate shards.
 
-	**Advantages of Horizontal Scaling**
-		 - **Increased Capacity**: You can store and process petabytes of
-			 data by distributing it across many servers.
-		 - **High Availability**: Each shard is typically a replica set, so
-			 MongoDB can continue to function even if individual nodes fail.
-		 - **Flexible Scaling**: As data grows, you can add more shards to
-			 handle increased load.
+**Shard Key Selection**
+Choosing an effective shard key is crucial for an efficient sharded
+cluster. The shard key should:
 
-	**Disadvantages of Horizontal Scaling**
-		 - **Complexity**: Setting up and maintaining a sharded cluster
-			 requires careful planning, especially with shard key selection
-			 and cluster monitoring.
-		 - **Cross-Shard Queries**: Inefficient shard keys can lead to
-			 queries that need data from multiple shards, which can impact
-			 performance.
-		 - **Data Distribution Management**: MongoDB automatically moves
-			 data between shards to maintain balance, which can introduce
-			 overhead if not optimized.
+- **Distribute Data Evenly**: Ensure that data is evenly
+  distributed across shards to avoid hotspots.
+- **Support Query Patterns**: Choose a shard key that aligns with
+  your application’s common queries to prevent excessive
+  cross-shard operations.
 
-	**Use Cases for Horizontal Scaling**
-		 - Applications with large and continuously growing datasets, such
-			 as social media platforms, IoT applications, and e-commerce
-			 sites.
-		 - Use cases where uptime and high availability are critical, as
-			 sharded clusters provide redundancy.
-		 - Scenarios where workloads are read-heavy or write-heavy,
-			 distributing the load across shards.
+**Advantages of Horizontal Scaling**
+
+- **Increased Capacity**: You can store and process petabytes of
+  data by distributing it across many servers.
+- **High Availability**: Each shard is typically a replica set, so
+  MongoDB can continue to function even if individual nodes fail.
+- **Flexible Scaling**: As data grows, you can add more shards to
+	handle increased load.
+
+**Disadvantages of Horizontal Scaling**
+
+- **Complexity**: Setting up and maintaining a sharded cluster
+  requires careful planning, especially with shard key selection
+  and cluster monitoring.
+- **Cross-Shard Queries**: Inefficient shard keys can lead to
+  queries that need data from multiple shards, which can impact
+  performance.
+- **Data Distribution Management**: MongoDB automatically moves
+  data between shards to maintain balance, which can introduce
+  overhead if not optimized.
+
+**Use Cases for Horizontal Scaling**
+
+- Applications with large and continuously growing datasets, such
+  as social media platforms, IoT applications, and e-commerce
+  sites.
+- Use cases where uptime and high availability are critical, as
+  sharded clusters provide redundancy.
+- Scenarios where workloads are read-heavy or write-heavy,
+  distributing the load across shards.
 
 3. **Scaling Read and Write Operations**
 
@@ -1270,23 +1291,25 @@ In addition to vertical and horizontal scaling, MongoDB provides several
 strategies to scale **read** and **write** operations specifically,
 ensuring performance remains stable as usage grows.
 
-	**Scaling Reads**
-		 - **Read from Secondaries**: In a replica set, you can configure
-			 `readPreference` to route read operations to secondary nodes,
-			 reducing the load on the primary node.
-		 - **Distributed Reads in Sharded Clusters**: In a sharded setup,
-			 data is spread across multiple shards, allowing concurrent read
-			 operations on different shards, which significantly improves read
-			 performance.
+**Scaling Reads**
 
-	**Scaling Writes**
-		 - **Sharding for Write Scalability**: By distributing data across
-			 shards, MongoDB allows for concurrent writes to different shards,
-			 avoiding bottlenecks on a single primary node.
-		 - **Write Concerns and Acknowledgments**: MongoDB’s write concerns
-			 allow for flexibility in ensuring data durability versus
-			 performance. For example, setting a lower write concern can
-			 increase write speed but reduce redundancy.
+- **Read from Secondaries**: In a replica set, you can configure
+  `readPreference` to route read operations to secondary nodes,
+  reducing the load on the primary node.
+- **Distributed Reads in Sharded Clusters**: In a sharded setup,
+  data is spread across multiple shards, allowing concurrent read
+  operations on different shards, which significantly improves read
+  performance.
+
+**Scaling Writes**
+
+- **Sharding for Write Scalability**: By distributing data across
+  shards, MongoDB allows for concurrent writes to different shards,
+  avoiding bottlenecks on a single primary node.
+- **Write Concerns and Acknowledgments**: MongoDB’s write concerns
+  allow for flexibility in ensuring data durability versus
+  performance. For example, setting a lower write concern can
+  increase write speed but reduce redundancy.
 
 4. **Replica Sets for High Availability and Read Scaling**
 
@@ -1296,12 +1319,12 @@ Each node in a replica set maintains a copy of the data, and MongoDB can
 distribute read requests across secondary nodes to reduce the load on
 the primary.
 
-	 - **Automatic Failover**: If the primary node fails, a secondary is
-		 automatically promoted to primary, ensuring minimal downtime.
-	 - **Optimized Read Operations**: Configure applications to read from
-		 secondaries based on data freshness requirements. For example, if
-		 some analytics queries don’t require real-time data, they can run
-		 on a secondary, leaving the primary for critical operations.
+- **Automatic Failover**: If the primary node fails, a secondary is
+  automatically promoted to primary, ensuring minimal downtime.
+- **Optimized Read Operations**: Configure applications to read from
+  secondaries based on data freshness requirements. For example, if
+  some analytics queries don’t require real-time data, they can run
+  on a secondary, leaving the primary for critical operations.
 
 
 5. **Combining Scaling Strategies for Optimal Performance**
@@ -1311,24 +1334,22 @@ horizontal scaling, along with replica sets, to achieve both high
 performance and resilience. Here’s how these strategies work together in
 practice:
 
-	 - **Start with Vertical Scaling**: Initially, many applications start
-		 with a vertically scaled replica set to meet performance needs. A
-		 single high-powered server or a small replica set can handle
-		 moderate workloads effectively.
-	 - **Transition to Sharding as Data Grows**: As the data grows and
-		 load increases, sharding becomes necessary to maintain performance.
-		 Sharding introduces horizontal scaling to manage data distribution
-		 and increase write scalability.
-	 - **Optimize Reads and Writes**: In a sharded environment,
-		 distributing reads across secondaries and writes across shards
-		 further enhances scalability, especially when workloads are
-		 substantial and continuous.
-	 - **Regularly Monitor and Reassess**: MongoDB provides monitoring
-		 tools to help assess the efficiency of your scaling strategy.
-		 Regularly evaluate performance metrics, replication lag, and shard
-		 distribution to maintain optimal performance.
-
----
+- **Start with Vertical Scaling**: Initially, many applications start
+  with a vertically scaled replica set to meet performance needs. A
+  single high-powered server or a small replica set can handle
+  moderate workloads effectively.
+- **Transition to Sharding as Data Grows**: As the data grows and
+  load increases, sharding becomes necessary to maintain performance.
+  Sharding introduces horizontal scaling to manage data distribution
+  and increase write scalability.
+- **Optimize Reads and Writes**: In a sharded environment,
+  distributing reads across secondaries and writes across shards
+  further enhances scalability, especially when workloads are
+  substantial and continuous.
+- **Regularly Monitor and Reassess**: MongoDB provides monitoring
+  tools to help assess the efficiency of your scaling strategy.
+  Regularly evaluate performance metrics, replication lag, and shard
+  distribution to maintain optimal performance.
 
 **Summary Table: MongoDB Scaling Strategies**
 
@@ -1339,8 +1360,6 @@ practice:
 | **Read Scaling**          | Distribute reads across secondaries or shards            | Read-heavy workloads, analytics, and reporting              | Reduces load on primary node                                | Replication lag affects data freshness                     |
 | **Write Scaling**         | Distribute writes across shards                          | Write-heavy workloads, high transaction requirements        | Increases write capacity, avoids bottlenecks on primary     | Requires effective shard key selection                     |
 | **Combined Scaling**      | Mix of vertical, horizontal, read, and write scaling     | Dynamic applications with varying read/write needs          | Optimal performance, redundancy, and flexibility            | Higher cost and complexity, needs regular maintenance      |
-
-
 
 ### Performance Optimization
 
@@ -1394,7 +1413,7 @@ Optimizing queries can significantly improve MongoDB’s performance,
 especially for high-traffic applications. Here are best practices for
 designing efficient queries:
 
-	**Query Optimization Techniques**
+**Query Optimization Techniques**
 
 - **Use Projection**: Limit the fields returned by queries to only
   those necessary using projections. This reduces the amount of
@@ -1410,7 +1429,7 @@ designing efficient queries:
   documents, use batch operations (`bulkWrite`, `$in`, etc.) to
   reduce overhead.
 
-	**Use Aggregation Framework for Complex Queries**
+**Use Aggregation Framework for Complex Queries**
 
  MongoDB’s **aggregation pipeline** is optimized for large data
  processing and is more efficient than map-reduce.
@@ -1418,7 +1437,6 @@ designing efficient queries:
  `$lookup` to filter, transform, and summarize data.
  Apply `$match` early in the pipeline to filter out unwanted
  documents quickly, reducing data passed to subsequent stages.
-
 
 3. **Data Modeling for Performance**
 
