@@ -575,108 +575,108 @@ look at each architecture, with use cases and reasons for choosing them.
  - If the primary node fails, an automatic election promotes one of
 	 the secondaries to primary, ensuring high availability.
 
-       > In MongoDB replica sets, the **election process** is a critical mechanism that enables high availability and fault tolerance. When the **primary node fails**, an election is triggered to promote one of the secondary nodes to the new primary, ensuring that write operations can continue without significant interruption. Here’s an in-depth look at how this election process works.
-       > 
-       > **1. When is an Election Triggered?**
-       >    - Elections happen under specific conditions, primarily when:
-       >       - The primary node becomes unresponsive (e.g., due to network issues, hardware failure).
-       >       - The primary node is deliberately shut down for maintenance or restarted.
-       >       - The primary node is isolated due to a network partition.
-       >    - Secondary nodes detect the primary’s unavailability through a heartbeat mechanism, where nodes regularly "ping" each other. If a primary node fails to respond within a specific time (default 10 seconds), eligible secondaries start the election process.
-       > 
-       > **2. Election Process Overview**
-       >    - The goal of the election process is to choose a new primary node from the available secondary nodes.
-       >    - The election process includes several steps:
-       >       1. **Triggering Election**: When a secondary detects the primary node is down, it starts the election process by increasing its election term and sending a `vote request` to other nodes.
-       >       2. **Voting**: Each member of the replica set can cast a single vote. To win, a node needs more than half of the votes, also known as a **majority**. For example, in a 5-node replica set, a candidate needs at least 3 votes to become primary.
-       >       3. **Selecting the New Primary**:
-       >          - MongoDB follows a set of criteria for eligibility and priority to determine which secondary becomes the new primary:
-       >             - **Node Priority**: Each node has a priority setting, with higher priority nodes favored to become primary. The default priority is `1`, and nodes with `priority: 0` will never become primary.
-       >             - **Replication Status**: Nodes that are most up-to-date with the primary (i.e., closest to the latest oplog entry) are preferred. This ensures minimal data loss during the transition.
-       >             - **Voting Members Only**: Only voting members (not arbiters or delayed members) can become primary.
-       >       4. **Confirmation**: Once a node receives a majority of votes, it assumes the role of the primary. The new primary then notifies all other members in the replica set to update their state.
-       > 
-       > **3. Election Scenarios and Examples**
-       >    - **Single Primary, Multiple Secondaries**: Suppose there’s a replica set with 3 nodes (1 primary, 2 secondaries). If the primary node fails:
-       >       - One of the secondaries requests an election.
-       >       - Each node votes, and as long as one secondary receives a majority (2 out of 3 votes), it becomes the new primary.
-       >    
-       >    - **Network Partition**:
-       >       - Imagine a 5-node setup split into two partitions (3 nodes in one partition, 2 in another).
-       >       - Only the partition with a majority (3 nodes) can elect a new primary. The other partition remains in a secondary state and cannot elect a primary due to lack of majority votes.
-       > 
-       > **4. Role of Arbiter Nodes**
-       >    - An **arbiter node** is a lightweight member in a replica set that doesn’t hold data but participates in elections to break ties.
-       >    - In setups with an even number of members (e.g., 2 primaries, 1 arbiter), the arbiter can cast a vote to help maintain a majority in case of a failure.
-       >    - **Important**: Arbiter nodes do not become primary; they exist solely to vote.
-       > 
-       > **5. Configuration Options for Elections**
-       >    - **Priority**: Each member in the replica set has a `priority` setting, determining its preference to become primary.
-       >       - Higher priority (e.g., `priority: 2`) nodes are more likely to be elected primary over lower priority ones (e.g., `priority: 1`).
-       >       - Nodes with `priority: 0` cannot become primary, useful for secondary nodes designated only for backup or analytical purposes.
-       >    - **Election Timeout (heartbeatTimeoutSecs)**: Determines the time MongoDB waits before triggering an election after the primary is deemed unavailable. A shorter timeout speeds up failover but can be sensitive to transient network issues.
-       > 
-       > **6. Failover Time and Downtime Minimization**
-       >    - The election process typically completes within seconds, though it can vary based on factors like network latency and the timeout configuration.
-       >    - To minimize downtime:
-       >       - **Optimize Heartbeat Settings**: Configuring heartbeat timeouts to match your infrastructure’s reliability can make failovers more responsive.
-       >       - **Monitor Node Health**: MongoDB monitoring tools like MongoDB Atlas and Ops Manager can alert on primary node failures, allowing proactive measures.
-       > 
-       > **7. Election Limitations and Constraints**
-       >    - **Minority Partitions**: If a partitioned group of nodes can’t form a majority, they remain secondary-only, unable to elect a new primary. This is known as a “split-brain” scenario.
-			 >
-			 > > In MongoDB replica sets, a **split-brain scenario** refers to a situation where a network partition divides the replica set into isolated groups of nodes, each with an incomplete view of the entire cluster. This can lead to **data inconsistency** and **availability issues** if more than one partition attempts to elect a new primary and continue operations independently.
-       > > 
-       > > **Understanding Split-Brain in MongoDB**
-       > > 
-       > > In a typical split-brain scenario:
-       > >    - The network partition causes the replica set members to lose connectivity with each other, splitting them into two (or more) isolated groups.
-       > >    - If neither group has a **majority of votes** (i.e., more than half of the total replica set members), no new primary can be elected, which prevents split-brain issues.
-       > >    - However, if each partition believes it has enough nodes to continue operations independently (especially if you have an even number of nodes), both might elect separate primaries, leading to potential **data divergence** as each primary accepts independent writes. 
-       > > 
-       > > **Why Split-Brain is Problematic**
-       > > 1. **Data Inconsistency**: If two partitions each have a primary, they may process write operations independently, resulting in different data versions on each primary. When the partitions reconnect, data conflicts can arise.
-       > > 2. **Data Loss Risks**: Once connectivity is restored, one of the primaries will have to step down, and any data written to it since the partition began may be lost or need complex reconciliation.
-       > > 3. **Application-Level Issues**: Applications might receive different data from each partition, potentially leading to inconsistent reads and stale data.
-       > > 
-       > > **Example of Split-Brain in a MongoDB Replica Set**
-       > > Imagine a 4-node replica set with:
-       > >    - 1 primary node
-       > >    - 2 secondary nodes
-       > >    - 1 arbiter (non-data-bearing, voting-only)
-       > > 
-       > >    - If a network partition splits the replica set into two groups (e.g., primary + 1 secondary in one partition, and the other secondary + arbiter in the other), each group could still believe it has a majority:
-       > >       - The first group has the primary and a secondary (two voting members), so it might try to continue operations.
-       > >       - The second group has a secondary and an arbiter (two voting members), so it also might attempt to elect a new primary.
-       > > 
-       > >    - With each partition having a perceived majority, they may each have a primary, leading to **dual-primary** writes and data inconsistencies.
-       > > 
-       > > **How MongoDB Mitigates Split-Brain Scenarios**
-       > > 
-       > > 1. **Majority Rule**: MongoDB requires a majority of votes to elect a primary. This means in most cases, a minority partition will stay as secondaries and won’t promote a new primary, preventing data inconsistency.
-       > > 2. **Arbiter Placement**: Adding an arbiter to an odd number of voting members can help avoid split-brain. For example, in a 3-node replica set (1 primary, 2 secondaries), an arbiter ensures a single primary can be elected by acting as a tie-breaker.
-       > > 3. **Write Concerns**: By using `writeConcern: "majority"`, applications can ensure that write operations only succeed if confirmed by a majority of nodes. This can prevent unintended data divergence by enforcing consistent writes across the network partitions.
-       > > 4. **Priority and Tags**: Configuring node priorities and replica set tags enables precise control over election behavior, ensuring that certain nodes in particular regions or data centers are more likely to become primary in case of a partition.
-       > > 
-       > > **Best Practices to Prevent Split-Brain Scenarios**
-       > > 
-       > > 1. **Use an Odd Number of Voting Members**: Odd numbers of voting nodes (e.g., 3, 5, or 7) reduce the chance of split-brain by making it easier to form a majority partition.
-       > > 2. **Place Arbiters Strategically**: Arbiters are inexpensive resources that act as tiebreakers. They’re best used in situations where a network partition might otherwise lead to dual-primary situations.
-       > > 3. **Monitor Network Health and Connectivity**: Monitoring the network between nodes allows you to detect partitions early and reduce failover time, minimizing the risk of split-brain.
-			 >
-       >    - **Intermittent Network Failures**: Flaky network conditions can trigger unnecessary elections, potentially causing instability. This can be mitigated with proper timeout settings.
-       >    - **Node Priority Misconfiguration**: Misconfigured priorities may result in unintended nodes becoming primary. It’s essential to set priorities that reflect your intended failover preferences.
-       > 
-       > 
-       > **Example Scenario**
-       > Consider a **3-node replica set** (1 primary, 2 secondaries), all with default priorities.
-       > 
-       > 1. **Primary Fails**: A secondary node detects that the primary is unreachable and starts an election.
-       > 2. **Election Request**: The initiating secondary sends vote requests to the other secondary.
-       > 3. **Winning the Election**: As soon as it gets 2 votes (a majority), this secondary becomes the new primary.
-       > 4. **Notification**: The new primary broadcasts its new role to other nodes in the replica set, allowing them to re-establish connections with it for read/write operations.
-       > 
-       > MongoDB’s election mechanism is essential for maintaining high availability, as it ensures that the replica set can quickly promote a new primary, maintaining uninterrupted write access and enabling applications to rely on consistent uptime.
+   > In MongoDB replica sets, the **election process** is a critical mechanism that enables high availability and fault tolerance. When the **primary node fails**, an election is triggered to promote one of the secondary nodes to the new primary, ensuring that write operations can continue without significant interruption. Here’s an in-depth look at how this election process works.
+   > 
+   > **1. When is an Election Triggered?**
+   >    - Elections happen under specific conditions, primarily when:
+   >       - The primary node becomes unresponsive (e.g., due to network issues, hardware failure).
+   >       - The primary node is deliberately shut down for maintenance or restarted.
+   >       - The primary node is isolated due to a network partition.
+   >    - Secondary nodes detect the primary’s unavailability through a heartbeat mechanism, where nodes regularly "ping" each other. If a primary node fails to respond within a specific time (default 10 seconds), eligible secondaries start the election process.
+   > 
+   > **2. Election Process Overview**
+   >    - The goal of the election process is to choose a new primary node from the available secondary nodes.
+   >    - The election process includes several steps:
+   >       1. **Triggering Election**: When a secondary detects the primary node is down, it starts the election process by increasing its election term and sending a `vote request` to other nodes.
+   >       2. **Voting**: Each member of the replica set can cast a single vote. To win, a node needs more than half of the votes, also known as a **majority**. For example, in a 5-node replica set, a candidate needs at least 3 votes to become primary.
+   >       3. **Selecting the New Primary**:
+   >          - MongoDB follows a set of criteria for eligibility and priority to determine which secondary becomes the new primary:
+   >             - **Node Priority**: Each node has a priority setting, with higher priority nodes favored to become primary. The default priority is `1`, and nodes with `priority: 0` will never become primary.
+   >             - **Replication Status**: Nodes that are most up-to-date with the primary (i.e., closest to the latest oplog entry) are preferred. This ensures minimal data loss during the transition.
+   >             - **Voting Members Only**: Only voting members (not arbiters or delayed members) can become primary.
+   >       4. **Confirmation**: Once a node receives a majority of votes, it assumes the role of the primary. The new primary then notifies all other members in the replica set to update their state.
+   > 
+   > **3. Election Scenarios and Examples**
+   >    - **Single Primary, Multiple Secondaries**: Suppose there’s a replica set with 3 nodes (1 primary, 2 secondaries). If the primary node fails:
+   >       - One of the secondaries requests an election.
+   >       - Each node votes, and as long as one secondary receives a majority (2 out of 3 votes), it becomes the new primary.
+   >    
+   >    - **Network Partition**:
+   >       - Imagine a 5-node setup split into two partitions (3 nodes in one partition, 2 in another).
+   >       - Only the partition with a majority (3 nodes) can elect a new primary. The other partition remains in a secondary state and cannot elect a primary due to lack of majority votes.
+   > 
+   > **4. Role of Arbiter Nodes**
+   >    - An **arbiter node** is a lightweight member in a replica set that doesn’t hold data but participates in elections to break ties.
+   >    - In setups with an even number of members (e.g., 2 primaries, 1 arbiter), the arbiter can cast a vote to help maintain a majority in case of a failure.
+   >    - **Important**: Arbiter nodes do not become primary; they exist solely to vote.
+   > 
+   > **5. Configuration Options for Elections**
+   >    - **Priority**: Each member in the replica set has a `priority` setting, determining its preference to become primary.
+   >       - Higher priority (e.g., `priority: 2`) nodes are more likely to be elected primary over lower priority ones (e.g., `priority: 1`).
+   >       - Nodes with `priority: 0` cannot become primary, useful for secondary nodes designated only for backup or analytical purposes.
+   >    - **Election Timeout (heartbeatTimeoutSecs)**: Determines the time MongoDB waits before triggering an election after the primary is deemed unavailable. A shorter timeout speeds up failover but can be sensitive to transient network issues.
+   > 
+   > **6. Failover Time and Downtime Minimization**
+   >    - The election process typically completes within seconds, though it can vary based on factors like network latency and the timeout configuration.
+   >    - To minimize downtime:
+   >       - **Optimize Heartbeat Settings**: Configuring heartbeat timeouts to match your infrastructure’s reliability can make failovers more responsive.
+   >       - **Monitor Node Health**: MongoDB monitoring tools like MongoDB Atlas and Ops Manager can alert on primary node failures, allowing proactive measures.
+   > 
+   > **7. Election Limitations and Constraints**
+   >    - **Minority Partitions**: If a partitioned group of nodes can’t form a majority, they remain secondary-only, unable to elect a new primary. This is known as a “split-brain” scenario.
+ 	 
+ 	  > In MongoDB replica sets, a **split-brain scenario** refers to a situation where a network partition divides the replica set into isolated groups of nodes, each with an incomplete view of the entire cluster. This can lead to **data inconsistency** and **availability issues** if more than one partition attempts to elect a new primary and continue operations independently.
+   > > 
+   > > **Understanding Split-Brain in MongoDB**
+   > > 
+   > > In a typical split-brain scenario:
+   > >    - The network partition causes the replica set members to lose connectivity with each other, splitting them into two (or more) isolated groups.
+   > >    - If neither group has a **majority of votes** (i.e., more than half of the total replica set members), no new primary can be elected, which prevents split-brain issues.
+   > >    - However, if each partition believes it has enough nodes to continue operations independently (especially if you have an even number of nodes), both might elect separate primaries, leading to potential **data divergence** as each primary accepts independent writes. 
+   > > 
+   > > **Why Split-Brain is Problematic**
+   > > 1. **Data Inconsistency**: If two partitions each have a primary, they may process write operations independently, resulting in different data versions on each primary. When the partitions reconnect, data conflicts can arise.
+   > > 2. **Data Loss Risks**: Once connectivity is restored, one of the primaries will have to step down, and any data written to it since the partition began may be lost or need complex reconciliation.
+   > > 3. **Application-Level Issues**: Applications might receive different data from each partition, potentially leading to inconsistent reads and stale data.
+   > > 
+   > > **Example of Split-Brain in a MongoDB Replica Set**
+   > > Imagine a 4-node replica set with:
+   > >    - 1 primary node
+   > >    - 2 secondary nodes
+   > >    - 1 arbiter (non-data-bearing, voting-only)
+   > > 
+   > >    - If a network partition splits the replica set into two groups (e.g., primary + 1 secondary in one partition, and the other secondary + arbiter in the other), each group could still believe it has a majority:
+   > >       - The first group has the primary and a secondary (two voting members), so it might try to continue operations.
+   > >       - The second group has a secondary and an arbiter (two voting members), so it also might attempt to elect a new primary.
+   > > 
+   > >    - With each partition having a perceived majority, they may each have a primary, leading to **dual-primary** writes and data inconsistencies.
+   > > 
+   > > **How MongoDB Mitigates Split-Brain Scenarios**
+   > > 
+   > > 1. **Majority Rule**: MongoDB requires a majority of votes to elect a primary. This means in most cases, a minority partition will stay as secondaries and won’t promote a new primary, preventing data inconsistency.
+   > > 2. **Arbiter Placement**: Adding an arbiter to an odd number of voting members can help avoid split-brain. For example, in a 3-node replica set (1 primary, 2 secondaries), an arbiter ensures a single primary can be elected by acting as a tie-breaker.
+   > > 3. **Write Concerns**: By using `writeConcern: "majority"`, applications can ensure that write operations only succeed if confirmed by a majority of nodes. This can prevent unintended data divergence by enforcing consistent writes across the network partitions.
+   > > 4. **Priority and Tags**: Configuring node priorities and replica set tags enables precise control over election behavior, ensuring that certain nodes in particular regions or data centers are more likely to become primary in case of a partition.
+   > > 
+   > > **Best Practices to Prevent Split-Brain Scenarios**
+   > > 
+   > > 1. **Use an Odd Number of Voting Members**: Odd numbers of voting nodes (e.g., 3, 5, or 7) reduce the chance of split-brain by making it easier to form a majority partition.
+   > > 2. **Place Arbiters Strategically**: Arbiters are inexpensive resources that act as tiebreakers. They’re best used in situations where a network partition might otherwise lead to dual-primary situations.
+   > > 3. **Monitor Network Health and Connectivity**: Monitoring the network between nodes allows you to detect partitions early and reduce failover time, minimizing the risk of split-brain.
+ 	 
+   >    - **Intermittent Network Failures**: Flaky network conditions can trigger unnecessary elections, potentially causing instability. This can be mitigated with proper timeout settings.
+   >    - **Node Priority Misconfiguration**: Misconfigured priorities may result in unintended nodes becoming primary. It’s essential to set priorities that reflect your intended failover preferences.
+   > 
+   > 
+   > **Example Scenario**
+   > Consider a **3-node replica set** (1 primary, 2 secondaries), all with default priorities.
+   > 
+   > 1. **Primary Fails**: A secondary node detects that the primary is unreachable and starts an election.
+   > 2. **Election Request**: The initiating secondary sends vote requests to the other secondary.
+   > 3. **Winning the Election**: As soon as it gets 2 votes (a majority), this secondary becomes the new primary.
+   > 4. **Notification**: The new primary broadcasts its new role to other nodes in the replica set, allowing them to re-establish connections with it for read/write operations.
+   > 
+   > MongoDB’s election mechanism is essential for maintaining high availability, as it ensures that the replica set can quickly promote a new primary, maintaining uninterrupted write access and enabling applications to rely on consistent uptime.
 
 - **Use Cases**:
  - **Production Applications**: Ideal for applications where high
